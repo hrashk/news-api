@@ -1,1 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/news?currentSchema=news_schema
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  main:
+    banner-mode: off
 
