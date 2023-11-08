@@ -19,9 +19,6 @@ It will have sample news and comments created in the db.
 mvn spring-boot:test-run
 ```
 
-The following URL shows the available REST API end points and example of their usage: http://localhost:8080
-You may interact with the API via Postman or another similar tool.
-
 ## Running from jar
 You will need a running postgres instance that you can spin up with docker-compose.
 
@@ -42,8 +39,17 @@ java -jar target/news-api-0.0.1-SNAPSHOT.jar
 
 ## Available commands
 
-The rest api services allow viewing, adding, editing and removing users, news, comments and categories.
-All of the entities are stored in a postgres db.
+The rest api services manages authors, news, their categories, and comments.
+The following URL shows the Swagger / Open API documentation of the available end points. Here you may try out
+individual requests.
+
+http://localhost:8080/swagger-ui/index.html
+
+The next URL shows the definition of the end points in json format. It can be imported into a Postman collection,
+for example.
+
+http://localhost:8080/v3/api-docs
+
 
 ## Configuration
 
