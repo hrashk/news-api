@@ -13,7 +13,8 @@ public class TestNewsApiApplication {
     @Bean
     @ServiceConnection
     PostgreSQLContainer<?> postgresContainer() {
-        return new PostgreSQLContainer<>(DockerImageName.parse("postgres:16-alpine"));
+        return new PostgreSQLContainer<>(DockerImageName.parse("postgres:16-alpine"))
+                .withInitScript("init.sql");
     }
 
     public static void main(String[] args) {
