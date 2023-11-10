@@ -1,0 +1,16 @@
+[
+  {
+    "id": 3,
+    "firstName": "Holy",
+    "lastName": "Moly",
+    "createdAt": "2011-10-13",
+    "modifiedAt": "2011-10-13"
+  },
+  {
+    "id": 13,
+    "firstName": "Syster",
+    "lastName": "Pauly",
+    "createdAt": "2011-07-17",
+    "modifiedAt": "2011-08-21"
+  }
+]
