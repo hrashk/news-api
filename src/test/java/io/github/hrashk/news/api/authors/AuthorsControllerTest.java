@@ -2,6 +2,7 @@ package io.github.hrashk.news.api.authors;
 
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -36,13 +37,15 @@ class AuthorsControllerTest {
     }
 
     @Test
-    void getAllAuthors(@Value("classpath:authors/authors.json") Resource expected) throws Exception {
+    void getAllAuthors(@Value("classpath:authors/authors.json") Resource r) throws Exception {
+        String expectedPayload = r.getContentAsString(StandardCharsets.UTF_8);
+        Mockito.when(service.findAll()).thenReturn(TestData.twoAuthors());
 
         mvc.perform(get("/authors"))
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        content().json(expected.getContentAsString(StandardCharsets.UTF_8))
+                        content().json(expectedPayload)
                 );
     }
 }
