@@ -1,6 +1,7 @@
 package io.github.hrashk.news.api.authors;
 
 import io.github.hrashk.news.api.PostgreSQLInitializer;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -18,6 +19,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AuthorServiceTest {
     @Autowired
     private AuthorService service;
+    @Autowired
+    private AuthorRepository repository;
+
+
+    @BeforeEach
+    void insertAuthors() {
+        repository.saveAll(TestData.twoAuthors());
+    }
 
     @Test
     void findAll() {
