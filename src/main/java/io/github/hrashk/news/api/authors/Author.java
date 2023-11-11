@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.Instant;
+import java.time.ZonedDateTime;
 
 @Entity
 @Table(name = "authors")
@@ -28,8 +28,8 @@ public class Author {
     private String lastName;
 
     @CreationTimestamp
-    private Instant createdAt;
+    private ZonedDateTime createdAt;
 
     @UpdateTimestamp
-    private Instant updatedAt;
+    private ZonedDateTime updatedAt;
 }
