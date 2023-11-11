@@ -15,9 +15,9 @@ public class AuthorsController {
     private final AuthorsMapper mapper;
 
     @GetMapping
-    public ResponseEntity<List<AuthorResponse>> getAllAuthors() {
+    public ResponseEntity<AuthorListResponse> getAllAuthors() {
         List<Author> authors = service.findAll();
-        return ResponseEntity.ok(mapper.toResponseList(authors));
+        return ResponseEntity.ok(new AuthorListResponse(mapper.toResponseList(authors)));
     }
 
     @PostMapping

@@ -37,7 +37,7 @@ class AuthorsControllerTest {
     }
 
     @Test
-    void getAllAuthors(@Value("classpath:authors/authors.json") Resource r) throws Exception {
+    void getAllAuthors(@Value("classpath:authors/find_all_authors_response.json") Resource r) throws Exception {
         String expectedPayload = r.getContentAsString(StandardCharsets.UTF_8);
         Mockito.when(service.findAll()).thenReturn(TestData.twoAuthors());
 
