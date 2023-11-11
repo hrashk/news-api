@@ -1,6 +1,8 @@
 package io.github.hrashk.news.api.authors;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,8 +23,13 @@ public class AuthorsController {
     }
 
     @PostMapping
-    public ResponseEntity<String> addAuthor() {
-        return ResponseEntity.ok("Author added");
+    public ResponseEntity<AuthorResponse> addAuthor(@RequestBody UpsertAuthorRequest authorRequest) {
+        Author a = service.save(mapper.toAuthor(authorRequest));
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(mapper.toResponse(a));
     }
 
     @GetMapping("/{id}")

@@ -21,4 +21,12 @@ public class TestData {
                 .build();
         return List.of(a1, a2);
     }
+
+    static Author jackDoe() {
+        return Author.builder()
+                .id(3L)
+                .firstName("Jack")
+                .lastName("Doe")
+                .build();
+    }
 }

@@ -9,4 +9,6 @@ import java.util.List;
 public interface AuthorsMapper {
     AuthorResponse toResponse(Author author);
     List<AuthorResponse> toResponseList(Collection<Author> authors);
+
+    Author toAuthor(UpsertAuthorRequest authorRequest);
 }
