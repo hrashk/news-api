@@ -17,4 +17,8 @@ public class AuthorService {
     public Author save(Author author) {
         return repository.save(author);
     }
+
+    public Author findById(Long id) {
+        return Author.builder().id(id).build();
+    }
 }

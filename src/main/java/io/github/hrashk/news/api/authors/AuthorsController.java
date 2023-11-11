@@ -33,8 +33,10 @@ public class AuthorsController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<String> getAuthorById(@PathVariable String id) {
-        return ResponseEntity.ok("Author " + id);
+    public ResponseEntity<AuthorResponse> getAuthorById(@PathVariable Long id) {
+        Author a = service.findById(id);
+
+        return ResponseEntity.ok(mapper.toResponse(a));
     }
 
     @PutMapping("/{id}")

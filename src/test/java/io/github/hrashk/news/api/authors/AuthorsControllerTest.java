@@ -67,8 +67,19 @@ class AuthorsControllerTest {
                         status().isCreated(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
                         content().json(expectedPayload)
-                )
-        ;
+                );
     }
 
+    @Test
+    void findByExistingId(@Value("classpath:authors/create_response.json") Resource r) throws Exception {
+        String expectedPayload = r.getContentAsString(StandardCharsets.UTF_8);
+        Mockito.when(service.findById(Mockito.anyLong())).thenReturn(TestData.jackDoe());
+
+        mvc.perform(get("/api/v1/authors/3"))
+                .andExpectAll(
+                        status().isOk(),
+                        content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
+                        content().json(expectedPayload)
+                );
+    }
 }
