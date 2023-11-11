@@ -19,6 +19,6 @@ public class AuthorService {
     }
 
     public Author findById(Long id) {
-        return Author.builder().id(id).build();
+        return repository.findById(id).orElseThrow();
     }
 }

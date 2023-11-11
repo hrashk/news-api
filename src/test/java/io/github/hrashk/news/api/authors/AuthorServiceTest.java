@@ -10,6 +10,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
@@ -22,10 +24,12 @@ class AuthorServiceTest {
     @Autowired
     private AuthorRepository repository;
 
+    private List<Author> savedEntities;
+
 
     @BeforeEach
     void insertAuthors() {
-        repository.saveAll(TestData.twoAuthors());
+        savedEntities = repository.saveAll(TestData.twoAuthors());
     }
 
     @Test
@@ -43,5 +47,14 @@ class AuthorServiceTest {
         Author saved = service.save(a);
 
         assertThat(saved.getId()).as("Author id").isNotNull();
+    }
+
+    @Test
+    void findById() {
+        Author expected = savedEntities.get(0);
+
+        Author actual = service.findById(expected.getId());
+
+        assertThat(actual).isEqualTo(expected);
     }
 }
