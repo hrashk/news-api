@@ -6,4 +6,6 @@ spring:
     driver-class-name: org.postgresql.Driver
   main:
     banner-mode: off
+  jpa:
+    generate-ddl: true
 
