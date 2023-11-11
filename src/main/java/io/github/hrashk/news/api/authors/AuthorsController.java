@@ -12,11 +12,12 @@ import java.util.List;
 public class AuthorsController {
 
     private final AuthorService service;
+    private final AuthorsMapper mapper;
 
     @GetMapping
     public ResponseEntity<List<AuthorResponse>> getAllAuthors() {
         List<Author> authors = service.findAll();
-        return ResponseEntity.ok(List.of(AuthorResponse.EMPTY, AuthorResponse.EMPTY));
+        return ResponseEntity.ok(mapper.toResponseList(authors));
     }
 
     @PostMapping

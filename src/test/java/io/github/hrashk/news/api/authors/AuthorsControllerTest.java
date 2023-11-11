@@ -1,10 +1,13 @@
 package io.github.hrashk.news.api.authors;
 
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -23,6 +26,14 @@ class AuthorsControllerTest {
 
     @MockBean
     private AuthorService service;
+
+    @TestConfiguration
+    static class AppConfig {
+        @Bean
+        AuthorsMapper mapper() {
+            return Mappers.getMapper(AuthorsMapper.class);
+        }
+    }
 
     @Test
     void getAllAuthors(@Value("classpath:authors/authors.json") Resource expected) throws Exception {
