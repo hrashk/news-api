@@ -32,4 +32,16 @@ class AuthorServiceTest {
     void findAll() {
         assertThat(service.findAll()).isNotEmpty();
     }
+
+    @Test
+    void saveNew() {
+        var a = Author.builder()
+                .firstName("Jack")
+                .lastName("Doe")
+                .build();
+
+        Author saved = service.save(a);
+
+        assertThat(saved.getId()).as("Author id").isNotNull();
+    }
 }

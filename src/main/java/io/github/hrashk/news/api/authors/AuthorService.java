@@ -15,6 +15,6 @@ public class AuthorService {
     }
 
     public Author save(Author author) {
-        return author;
+        return repository.save(author);
     }
 }
