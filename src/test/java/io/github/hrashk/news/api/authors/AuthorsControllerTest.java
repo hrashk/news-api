@@ -41,7 +41,7 @@ class AuthorsControllerTest {
         String expectedPayload = r.getContentAsString(StandardCharsets.UTF_8);
         Mockito.when(service.findAll()).thenReturn(TestData.twoAuthors());
 
-        mvc.perform(get("/authors"))
+        mvc.perform(get("/api/v1/authors"))
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
