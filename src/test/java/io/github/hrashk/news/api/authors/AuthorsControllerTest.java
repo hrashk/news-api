@@ -46,43 +46,43 @@ class AuthorsControllerTest {
 
     @Test
     void getAllAuthors(@Value("classpath:authors/find_all_response.json") Resource r) throws Exception {
-        String expectedPayload = r.getContentAsString(StandardCharsets.UTF_8);
+        String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
         Mockito.when(service.findAll()).thenReturn(TestData.twoAuthors());
 
         mvc.perform(get("/api/v1/authors"))
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        content().json(expectedPayload)
+                        content().json(expectedResponse)
                 );
     }
 
     @Test
     void addAuthor(@Value("classpath:authors/upsert_response.json") Resource r) throws Exception {
-        String expectedPayload = r.getContentAsString(StandardCharsets.UTF_8);
-        var request = new UpsertAuthorRequest("Jack", "Doe");
+        String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
+        String requestPayload = objectMapper.writeValueAsString(new UpsertAuthorRequest("Jack", "Doe"));
         Mockito.when(service.add(Mockito.any(Author.class))).thenReturn(TestData.jackDoe());
 
         mvc.perform(post("/api/v1/authors")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(requestPayload))
                 .andExpectAll(
                         status().isCreated(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        content().json(expectedPayload)
+                        content().json(expectedResponse)
                 );
     }
 
     @Test
     void findByExistingId(@Value("classpath:authors/upsert_response.json") Resource r) throws Exception {
-        String expectedPayload = r.getContentAsString(StandardCharsets.UTF_8);
+        String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
         Mockito.when(service.findById(Mockito.anyLong())).thenReturn(TestData.jackDoe());
 
         mvc.perform(get("/api/v1/authors/3"))
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        content().json(expectedPayload)
+                        content().json(expectedResponse)
                 );
     }
 }
