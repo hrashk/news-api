@@ -40,7 +40,7 @@ class AuthorServiceTest {
                 .lastName("Doe")
                 .build();
 
-        Author saved = service.add(a);
+        Author saved = service.addOrReplace(a);
 
         assertThat(saved.getId()).as("Author id").isNotNull();
     }
@@ -54,7 +54,7 @@ class AuthorServiceTest {
                 .lastName("Doe")
                 .build();
 
-        Author saved = service.add(a);
+        Author saved = service.addOrReplace(a);
 
         assertThat(saved.getId()).as("Author id").isNotEqualTo(originalId);
     }

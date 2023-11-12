@@ -20,8 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.nio.charset.StandardCharsets;
 import java.util.NoSuchElementException;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -62,7 +61,7 @@ class AuthorsControllerTest {
     void addAuthor(@Value("classpath:authors/upsert_response.json") Resource r) throws Exception {
         String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
         String requestPayload = objectMapper.writeValueAsString(new UpsertAuthorRequest("Jack", "Doe"));
-        Mockito.when(service.add(Mockito.any(Author.class))).thenReturn(TestData.jackDoe());
+        Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(TestData.jackDoe());
 
         mvc.perform(post("/api/v1/authors")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -95,5 +94,26 @@ class AuthorsControllerTest {
                 .andExpectAll(
                         status().isNotFound()
                 );
+    }
+
+    @Test
+    void updateByValid(@Value("classpath:authors/upsert_response.json") Resource r) throws Exception {
+        String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
+        String requestPayload = objectMapper.writeValueAsString(new UpsertAuthorRequest("Jack", "Doe"));
+        Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(TestData.jackDoe());
+
+        mvc.perform(put("/api/v1/authors/3")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestPayload))
+                .andExpectAll(
+                        status().isOk(),
+                        content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
+                        content().json(expectedResponse)
+                );
+    }
+
+    @Test
+    void deleteAuthor() throws Exception {
+        mvc.perform(delete("/api/v1/authors/3"));
     }
 }

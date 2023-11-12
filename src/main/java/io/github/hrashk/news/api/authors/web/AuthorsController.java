@@ -27,7 +27,7 @@ public class AuthorsController {
 
     @PostMapping
     public ResponseEntity<AuthorResponse> addAuthor(@RequestBody UpsertAuthorRequest authorRequest) {
-        Author a = service.add(mapper.toAuthor(authorRequest));
+        Author a = service.addOrReplace(mapper.toAuthor(authorRequest));
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -48,8 +48,12 @@ public class AuthorsController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateAuthor(@PathVariable String id) {
-        return ResponseEntity.ok("Author " + id);
+    public ResponseEntity<AuthorResponse> updateAuthor(@PathVariable Long id, @RequestBody UpsertAuthorRequest authorRequest) {
+        Author author = mapper.toAuthor(authorRequest);
+        author.setId(id);
+        Author saved = service.addOrReplace(author);
+
+        return ResponseEntity.ok(mapper.toResponse(saved));
     }
 
     @DeleteMapping("/{id}")
