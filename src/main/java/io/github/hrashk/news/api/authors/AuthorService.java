@@ -26,6 +26,6 @@ public class AuthorService {
     }
 
     public boolean contains(Long id) {
-        return false;
+        return repository.existsById(id);
     }
 }
