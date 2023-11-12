@@ -8,7 +8,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class AuthorService {
-    private final AuthorRepository repository;
+    private final AuthorsRepository repository;
 
     public List<Author> findAll() {
         return repository.findAll();
