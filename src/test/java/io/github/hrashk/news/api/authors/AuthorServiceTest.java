@@ -86,4 +86,13 @@ class AuthorServiceTest {
     void doesNotContainInvalidId() {
         assertThat(service.contains(INVALID_ID)).isFalse();
     }
+
+    @Test
+    void removeById() {
+        Long id = savedEntities.get(0).getId();
+
+        service.removeById(id);
+
+        assertThat(service.contains(id)).isFalse();
+    }
 }

@@ -63,7 +63,12 @@ public class AuthorsController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteAuthor(@PathVariable String id) {
-        return ResponseEntity.ok("Author " + id);
+    public ResponseEntity<Void> deleteAuthor(@PathVariable Long id) {
+        if (service.contains(id)) {
+            service.removeById(id);
+
+            return ResponseEntity.noContent().build();
+        } else
+            return ResponseEntity.notFound().build();
     }
 }

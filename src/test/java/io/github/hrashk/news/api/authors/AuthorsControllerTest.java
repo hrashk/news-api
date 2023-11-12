@@ -143,7 +143,24 @@ class AuthorsControllerTest {
     }
 
     @Test
-    void deleteAuthor() throws Exception {
-        mvc.perform(delete("/api/v1/authors/3"));
+    void deleteByValidId() throws Exception {
+        Mockito.when(service.contains(Mockito.anyLong())).thenReturn(true);
+
+        mvc.perform(delete("/api/v1/authors/3"))
+                .andExpectAll(
+                        status().isNoContent()
+                );
+
+        Mockito.verify(service).removeById(Mockito.eq(3L));
+    }
+
+    @Test
+    void deleteByInvalidId() throws Exception {
+        Mockito.when(service.contains(Mockito.anyLong())).thenReturn(false);
+
+        mvc.perform(delete("/api/v1/authors/713"))
+                .andExpectAll(
+                        status().isNotFound()
+                );
     }
 }
