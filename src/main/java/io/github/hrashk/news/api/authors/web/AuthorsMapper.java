@@ -12,4 +12,9 @@ public interface AuthorsMapper {
     List<AuthorResponse> toResponseList(Collection<Author> authors);
 
     Author toAuthor(UpsertAuthorRequest authorRequest);
+    Author toAuthor(Long id, UpsertAuthorRequest authorRequest);
+
+    default AuthorListResponse toResponse(List<Author> authors) {
+        return new AuthorListResponse(toResponseList(authors));
+    }
 }

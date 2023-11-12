@@ -22,7 +22,8 @@ public class AuthorsController {
     @GetMapping
     public ResponseEntity<AuthorListResponse> getAllAuthors() {
         List<Author> authors = service.findAll();
-        return ResponseEntity.ok(new AuthorListResponse(mapper.toResponseList(authors)));
+
+        return ResponseEntity.ok(mapper.toResponse(authors));
     }
 
     @PostMapping
@@ -44,9 +45,8 @@ public class AuthorsController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AuthorResponse> updateAuthor(@PathVariable Long id, @RequestBody UpsertAuthorRequest authorRequest) {
-        Author author = mapper.toAuthor(authorRequest);
-        author.setId(id);
+    public ResponseEntity<AuthorResponse> updateAuthor(@PathVariable Long id, @RequestBody UpsertAuthorRequest request) {
+        Author author = mapper.toAuthor(id, request);
 
         boolean authorExisted = service.contains(id);
         Author saved = service.addOrReplace(author);
