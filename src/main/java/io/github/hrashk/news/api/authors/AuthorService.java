@@ -18,6 +18,9 @@ public class AuthorService {
         return repository.save(author);
     }
 
+    /**
+     * @throws java.util.NoSuchElementException if id is not found
+     */
     public Author findById(Long id) {
         return repository.findById(id).orElseThrow();
     }

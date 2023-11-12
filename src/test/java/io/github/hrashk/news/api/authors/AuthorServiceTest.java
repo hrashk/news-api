@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ContainerJpaTest
 @Import(AuthorService.class)
@@ -58,11 +60,17 @@ class AuthorServiceTest {
     }
 
     @Test
-    void findById() {
+    void findByValidId() {
         Author expected = savedEntities.get(0);
 
         Author actual = service.findById(expected.getId());
 
         assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void findByInvalidId() {
+        assertThatThrownBy(() -> service.findById(11333L))
+                .isInstanceOf(NoSuchElementException.class);
     }
 }

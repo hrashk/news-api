@@ -18,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.charset.StandardCharsets;
+import java.util.NoSuchElementException;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -74,7 +75,7 @@ class AuthorsControllerTest {
     }
 
     @Test
-    void findByExistingId(@Value("classpath:authors/upsert_response.json") Resource r) throws Exception {
+    void findByValidId(@Value("classpath:authors/upsert_response.json") Resource r) throws Exception {
         String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
         Mockito.when(service.findById(Mockito.anyLong())).thenReturn(TestData.jackDoe());
 
@@ -83,6 +84,16 @@ class AuthorsControllerTest {
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
                         content().json(expectedResponse)
+                );
+    }
+
+    @Test
+    void findByInvalidId() throws Exception {
+        Mockito.when(service.findById(Mockito.anyLong())).thenThrow(NoSuchElementException.class);
+
+        mvc.perform(get("/api/v1/authors/713"))
+                .andExpectAll(
+                        status().isNotFound()
                 );
     }
 }

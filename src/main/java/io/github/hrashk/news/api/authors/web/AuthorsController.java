@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/v1/authors")
@@ -36,9 +37,14 @@ public class AuthorsController {
 
     @GetMapping("/{id}")
     public ResponseEntity<AuthorResponse> getAuthorById(@PathVariable Long id) {
-        Author a = service.findById(id);
+        try {
+            Author a = service.findById(id);
 
-        return ResponseEntity.ok(mapper.toResponse(a));
+            return ResponseEntity.ok(mapper.toResponse(a));
+        } catch (NoSuchElementException ex) {
+            return ResponseEntity.notFound().build();
+
+        }
     }
 
     @PutMapping("/{id}")
