@@ -12,7 +12,7 @@ public class SampleDataInjector implements CommandLineRunner {
     private final SampleDataGenerator generator = new SampleDataGenerator();
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         repository.saveAll(generator.sampleAuthors(10));
     }
 }
