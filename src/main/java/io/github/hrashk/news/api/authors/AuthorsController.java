@@ -24,7 +24,7 @@ public class AuthorsController {
 
     @PostMapping
     public ResponseEntity<AuthorResponse> addAuthor(@RequestBody UpsertAuthorRequest authorRequest) {
-        Author a = service.save(mapper.toAuthor(authorRequest));
+        Author a = service.add(mapper.toAuthor(authorRequest));
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

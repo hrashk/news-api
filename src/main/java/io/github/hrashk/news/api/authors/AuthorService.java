@@ -14,7 +14,7 @@ public class AuthorService {
         return repository.findAll();
     }
 
-    public Author save(Author author) {
+    public Author add(Author author) {
         return repository.save(author);
     }
 

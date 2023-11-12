@@ -32,15 +32,29 @@ class AuthorServiceTest {
     }
 
     @Test
-    void saveNew() {
+    void saveWithNullId() {
         var a = Author.builder()
                 .firstName("Jack")
                 .lastName("Doe")
                 .build();
 
-        Author saved = service.save(a);
+        Author saved = service.add(a);
 
         assertThat(saved.getId()).as("Author id").isNotNull();
+    }
+
+    @Test
+    void saveWithNonNullId() {
+        long originalId = 123123L;
+        var a = Author.builder()
+                .id(originalId)
+                .firstName("Jack")
+                .lastName("Doe")
+                .build();
+
+        Author saved = service.add(a);
+
+        assertThat(saved.getId()).as("Author id").isNotEqualTo(originalId);
     }
 
     @Test

@@ -58,7 +58,7 @@ class AuthorsControllerTest {
     void addAuthor(@Value("classpath:authors/create_response.json") Resource r) throws Exception {
         String expectedPayload = r.getContentAsString(StandardCharsets.UTF_8);
         var request = new UpsertAuthorRequest("Jack", "Doe");
-        Mockito.when(service.save(Mockito.any(Author.class))).thenReturn(TestData.jackDoe());
+        Mockito.when(service.add(Mockito.any(Author.class))).thenReturn(TestData.jackDoe());
 
         mvc.perform(post("/api/v1/authors")
                         .contentType(MediaType.APPLICATION_JSON)
