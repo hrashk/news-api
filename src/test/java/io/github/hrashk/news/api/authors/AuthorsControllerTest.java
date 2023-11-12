@@ -55,7 +55,7 @@ class AuthorsControllerTest {
     }
 
     @Test
-    void addAuthor(@Value("classpath:authors/create_response.json") Resource r) throws Exception {
+    void addAuthor(@Value("classpath:authors/upsert_response.json") Resource r) throws Exception {
         String expectedPayload = r.getContentAsString(StandardCharsets.UTF_8);
         var request = new UpsertAuthorRequest("Jack", "Doe");
         Mockito.when(service.add(Mockito.any(Author.class))).thenReturn(TestData.jackDoe());
@@ -71,7 +71,7 @@ class AuthorsControllerTest {
     }
 
     @Test
-    void findByExistingId(@Value("classpath:authors/create_response.json") Resource r) throws Exception {
+    void findByExistingId(@Value("classpath:authors/upsert_response.json") Resource r) throws Exception {
         String expectedPayload = r.getContentAsString(StandardCharsets.UTF_8);
         Mockito.when(service.findById(Mockito.anyLong())).thenReturn(TestData.jackDoe());
 
