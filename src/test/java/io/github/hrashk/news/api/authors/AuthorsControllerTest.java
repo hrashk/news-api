@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.nio.charset.StandardCharsets;
 import java.util.NoSuchElementException;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -71,6 +72,9 @@ class AuthorsControllerTest {
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
                         content().json(expectedResponse)
                 );
+
+        Mockito.verify(service).addOrReplace(Mockito.assertArg(a ->
+                assertThat(a).hasFieldOrPropertyWithValue("id", null)));
     }
 
     @Test
@@ -97,10 +101,12 @@ class AuthorsControllerTest {
     }
 
     @Test
-    void updateByValid(@Value("classpath:authors/upsert_response.json") Resource r) throws Exception {
+    void updateByValidId(@Value("classpath:authors/upsert_response.json") Resource r) throws Exception {
         String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
+
         String requestPayload = objectMapper.writeValueAsString(new UpsertAuthorRequest("Jack", "Doe"));
         Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(TestData.jackDoe());
+        Mockito.when(service.contains(Mockito.anyLong())).thenReturn(false);
 
         mvc.perform(put("/api/v1/authors/3")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -110,6 +116,30 @@ class AuthorsControllerTest {
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
                         content().json(expectedResponse)
                 );
+
+        Mockito.verify(service).addOrReplace(Mockito.assertArg(a ->
+                assertThat(a).hasFieldOrPropertyWithValue("id", 3L)));
+    }
+
+    @Test
+    void updateByInvalidId(@Value("classpath:authors/upsert_response.json") Resource r) throws Exception {
+        String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
+
+        String requestPayload = objectMapper.writeValueAsString(new UpsertAuthorRequest("Jack", "Doe"));
+        Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(TestData.jackDoe());
+        Mockito.when(service.contains(Mockito.anyLong())).thenReturn(true);
+
+        mvc.perform(put("/api/v1/authors/713")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestPayload))
+                .andExpectAll(
+                        status().isCreated(),
+                        content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
+                        content().json(expectedResponse)
+                );
+
+        Mockito.verify(service).addOrReplace(Mockito.assertArg(a ->
+                assertThat(a).hasFieldOrPropertyWithValue("id", 713L)));
     }
 
     @Test

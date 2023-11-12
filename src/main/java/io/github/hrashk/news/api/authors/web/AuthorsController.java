@@ -29,10 +29,7 @@ public class AuthorsController {
     public ResponseEntity<AuthorResponse> addAuthor(@RequestBody UpsertAuthorRequest authorRequest) {
         Author a = service.addOrReplace(mapper.toAuthor(authorRequest));
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(mapper.toResponse(a));
+        return created(mapper.toResponse(a));
     }
 
     @GetMapping("/{id}")
@@ -43,7 +40,6 @@ public class AuthorsController {
             return ResponseEntity.ok(mapper.toResponse(a));
         } catch (NoSuchElementException ex) {
             return ResponseEntity.notFound().build();
-
         }
     }
 
@@ -51,9 +47,19 @@ public class AuthorsController {
     public ResponseEntity<AuthorResponse> updateAuthor(@PathVariable Long id, @RequestBody UpsertAuthorRequest authorRequest) {
         Author author = mapper.toAuthor(authorRequest);
         author.setId(id);
-        Author saved = service.addOrReplace(author);
 
-        return ResponseEntity.ok(mapper.toResponse(saved));
+        boolean authorExisted = service.contains(id);
+        Author saved = service.addOrReplace(author);
+        AuthorResponse response = mapper.toResponse(saved);
+
+        return authorExisted ? created(response) : ResponseEntity.ok(response);
+    }
+
+    private static ResponseEntity<AuthorResponse> created(AuthorResponse response) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(response);
     }
 
     @DeleteMapping("/{id}")

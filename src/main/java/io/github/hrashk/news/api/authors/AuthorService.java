@@ -24,4 +24,8 @@ public class AuthorService {
     public Author findById(Long id) {
         return repository.findById(id).orElseThrow();
     }
+
+    public boolean contains(Long id) {
+        return false;
+    }
 }
