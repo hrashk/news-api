@@ -106,7 +106,7 @@ class AuthorsControllerTest {
 
         String requestPayload = objectMapper.writeValueAsString(new UpsertAuthorRequest("Jack", "Doe"));
         Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(TestData.jackDoe());
-        Mockito.when(service.contains(Mockito.anyLong())).thenReturn(false);
+        Mockito.when(service.contains(Mockito.anyLong())).thenReturn(true);
 
         mvc.perform(put("/api/v1/authors/3")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -127,7 +127,7 @@ class AuthorsControllerTest {
 
         String requestPayload = objectMapper.writeValueAsString(new UpsertAuthorRequest("Jack", "Doe"));
         Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(TestData.jackDoe());
-        Mockito.when(service.contains(Mockito.anyLong())).thenReturn(true);
+        Mockito.when(service.contains(Mockito.anyLong())).thenReturn(false);
 
         mvc.perform(put("/api/v1/authors/713")
                         .contentType(MediaType.APPLICATION_JSON)

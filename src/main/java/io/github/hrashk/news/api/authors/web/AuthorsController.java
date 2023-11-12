@@ -52,7 +52,7 @@ public class AuthorsController {
         Author saved = service.addOrReplace(author);
         AuthorResponse response = mapper.toResponse(saved);
 
-        return authorExisted ? created(response) : ResponseEntity.ok(response);
+        return authorExisted ? ResponseEntity.ok(response) : created(response);
     }
 
     private static ResponseEntity<AuthorResponse> created(AuthorResponse response) {
