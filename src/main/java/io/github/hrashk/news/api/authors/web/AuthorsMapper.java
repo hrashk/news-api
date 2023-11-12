@@ -1,5 +1,6 @@
-package io.github.hrashk.news.api.authors;
+package io.github.hrashk.news.api.authors.web;
 
+import io.github.hrashk.news.api.authors.Author;
 import org.mapstruct.Mapper;
 
 import java.util.Collection;

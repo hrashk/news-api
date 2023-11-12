@@ -1,6 +1,9 @@
 package io.github.hrashk.news.api.authors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.hrashk.news.api.authors.web.AuthorsController;
+import io.github.hrashk.news.api.authors.web.AuthorsMapper;
+import io.github.hrashk.news.api.authors.web.UpsertAuthorRequest;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mockito;

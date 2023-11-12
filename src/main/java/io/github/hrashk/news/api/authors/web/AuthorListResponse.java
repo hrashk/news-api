@@ -1,4 +1,4 @@
-package io.github.hrashk.news.api.authors;
+package io.github.hrashk.news.api.authors.web;
 
 import java.util.List;
 

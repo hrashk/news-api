@@ -1,5 +1,7 @@
-package io.github.hrashk.news.api.authors;
+package io.github.hrashk.news.api.authors.web;
 
+import io.github.hrashk.news.api.authors.Author;
+import io.github.hrashk.news.api.authors.AuthorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
