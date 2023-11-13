@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Controller
 @RequestMapping("/api/v1/news")
@@ -26,9 +27,13 @@ public class NewsController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<NewsResponse> getById(@PathVariable Long id) {
-        News news = service.findById(id);
+    public ResponseEntity<NewsResponse> getNewsById(@PathVariable Long id) {
+        try {
+            News news = service.findById(id);
 
-        return ResponseEntity.ok(mapper.toResponse(news));
+            return ResponseEntity.ok(mapper.toResponse(news));
+        } catch (NoSuchElementException ex) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

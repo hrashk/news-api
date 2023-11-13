@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.charset.StandardCharsets;
+import java.util.NoSuchElementException;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -62,6 +63,16 @@ class NewsControllerTest {
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
                         content().json(expectedResponse, true)
+                );
+    }
+
+    @Test
+    void findByInvalidId() throws Exception {
+        Mockito.when(service.findById(Mockito.eq(INVALID_ID))).thenThrow(NoSuchElementException.class);
+
+        mvc.perform(get("/api/v1/news/" + INVALID_ID))
+                .andExpectAll(
+                        status().isNotFound()
                 );
     }
 }
