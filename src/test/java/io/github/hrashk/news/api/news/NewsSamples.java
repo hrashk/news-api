@@ -28,4 +28,19 @@ public final class NewsSamples {
                 .updatedAt(LocalDateTime.parse("2011-10-13T00:00:00"))
                 .build();
     }
+
+    public static News withoutId() {
+        return News.builder()
+                .headline("Great news")
+                .content("Lorem ipsum dolor")
+                .build();
+    }
+
+    public static News withId() {
+        return News.builder()
+                .id(123123L)
+                .headline("Great news")
+                .content("Lorem ipsum dolor")
+                .build();
+    }
 }
