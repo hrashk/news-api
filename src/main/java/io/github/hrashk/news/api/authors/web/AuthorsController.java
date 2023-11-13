@@ -3,6 +3,7 @@ package io.github.hrashk.news.api.authors.web;
 import io.github.hrashk.news.api.authors.Author;
 import io.github.hrashk.news.api.authors.AuthorService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,9 +29,17 @@ public class AuthorsController {
 
     @PostMapping
     public ResponseEntity<AuthorResponse> addAuthor(@RequestBody UpsertAuthorRequest authorRequest) {
-        Author a = service.addOrReplace(mapper.toAuthor(authorRequest));
+        Author author = mapper.toAuthor(authorRequest);
+        Author saved = service.addOrReplace(author);
 
-        return created(mapper.toResponse(a));
+        return created(mapper.toResponse(saved));
+    }
+
+    private static ResponseEntity<AuthorResponse> created(AuthorResponse response) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(response);
     }
 
     @GetMapping("/{id}")
@@ -46,20 +55,16 @@ public class AuthorsController {
 
     @PutMapping("/{id}")
     public ResponseEntity<AuthorResponse> updateAuthor(@PathVariable Long id, @RequestBody UpsertAuthorRequest request) {
-        Author author = mapper.toAuthor(id, request);
+        try {
+            Author author = service.findById(id);
+            BeanUtils.copyProperties(request, author);
 
-        boolean authorExisted = service.contains(id);
-        Author saved = service.addOrReplace(author);
-        AuthorResponse response = mapper.toResponse(saved);
+            Author saved = service.addOrReplace(author);
 
-        return authorExisted ? ResponseEntity.ok(response) : created(response);
-    }
-
-    private static ResponseEntity<AuthorResponse> created(AuthorResponse response) {
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(response);
+            return ResponseEntity.ok(mapper.toResponse(saved));
+        } catch (NoSuchElementException ex) {
+            return addAuthor(request);
+        }
     }
 
     @DeleteMapping("/{id}")

@@ -27,6 +27,8 @@ public class TestData {
                 .id(3L)
                 .firstName("Jack")
                 .lastName("Doe")
+                .createdAt(LocalDateTime.parse("2011-07-17T00:00:00"))
+                .updatedAt(LocalDateTime.parse("2011-08-21T00:00:00"))
                 .build();
     }
 }

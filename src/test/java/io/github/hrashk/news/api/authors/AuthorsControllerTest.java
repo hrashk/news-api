@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.hrashk.news.api.authors.web.AuthorsController;
 import io.github.hrashk.news.api.authors.web.AuthorsMapper;
 import io.github.hrashk.news.api.authors.web.UpsertAuthorRequest;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mockito;
@@ -28,6 +29,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(AuthorsController.class)
 class AuthorsControllerTest {
 
+    private static final long VALID_ID = 3L;
+    private static final long INVALID_ID = 713L;
     @Autowired
     private MockMvc mvc;
 
@@ -74,7 +77,7 @@ class AuthorsControllerTest {
                 );
 
         Mockito.verify(service).addOrReplace(Mockito.assertArg(a ->
-                assertThat(a).hasFieldOrPropertyWithValue("id", null)));
+                assertThat(a.getId()).as("Author id").isNull()));
     }
 
     @Test
@@ -82,7 +85,7 @@ class AuthorsControllerTest {
         String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
         Mockito.when(service.findById(Mockito.anyLong())).thenReturn(TestData.jackDoe());
 
-        mvc.perform(get("/api/v1/authors/3"))
+        mvc.perform(get("/api/v1/authors/" + VALID_ID))
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
@@ -94,7 +97,7 @@ class AuthorsControllerTest {
     void findByInvalidId() throws Exception {
         Mockito.when(service.findById(Mockito.anyLong())).thenThrow(NoSuchElementException.class);
 
-        mvc.perform(get("/api/v1/authors/713"))
+        mvc.perform(get("/api/v1/authors/" + INVALID_ID))
                 .andExpectAll(
                         status().isNotFound()
                 );
@@ -105,10 +108,10 @@ class AuthorsControllerTest {
         String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
 
         String requestPayload = objectMapper.writeValueAsString(new UpsertAuthorRequest("Jack", "Doe"));
+        Mockito.when(service.findById(Mockito.eq(VALID_ID))).thenReturn(TestData.jackDoe());
         Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(TestData.jackDoe());
-        Mockito.when(service.contains(Mockito.anyLong())).thenReturn(true);
 
-        mvc.perform(put("/api/v1/authors/3")
+        mvc.perform(put("/api/v1/authors/" + VALID_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestPayload))
                 .andExpectAll(
@@ -117,8 +120,10 @@ class AuthorsControllerTest {
                         content().json(expectedResponse)
                 );
 
-        Mockito.verify(service).addOrReplace(Mockito.assertArg(a ->
-                assertThat(a).hasFieldOrPropertyWithValue("id", 3L)));
+        Mockito.verify(service).addOrReplace(Mockito.assertArg(a -> Assertions.assertAll(
+                () -> assertThat(a.getId()).as("Author id").isEqualTo(VALID_ID),
+                () -> assertThat(a.getCreatedAt()).as("Author created at").isNotNull()
+        )));
     }
 
     @Test
@@ -126,10 +131,10 @@ class AuthorsControllerTest {
         String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
 
         String requestPayload = objectMapper.writeValueAsString(new UpsertAuthorRequest("Jack", "Doe"));
+        Mockito.when(service.findById(Mockito.eq(INVALID_ID))).thenThrow(NoSuchElementException.class);
         Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(TestData.jackDoe());
-        Mockito.when(service.contains(Mockito.anyLong())).thenReturn(false);
 
-        mvc.perform(put("/api/v1/authors/713")
+        mvc.perform(put("/api/v1/authors/" + INVALID_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestPayload))
                 .andExpectAll(
@@ -139,26 +144,26 @@ class AuthorsControllerTest {
                 );
 
         Mockito.verify(service).addOrReplace(Mockito.assertArg(a ->
-                assertThat(a).hasFieldOrPropertyWithValue("id", 713L)));
+                assertThat(a.getId()).as("Author id").isNull()));
     }
 
     @Test
     void deleteByValidId() throws Exception {
         Mockito.when(service.contains(Mockito.anyLong())).thenReturn(true);
 
-        mvc.perform(delete("/api/v1/authors/3"))
+        mvc.perform(delete("/api/v1/authors/" + VALID_ID))
                 .andExpectAll(
                         status().isNoContent()
                 );
 
-        Mockito.verify(service).removeById(Mockito.eq(3L));
+        Mockito.verify(service).removeById(Mockito.eq(VALID_ID));
     }
 
     @Test
     void deleteByInvalidId() throws Exception {
         Mockito.when(service.contains(Mockito.anyLong())).thenReturn(false);
 
-        mvc.perform(delete("/api/v1/authors/713"))
+        mvc.perform(delete("/api/v1/authors/" + INVALID_ID))
                 .andExpectAll(
                         status().isNotFound()
                 );
