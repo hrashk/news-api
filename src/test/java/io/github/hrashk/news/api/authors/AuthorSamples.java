@@ -3,7 +3,7 @@ package io.github.hrashk.news.api.authors;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class TestData {
+public class AuthorSamples {
     static List<Author> twoAuthors() {
         var a1 = Author.builder()
                 .id(3L)

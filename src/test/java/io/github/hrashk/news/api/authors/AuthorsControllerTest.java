@@ -51,7 +51,7 @@ class AuthorsControllerTest {
     @Test
     void getAllAuthors(@Value("classpath:authors/find_all_response.json") Resource r) throws Exception {
         String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
-        Mockito.when(service.findAll()).thenReturn(TestData.twoAuthors());
+        Mockito.when(service.findAll()).thenReturn(AuthorSamples.twoAuthors());
 
         mvc.perform(get("/api/v1/authors"))
                 .andExpectAll(
@@ -65,7 +65,7 @@ class AuthorsControllerTest {
     void addAuthor(@Value("classpath:authors/upsert_response.json") Resource r) throws Exception {
         String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
         String requestPayload = objectMapper.writeValueAsString(new UpsertAuthorRequest("Jack", "Doe"));
-        Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(TestData.jackDoe());
+        Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(AuthorSamples.jackDoe());
 
         mvc.perform(post("/api/v1/authors")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -83,7 +83,7 @@ class AuthorsControllerTest {
     @Test
     void findByValidId(@Value("classpath:authors/upsert_response.json") Resource r) throws Exception {
         String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
-        Mockito.when(service.findById(Mockito.anyLong())).thenReturn(TestData.jackDoe());
+        Mockito.when(service.findById(Mockito.anyLong())).thenReturn(AuthorSamples.jackDoe());
 
         mvc.perform(get("/api/v1/authors/" + VALID_ID))
                 .andExpectAll(
@@ -108,8 +108,8 @@ class AuthorsControllerTest {
         String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
 
         String requestPayload = objectMapper.writeValueAsString(new UpsertAuthorRequest("Jack", "Doe"));
-        Mockito.when(service.findById(Mockito.eq(VALID_ID))).thenReturn(TestData.jackDoe());
-        Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(TestData.jackDoe());
+        Mockito.when(service.findById(Mockito.eq(VALID_ID))).thenReturn(AuthorSamples.jackDoe());
+        Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(AuthorSamples.jackDoe());
 
         mvc.perform(put("/api/v1/authors/" + VALID_ID)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -132,7 +132,7 @@ class AuthorsControllerTest {
 
         String requestPayload = objectMapper.writeValueAsString(new UpsertAuthorRequest("Jack", "Doe"));
         Mockito.when(service.findById(Mockito.eq(INVALID_ID))).thenThrow(NoSuchElementException.class);
-        Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(TestData.jackDoe());
+        Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(AuthorSamples.jackDoe());
 
         mvc.perform(put("/api/v1/authors/" + INVALID_ID)
                         .contentType(MediaType.APPLICATION_JSON)

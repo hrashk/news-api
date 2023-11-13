@@ -26,7 +26,7 @@ class AuthorServiceTest {
 
     @BeforeEach
     void insertAuthors() {
-        savedEntities = repository.saveAll(TestData.twoAuthors());
+        savedEntities = repository.saveAll(AuthorSamples.twoAuthors());
     }
 
     @Test
