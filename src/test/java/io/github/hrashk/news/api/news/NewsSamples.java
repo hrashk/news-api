@@ -1,5 +1,7 @@
 package io.github.hrashk.news.api.news;
 
+import io.github.hrashk.news.api.news.web.UpsertNewsRequest;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -42,5 +44,9 @@ public final class NewsSamples {
                 .headline("Great news")
                 .content("Lorem ipsum dolor")
                 .build();
+    }
+
+    public static UpsertNewsRequest greatNewsRequest() {
+        return new UpsertNewsRequest("Great news", "Lorem ipsum dolor");
     }
 }

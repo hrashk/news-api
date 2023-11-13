@@ -14,4 +14,6 @@ public interface NewsMapper {
     }
 
     NewsResponse toResponse(News news);
+
+    News toNews(UpsertNewsRequest newsRequest);
 }
