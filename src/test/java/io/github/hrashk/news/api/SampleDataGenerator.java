@@ -1,14 +1,15 @@
 package io.github.hrashk.news.api;
 
 import io.github.hrashk.news.api.authors.Author;
+import io.github.hrashk.news.api.categories.Category;
 import io.github.hrashk.news.api.news.News;
 import net.datafaker.Faker;
 
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.IntFunction;
-import java.util.stream.IntStream;
+import java.util.function.LongFunction;
+import java.util.stream.LongStream;
 
 public class SampleDataGenerator {
     private final Random random = ThreadLocalRandom.current();
@@ -22,9 +23,13 @@ public class SampleDataGenerator {
         return generateSample(count, this::aRandomNews);
     }
 
-    private <T> List<T> generateSample(int count, IntFunction<T> authorIntFunction) {
-        return IntStream.range(1, count + 1)
-                .mapToObj(authorIntFunction)
+    public Iterable<Category> sampleCategories(int count) {
+        return generateSample(count, this::aRandomCategory);
+    }
+
+    private <T> List<T> generateSample(int count, LongFunction<T> entityGenerator) {
+        return LongStream.range(1, count + 1)
+                .mapToObj(entityGenerator)
                 .toList();
     }
 
@@ -41,6 +46,13 @@ public class SampleDataGenerator {
                 .id(id)
                 .headline(faker.lorem().sentence())
                 .content(faker.lorem().paragraph())
+                .build();
+    }
+
+    private Category aRandomCategory(long id) {
+        return Category.builder()
+                .id(id)
+                .name(faker.book().genre())
                 .build();
     }
 }
