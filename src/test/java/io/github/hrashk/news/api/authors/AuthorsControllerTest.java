@@ -57,7 +57,7 @@ class AuthorsControllerTest {
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        content().json(expectedResponse)
+                        content().json(expectedResponse, true)
                 );
     }
 
@@ -73,7 +73,7 @@ class AuthorsControllerTest {
                 .andExpectAll(
                         status().isCreated(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        content().json(expectedResponse)
+                        content().json(expectedResponse, true)
                 );
 
         Mockito.verify(service).addOrReplace(Mockito.assertArg(a ->
@@ -89,7 +89,7 @@ class AuthorsControllerTest {
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        content().json(expectedResponse)
+                        content().json(expectedResponse, true)
                 );
     }
 
@@ -117,7 +117,7 @@ class AuthorsControllerTest {
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        content().json(expectedResponse)
+                        content().json(expectedResponse, true)
                 );
 
         Mockito.verify(service).addOrReplace(Mockito.assertArg(a -> Assertions.assertAll(
@@ -140,7 +140,7 @@ class AuthorsControllerTest {
                 .andExpectAll(
                         status().isCreated(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        content().json(expectedResponse)
+                        content().json(expectedResponse, true)
                 );
 
         Mockito.verify(service).addOrReplace(Mockito.assertArg(a ->
