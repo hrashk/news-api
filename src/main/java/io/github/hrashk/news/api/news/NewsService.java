@@ -1,16 +1,20 @@
 package io.github.hrashk.news.api.news;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class NewsService {
+    private final NewsRepository repository;
+
     public List<News> findAll() {
-        return List.of();
+        return repository.findAll();
     }
 
     public News findById(Long id) {
-        return News.builder().build();
+        return repository.findById(id).orElseThrow();
     }
 }
