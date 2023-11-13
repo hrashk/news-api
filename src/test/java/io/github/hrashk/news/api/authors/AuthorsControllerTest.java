@@ -3,7 +3,6 @@ package io.github.hrashk.news.api.authors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.hrashk.news.api.authors.web.AuthorsController;
 import io.github.hrashk.news.api.authors.web.AuthorsMapper;
-import io.github.hrashk.news.api.authors.web.UpsertAuthorRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
@@ -64,7 +63,7 @@ class AuthorsControllerTest {
     @Test
     void addAuthor(@Value("classpath:authors/upsert_response.json") Resource r) throws Exception {
         String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
-        String requestPayload = objectMapper.writeValueAsString(new UpsertAuthorRequest("Jack", "Doe"));
+        String requestPayload = objectMapper.writeValueAsString(AuthorSamples.jackDoeRequest());
         Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(AuthorSamples.jackDoe());
 
         mvc.perform(post("/api/v1/authors")
@@ -107,7 +106,7 @@ class AuthorsControllerTest {
     void updateByValidId(@Value("classpath:authors/upsert_response.json") Resource r) throws Exception {
         String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
 
-        String requestPayload = objectMapper.writeValueAsString(new UpsertAuthorRequest("Jack", "Doe"));
+        String requestPayload = objectMapper.writeValueAsString(AuthorSamples.jackDoeRequest());
         Mockito.when(service.findById(Mockito.eq(VALID_ID))).thenReturn(AuthorSamples.jackDoe());
         Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(AuthorSamples.jackDoe());
 
@@ -130,7 +129,7 @@ class AuthorsControllerTest {
     void updateByInvalidId(@Value("classpath:authors/upsert_response.json") Resource r) throws Exception {
         String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
 
-        String requestPayload = objectMapper.writeValueAsString(new UpsertAuthorRequest("Jack", "Doe"));
+        String requestPayload = objectMapper.writeValueAsString(AuthorSamples.jackDoeRequest());
         Mockito.when(service.findById(Mockito.eq(INVALID_ID))).thenThrow(NoSuchElementException.class);
         Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(AuthorSamples.jackDoe());
 
