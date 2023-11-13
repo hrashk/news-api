@@ -15,10 +15,10 @@ import java.util.NoSuchElementException;
 @RestController
 @RequestMapping("/api/v1/authors")
 @RequiredArgsConstructor
-public class AuthorsController {
+public class AuthorController {
 
     private final AuthorService service;
-    private final AuthorsMapper mapper;
+    private final AuthorMapper mapper;
 
     @GetMapping
     public ResponseEntity<AuthorListResponse> getAllAuthors() {

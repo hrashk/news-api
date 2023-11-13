@@ -1,6 +1,6 @@
 package io.github.hrashk.news.api;
 
-import io.github.hrashk.news.api.authors.AuthorsRepository;
+import io.github.hrashk.news.api.authors.AuthorRepository;
 import io.github.hrashk.news.api.categories.CategoryRepository;
 import io.github.hrashk.news.api.news.NewsRepository;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @Import(SampleDataInjector.class) // will run automatically
 class SampleDataInjectorTest {
     @Autowired
-    private AuthorsRepository authorsRepo;
+    private AuthorRepository authorsRepo;
     @Autowired
     private NewsRepository newsRepo;
     @Autowired

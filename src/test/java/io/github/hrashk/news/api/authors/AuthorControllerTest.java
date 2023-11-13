@@ -1,8 +1,8 @@
 package io.github.hrashk.news.api.authors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.hrashk.news.api.authors.web.AuthorsController;
-import io.github.hrashk.news.api.authors.web.AuthorsMapper;
+import io.github.hrashk.news.api.authors.web.AuthorController;
+import io.github.hrashk.news.api.authors.web.AuthorMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
@@ -25,8 +25,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(AuthorsController.class)
-class AuthorsControllerTest {
+@WebMvcTest(AuthorController.class)
+class AuthorControllerTest {
 
     private static final long VALID_ID = 3L;
     private static final long INVALID_ID = 713L;
@@ -42,8 +42,8 @@ class AuthorsControllerTest {
     @TestConfiguration
     static class AppConfig {
         @Bean
-        AuthorsMapper mapper() {
-            return Mappers.getMapper(AuthorsMapper.class);
+        AuthorMapper mapper() {
+            return Mappers.getMapper(AuthorMapper.class);
         }
     }
 

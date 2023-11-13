@@ -19,7 +19,7 @@ class AuthorServiceTest {
     @Autowired
     private AuthorService service;
     @Autowired
-    private AuthorsRepository repository;
+    private AuthorRepository repository;
 
     private List<Author> savedEntities;
 

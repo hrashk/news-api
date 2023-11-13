@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface AuthorsMapper {
+public interface AuthorMapper {
     AuthorResponse toResponse(Author author);
     List<AuthorResponse> toResponseList(Collection<Author> authors);
 
