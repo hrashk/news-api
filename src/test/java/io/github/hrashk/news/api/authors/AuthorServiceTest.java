@@ -36,10 +36,7 @@ class AuthorServiceTest {
 
     @Test
     void saveWithNullId() {
-        var a = Author.builder()
-                .firstName("Jack")
-                .lastName("Doe")
-                .build();
+        var a = AuthorSamples.withoutId();
 
         Author saved = service.addOrReplace(a);
 
@@ -48,12 +45,8 @@ class AuthorServiceTest {
 
     @Test
     void saveWithNonNullId() {
-        long originalId = 123123L;
-        var a = Author.builder()
-                .id(originalId)
-                .firstName("Jack")
-                .lastName("Doe")
-                .build();
+        var a = AuthorSamples.withId();
+        long originalId = a.getId();  // the author object is changed after saving
 
         Author saved = service.addOrReplace(a);
 
