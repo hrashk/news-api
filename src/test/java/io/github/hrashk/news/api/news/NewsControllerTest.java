@@ -4,13 +4,18 @@ import io.github.hrashk.news.api.news.web.NewsController;
 import io.github.hrashk.news.api.news.web.NewsMapper;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.nio.charset.StandardCharsets;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -32,8 +37,9 @@ class NewsControllerTest {
     }
 
     @Test
-    void getAllNews() throws Exception {
-        String expectedResponse = "{}";
+    void getAllNews(@Value("classpath:news/find_all_response.json") Resource r) throws Exception {
+        String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
+        Mockito.when(service.findAll()).thenReturn(NewsSamples.twoNews());
 
         mvc.perform(get("/api/v1/news"))
                 .andExpectAll(

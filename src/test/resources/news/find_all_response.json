@@ -1,0 +1,14 @@
+{
+  "news": [
+    {
+      "id": 7,
+      "headline": "Great news",
+      "content": "Lorem ipsum dolor"
+    },
+    {
+      "id": 22,
+      "headline": "Sad news",
+      "content": "Dolor sit amet"
+    }
+  ]
+}
