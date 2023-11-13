@@ -12,4 +12,6 @@ public interface NewsMapper {
     default NewsListResponse toResponse(List<News> news) {
         return new NewsListResponse(toResponseList(news));
     }
+
+    NewsResponse toResponse(News news);
 }

@@ -23,6 +23,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(NewsController.class)
 class NewsControllerTest {
+    private static final long VALID_ID = 7L;
+    private static final long INVALID_ID = 522L;
+
     @Autowired
     private MockMvc mvc;
     @MockBean
@@ -42,6 +45,19 @@ class NewsControllerTest {
         Mockito.when(service.findAll()).thenReturn(NewsSamples.twoNews());
 
         mvc.perform(get("/api/v1/news"))
+                .andExpectAll(
+                        status().isOk(),
+                        content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
+                        content().json(expectedResponse, true)
+                );
+    }
+
+    @Test
+    void findByValidId(@Value("classpath:news/upsert_response.json") Resource r) throws Exception {
+        String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
+        Mockito.when(service.findById(Mockito.eq(VALID_ID))).thenReturn(NewsSamples.greatNews());
+
+        mvc.perform(get("/api/v1/news/" + VALID_ID))
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),

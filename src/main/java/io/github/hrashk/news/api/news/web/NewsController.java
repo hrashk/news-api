@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
@@ -20,6 +21,13 @@ public class NewsController {
     @GetMapping
     public ResponseEntity<NewsListResponse> getAllNews() {
         List<News> news = service.findAll();
+
+        return ResponseEntity.ok(mapper.toResponse(news));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<NewsResponse> getById(@PathVariable Long id) {
+        News news = service.findById(id);
 
         return ResponseEntity.ok(mapper.toResponse(news));
     }

@@ -9,4 +9,8 @@ public class NewsService {
     public List<News> findAll() {
         return List.of();
     }
+
+    public News findById(Long id) {
+        return News.builder().build();
+    }
 }
