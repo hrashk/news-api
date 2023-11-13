@@ -1,5 +1,6 @@
 HELP.md
 target/
+*.http
 
 ### STS ###
 .apt_generated
