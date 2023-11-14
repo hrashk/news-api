@@ -7,9 +7,29 @@ import java.util.List;
 
 @TestComponent
 public class AuthorSamples {
+    public String baseUrl() {
+        return "/api/v1/authors";
+    }
+
+    public Long validId() {
+        return 3L;
+    }
+
+    public Long invalidId() {
+        return 713L;
+    }
+
+    public String validAuthorUrl() {
+        return baseUrl() + "/" + validId();
+    }
+
+    public String invalidAuthorUrl() {
+        return baseUrl() + "/" + invalidId();
+    }
+
     public List<Author> twoAuthors() {
         var a1 = Author.builder()
-                .id(3L)
+                .id(validId())
                 .firstName("Holy")
                 .lastName("Moly")
                 .createdAt(LocalDateTime.parse("2011-10-13T00:00:00"))
@@ -27,7 +47,7 @@ public class AuthorSamples {
 
     public Author jackDoe() {
         return Author.builder()
-                .id(3L)
+                .id(validId())
                 .firstName("Jack")
                 .lastName("Doe")
                 .createdAt(LocalDateTime.parse("2011-07-17T00:00:00"))
@@ -42,9 +62,9 @@ public class AuthorSamples {
                 .build();
     }
 
-    public Author withId() {
+    public Author withInvalidId() {
         return Author.builder()
-                .id(123123L)
+                .id(invalidId())
                 .firstName("Jack")
                 .lastName("Doe")
                 .build();

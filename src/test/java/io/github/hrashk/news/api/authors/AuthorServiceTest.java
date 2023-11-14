@@ -15,7 +15,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @ContainerJpaTest
 @Import({AuthorService.class, AuthorSamples.class})
 class AuthorServiceTest {
-    private static final long INVALID_ID = 11333L;
     @Autowired
     private AuthorService service;
     @Autowired
@@ -47,7 +46,7 @@ class AuthorServiceTest {
 
     @Test
     void saveWithNonNullId() {
-        var a = samples.withId();
+        var a = samples.withInvalidId();
         long originalId = a.getId();  // the author object is changed after saving
 
         Author saved = service.addOrReplace(a);
@@ -66,7 +65,7 @@ class AuthorServiceTest {
 
     @Test
     void findByInvalidId() {
-        assertThatThrownBy(() -> service.findById(INVALID_ID))
+        assertThatThrownBy(() -> service.findById(samples.invalidId()))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
@@ -79,7 +78,7 @@ class AuthorServiceTest {
 
     @Test
     void doesNotContainInvalidId() {
-        assertThat(service.contains(INVALID_ID)).isFalse();
+        assertThat(service.contains(samples.invalidId())).isFalse();
     }
 
     @Test

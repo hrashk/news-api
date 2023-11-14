@@ -14,14 +14,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class AuthorControllerTest extends ControllerTestDependencies {
 
-    private static final long VALID_ID = 3L;
-    private static final long INVALID_ID = 713L;
-
     @Test
     void getAllAuthors() throws Exception {
         Mockito.when(service.findAll()).thenReturn(samples.twoAuthors());
 
-        mvc.perform(get("/api/v1/authors"))
+        mvc.perform(get(samples.baseUrl()))
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
@@ -33,7 +30,7 @@ class AuthorControllerTest extends ControllerTestDependencies {
     void addAuthor() throws Exception {
         Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(samples.jackDoe());
 
-        mvc.perform(post("/api/v1/authors")
+        mvc.perform(post(samples.baseUrl())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.upsertRequest()))
                 .andExpectAll(
@@ -50,7 +47,7 @@ class AuthorControllerTest extends ControllerTestDependencies {
     void findByValidId() throws Exception {
         Mockito.when(service.findById(Mockito.anyLong())).thenReturn(samples.jackDoe());
 
-        mvc.perform(get("/api/v1/authors/" + VALID_ID))
+        mvc.perform(get(samples.validAuthorUrl()))
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
@@ -62,7 +59,7 @@ class AuthorControllerTest extends ControllerTestDependencies {
     void findByInvalidId() throws Exception {
         Mockito.when(service.findById(Mockito.anyLong())).thenThrow(NoSuchElementException.class);
 
-        mvc.perform(get("/api/v1/authors/" + INVALID_ID))
+        mvc.perform(get(samples.invalidAuthorUrl()))
                 .andExpectAll(
                         status().isNotFound()
                 );
@@ -70,10 +67,10 @@ class AuthorControllerTest extends ControllerTestDependencies {
 
     @Test
     void updateByValidId() throws Exception {
-        Mockito.when(service.findById(Mockito.eq(VALID_ID))).thenReturn(samples.jackDoe());
+        Mockito.when(service.findById(Mockito.eq(samples.validId()))).thenReturn(samples.jackDoe());
         Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(samples.jackDoe());
 
-        mvc.perform(put("/api/v1/authors/" + VALID_ID)
+        mvc.perform(put(samples.validAuthorUrl())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.upsertRequest()))
                 .andExpectAll(
@@ -83,17 +80,17 @@ class AuthorControllerTest extends ControllerTestDependencies {
                 );
 
         Mockito.verify(service).addOrReplace(Mockito.assertArg(a -> Assertions.assertAll(
-                () -> assertThat(a.getId()).as("Author id").isEqualTo(VALID_ID),
+                () -> assertThat(a.getId()).as("Author id").isEqualTo(samples.validId()),
                 () -> assertThat(a.getCreatedAt()).as("Author created at").isNotNull()
         )));
     }
 
     @Test
     void updateByInvalidId() throws Exception {
-        Mockito.when(service.findById(Mockito.eq(INVALID_ID))).thenThrow(NoSuchElementException.class);
+        Mockito.when(service.findById(Mockito.eq(samples.invalidId()))).thenThrow(NoSuchElementException.class);
         Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(samples.jackDoe());
 
-        mvc.perform(put("/api/v1/authors/" + INVALID_ID)
+        mvc.perform(put(samples.invalidAuthorUrl())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.upsertRequest()))
                 .andExpectAll(
@@ -110,19 +107,19 @@ class AuthorControllerTest extends ControllerTestDependencies {
     void deleteByValidId() throws Exception {
         Mockito.when(service.contains(Mockito.anyLong())).thenReturn(true);
 
-        mvc.perform(delete("/api/v1/authors/" + VALID_ID))
+        mvc.perform(delete(samples.validAuthorUrl()))
                 .andExpectAll(
                         status().isNoContent()
                 );
 
-        Mockito.verify(service).removeById(Mockito.eq(VALID_ID));
+        Mockito.verify(service).removeById(Mockito.eq(samples.validId()));
     }
 
     @Test
     void deleteByInvalidId() throws Exception {
         Mockito.when(service.contains(Mockito.anyLong())).thenReturn(false);
 
-        mvc.perform(delete("/api/v1/authors/" + INVALID_ID))
+        mvc.perform(delete(samples.invalidAuthorUrl()))
                 .andExpectAll(
                         status().isNotFound()
                 );
