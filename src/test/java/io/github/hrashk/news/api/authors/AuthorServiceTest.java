@@ -31,8 +31,13 @@ class AuthorServiceTest {
     }
 
     @Test
-    void findAll() {
-        assertThat(service.findAll()).isNotEmpty();
+    void firstPage() {
+        assertThat(service.findAll(0, 1)).hasSize(1);
+    }
+
+    @Test
+    void secondPage() {
+        assertThat(service.findAll(1, 1)).hasSize(1);
     }
 
     @Test

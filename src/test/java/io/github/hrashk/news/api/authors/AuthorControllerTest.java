@@ -18,6 +18,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,8 +45,8 @@ class AuthorControllerTest {
     }
 
     @Test
-    void getAllAuthors() throws Exception {
-        Mockito.when(service.findAll()).thenReturn(samples.twoAuthors());
+    void getFirstPageOfAuthors() throws Exception {
+        when(service.findAll(eq(0), eq(10))).thenReturn(samples.twoAuthors());
 
         mvc.perform(get(samples.baseUrl()))
                 .andExpectAll(
@@ -55,8 +57,20 @@ class AuthorControllerTest {
     }
 
     @Test
+    void getSecondPageOfAuthors() throws Exception {
+        when(service.findAll(eq(1), eq(7))).thenReturn(samples.twoAuthors());
+
+        mvc.perform(get(samples.pageUrl(1, 7)))
+                .andExpectAll(
+                        status().isOk(),
+                        content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
+                        content().json(json.findAllResponse(), true)
+                );
+    }
+
+    @Test
     void addAuthor() throws Exception {
-        Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(samples.jackDoe());
+        when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(samples.jackDoe());
 
         mvc.perform(post(samples.baseUrl())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -73,7 +87,7 @@ class AuthorControllerTest {
 
     @Test
     void findByValidId() throws Exception {
-        Mockito.when(service.findById(Mockito.anyLong())).thenReturn(samples.jackDoe());
+        when(service.findById(Mockito.anyLong())).thenReturn(samples.jackDoe());
 
         mvc.perform(get(samples.validAuthorUrl()))
                 .andExpectAll(
@@ -85,7 +99,7 @@ class AuthorControllerTest {
 
     @Test
     void findByInvalidId() throws Exception {
-        Mockito.when(service.findById(Mockito.anyLong())).thenThrow(NoSuchElementException.class);
+        when(service.findById(Mockito.anyLong())).thenThrow(NoSuchElementException.class);
 
         mvc.perform(get(samples.invalidAuthorUrl()))
                 .andExpectAll(
@@ -95,8 +109,8 @@ class AuthorControllerTest {
 
     @Test
     void updateByValidId() throws Exception {
-        Mockito.when(service.findById(Mockito.eq(samples.validId()))).thenReturn(samples.jackDoe());
-        Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(samples.jackDoe());
+        when(service.findById(eq(samples.validId()))).thenReturn(samples.jackDoe());
+        when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(samples.jackDoe());
 
         mvc.perform(put(samples.validAuthorUrl())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -115,8 +129,8 @@ class AuthorControllerTest {
 
     @Test
     void updateByInvalidId() throws Exception {
-        Mockito.when(service.findById(Mockito.eq(samples.invalidId()))).thenThrow(NoSuchElementException.class);
-        Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(samples.jackDoe());
+        when(service.findById(eq(samples.invalidId()))).thenThrow(NoSuchElementException.class);
+        when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(samples.jackDoe());
 
         mvc.perform(put(samples.invalidAuthorUrl())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -133,19 +147,19 @@ class AuthorControllerTest {
 
     @Test
     void deleteByValidId() throws Exception {
-        Mockito.when(service.contains(Mockito.anyLong())).thenReturn(true);
+        when(service.contains(Mockito.anyLong())).thenReturn(true);
 
         mvc.perform(delete(samples.validAuthorUrl()))
                 .andExpectAll(
                         status().isNoContent()
                 );
 
-        Mockito.verify(service).removeById(Mockito.eq(samples.validId()));
+        Mockito.verify(service).removeById(eq(samples.validId()));
     }
 
     @Test
     void deleteByInvalidId() throws Exception {
-        Mockito.when(service.contains(Mockito.anyLong())).thenReturn(false);
+        when(service.contains(Mockito.anyLong())).thenReturn(false);
 
         mvc.perform(delete(samples.invalidAuthorUrl()))
                 .andExpectAll(

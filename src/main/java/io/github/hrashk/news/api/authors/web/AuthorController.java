@@ -21,8 +21,10 @@ public class AuthorController {
     private final AuthorMapper mapper;
 
     @GetMapping
-    public ResponseEntity<AuthorListResponse> getAllAuthors() {
-        List<Author> authors = service.findAll();
+    public ResponseEntity<AuthorListResponse> getAllAuthors(
+            @RequestParam(name = "page", defaultValue = "0") int pageNumber,
+            @RequestParam(name = "size", defaultValue = "10") int pageSize) {
+        List<Author> authors = service.findAll(pageNumber, pageSize);
 
         return ResponseEntity.ok(mapper.toResponse(authors));
     }

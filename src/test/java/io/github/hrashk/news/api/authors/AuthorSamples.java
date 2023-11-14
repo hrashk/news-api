@@ -69,4 +69,8 @@ public class AuthorSamples {
                 .lastName("Doe")
                 .build();
     }
+
+    public String pageUrl(int pageNumber, int pageSize) {
+        return "%s?page=%d&size=%d".formatted(baseUrl(), pageNumber, pageSize);
+    }
 }
