@@ -24,18 +24,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(CategoryController.class)
 class CategoryControllerTest {
-    private static final long VALID_ID = 7L;
-    private static final long INVALID_ID = 522L;
-
     @Autowired
     private MockMvc mvc;
     @Autowired
     private CategoryJsonSamples json;
+    @Autowired
+    private CategorySamples samples;
     @MockBean
     private CategoryService service;
 
     @TestConfiguration
-    @Import({CategoryJsonSamples.class})
+    @Import({CategoryJsonSamples.class, CategorySamples.class})
     static class AppConfig {
         @Bean
         CategoryMapper mapper() {
@@ -45,9 +44,9 @@ class CategoryControllerTest {
 
     @Test
     void getAllCategories() throws Exception {
-        Mockito.when(service.findAll()).thenReturn(CategorySamples.twoCategories());
+        Mockito.when(service.findAll()).thenReturn(samples.twoCategories());
 
-        mvc.perform(get("/api/v1/categories"))
+        mvc.perform(get(samples.baseUrl()))
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
@@ -57,9 +56,9 @@ class CategoryControllerTest {
 
     @Test
     void findByValidId() throws Exception {
-        Mockito.when(service.findById(Mockito.eq(VALID_ID))).thenReturn(CategorySamples.sciFi());
+        Mockito.when(service.findById(Mockito.eq(samples.validId()))).thenReturn(samples.sciFi());
 
-        mvc.perform(get("/api/v1/categories/" + VALID_ID))
+        mvc.perform(get(samples.validCategoryUrl()))
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
@@ -69,9 +68,9 @@ class CategoryControllerTest {
 
     @Test
     void findByInvalidId() throws Exception {
-        Mockito.when(service.findById(Mockito.eq(INVALID_ID))).thenThrow(NoSuchElementException.class);
+        Mockito.when(service.findById(Mockito.eq(samples.invalidId()))).thenThrow(NoSuchElementException.class);
 
-        mvc.perform(get("/api/v1/categories/" + INVALID_ID))
+        mvc.perform(get(samples.invalidCategoryUrl()))
                 .andExpectAll(
                         status().isNotFound()
                 );
@@ -79,9 +78,9 @@ class CategoryControllerTest {
 
     @Test
     void addCategory() throws Exception {
-        Mockito.when(service.addOrReplace(Mockito.any(Category.class))).thenReturn(CategorySamples.sciFi());
+        Mockito.when(service.addOrReplace(Mockito.any(Category.class))).thenReturn(samples.sciFi());
 
-        mvc.perform(post("/api/v1/categories")
+        mvc.perform(post(samples.baseUrl())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.upsertRequest()))
                 .andExpectAll(
@@ -96,10 +95,10 @@ class CategoryControllerTest {
 
     @Test
     void updateByValidId() throws Exception {
-        Mockito.when(service.findById(Mockito.eq(VALID_ID))).thenReturn(CategorySamples.sciFi());
-        Mockito.when(service.addOrReplace(Mockito.any(Category.class))).thenReturn(CategorySamples.sciFi());
+        Mockito.when(service.findById(Mockito.eq(samples.validId()))).thenReturn(samples.sciFi());
+        Mockito.when(service.addOrReplace(Mockito.any(Category.class))).thenReturn(samples.sciFi());
 
-        mvc.perform(put("/api/v1/categories/" + VALID_ID)
+        mvc.perform(put(samples.validCategoryUrl())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.upsertRequest()))
                 .andExpectAll(
@@ -109,17 +108,17 @@ class CategoryControllerTest {
                 );
 
         Mockito.verify(service).addOrReplace(Mockito.assertArg(a -> Assertions.assertAll(
-                () -> assertThat(a.getId()).as("Category id").isEqualTo(VALID_ID),
+                () -> assertThat(a.getId()).as("Category id").isEqualTo(samples.validId()),
                 () -> assertThat(a.getCreatedAt()).as("Category created at").isNotNull()
         )));
     }
 
     @Test
     void updateByInvalidId() throws Exception {
-        Mockito.when(service.findById(Mockito.eq(INVALID_ID))).thenThrow(NoSuchElementException.class);
-        Mockito.when(service.addOrReplace(Mockito.any(Category.class))).thenReturn(CategorySamples.sciFi());
+        Mockito.when(service.findById(Mockito.eq(samples.invalidId()))).thenThrow(NoSuchElementException.class);
+        Mockito.when(service.addOrReplace(Mockito.any(Category.class))).thenReturn(samples.sciFi());
 
-        mvc.perform(put("/api/v1/categories/" + INVALID_ID)
+        mvc.perform(put(samples.invalidCategoryUrl())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.upsertRequest()))
                 .andExpectAll(
@@ -136,19 +135,19 @@ class CategoryControllerTest {
     void deleteByValidId() throws Exception {
         Mockito.when(service.contains(Mockito.anyLong())).thenReturn(true);
 
-        mvc.perform(delete("/api/v1/categories/" + VALID_ID))
+        mvc.perform(delete(samples.validCategoryUrl()))
                 .andExpectAll(
                         status().isNoContent()
                 );
 
-        Mockito.verify(service).removeById(Mockito.eq(VALID_ID));
+        Mockito.verify(service).removeById(Mockito.eq(samples.validId()));
     }
 
     @Test
     void deleteByInvalidId() throws Exception {
         Mockito.when(service.contains(Mockito.anyLong())).thenReturn(false);
 
-        mvc.perform(delete("/api/v1/categories/" + INVALID_ID))
+        mvc.perform(delete(samples.invalidCategoryUrl()))
                 .andExpectAll(
                         status().isNotFound()
                 );

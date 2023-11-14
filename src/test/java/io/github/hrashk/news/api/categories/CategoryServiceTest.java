@@ -13,20 +13,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ContainerJpaTest
-@Import(CategoryService.class)
+@Import({CategoryService.class, CategorySamples.class})
 class CategoryServiceTest {
-    private static final long INVALID_ID = 11333L;
-
     @Autowired
     private CategoryService service;
-
+    @Autowired
+    private CategorySamples samples;
     @Autowired
     private CategoryRepository repository;
     private List<Category> savedCategory;
 
     @BeforeEach
     public void injectCategory() {
-        this.savedCategory = repository.saveAll(CategorySamples.twoCategories());
+        this.savedCategory = repository.saveAll(samples.twoCategories());
     }
 
     @Test
@@ -44,25 +43,25 @@ class CategoryServiceTest {
 
     @Test
     void findByInvalidId() {
-        assertThatThrownBy(() -> service.findById(INVALID_ID))
+        assertThatThrownBy(() -> service.findById(samples.invalidId()))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
     void saveWithNullId() {
-        Category saved = service.addOrReplace(CategorySamples.withoutId());
+        Category saved = service.addOrReplace(samples.withoutId());
 
         assertThat(saved.getId()).as("Category id").isNotNull();
     }
 
     @Test
     void saveWithNonNullId() {
-        var n = CategorySamples.withId();
-        long originalid = n.getId(); // the news object is changed after saving
+        var n = samples.withInvalidId();
+        long originalId = n.getId(); // the news object is changed after saving
 
         Category saved = service.addOrReplace(n);
 
-        assertThat(saved.getId()).as("Category id").isNotEqualTo(originalid);
+        assertThat(saved.getId()).as("Category id").isNotEqualTo(originalId);
     }
 
     @Test
@@ -74,7 +73,7 @@ class CategoryServiceTest {
 
     @Test
     void doesNotContainInvalidId() {
-        assertThat(service.contains(INVALID_ID)).isFalse();
+        assertThat(service.contains(samples.invalidId())).isFalse();
     }
 
     @Test

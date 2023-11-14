@@ -1,11 +1,34 @@
 package io.github.hrashk.news.api.categories;
 
+import org.springframework.boot.test.context.TestComponent;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
-public final class CategorySamples {
+@TestComponent
+public class CategorySamples {
+    public String baseUrl() {
+        return "/api/v1/categories";
+    }
 
-    static List<Category> twoCategories() {
+    public Long validId() {
+        return 7L;
+    }
+
+    public Long invalidId() {
+        return 522L;
+    }
+
+    public String validCategoryUrl() {
+        return baseUrl() + "/" + validId();
+    }
+
+    public String invalidCategoryUrl() {
+        return baseUrl() + "/" + invalidId();
+    }
+
+
+    public List<Category> twoCategories() {
         Category n1 = sciFi();
 
         Category n2 = Category.builder()
@@ -18,24 +41,24 @@ public final class CategorySamples {
         return List.of(n1, n2);
     }
 
-    public static Category sciFi() {
+    public Category sciFi() {
         return Category.builder()
-                .id(7L)
+                .id(validId())
                 .name("Science Fiction")
                 .createdAt(LocalDateTime.parse("2011-10-13T00:00:00"))
                 .updatedAt(LocalDateTime.parse("2011-10-13T00:00:00"))
                 .build();
     }
 
-    public static Category withoutId() {
+    public Category withoutId() {
         return Category.builder()
                 .name("Science Fiction")
                 .build();
     }
 
-    public static Category withId() {
+    public Category withInvalidId() {
         return Category.builder()
-                .id(123123L)
+                .id(invalidId())
                 .name("Science Fiction")
                 .build();
     }
