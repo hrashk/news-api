@@ -8,12 +8,14 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(AuthorController.class)
-@Import({MapperBeans.class, AuthorJsonSamples.class})
+@Import({AuthorConfig.class})
 abstract class ControllerTestDependencies {
     @Autowired
     protected MockMvc mvc;
     @Autowired
     protected AuthorJsonSamples json;
+    @Autowired
+    protected AuthorSamples samples;
     @MockBean
     protected AuthorService service;
 }

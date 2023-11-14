@@ -13,20 +13,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ContainerJpaTest
-@Import(AuthorService.class)
+@Import({AuthorService.class, AuthorSamples.class})
 class AuthorServiceTest {
     private static final long INVALID_ID = 11333L;
     @Autowired
     private AuthorService service;
     @Autowired
     private AuthorRepository repository;
+    @Autowired
+    protected AuthorSamples samples;
 
     private List<Author> savedEntities;
 
 
     @BeforeEach
     void insertAuthors() {
-        savedEntities = repository.saveAll(AuthorSamples.twoAuthors());
+        savedEntities = repository.saveAll(samples.twoAuthors());
     }
 
     @Test
@@ -36,7 +38,7 @@ class AuthorServiceTest {
 
     @Test
     void saveWithNullId() {
-        var a = AuthorSamples.withoutId();
+        var a = samples.withoutId();
 
         Author saved = service.addOrReplace(a);
 
@@ -45,7 +47,7 @@ class AuthorServiceTest {
 
     @Test
     void saveWithNonNullId() {
-        var a = AuthorSamples.withId();
+        var a = samples.withId();
         long originalId = a.getId();  // the author object is changed after saving
 
         Author saved = service.addOrReplace(a);

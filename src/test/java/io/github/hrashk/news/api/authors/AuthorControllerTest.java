@@ -19,7 +19,7 @@ class AuthorControllerTest extends ControllerTestDependencies {
 
     @Test
     void getAllAuthors() throws Exception {
-        Mockito.when(service.findAll()).thenReturn(AuthorSamples.twoAuthors());
+        Mockito.when(service.findAll()).thenReturn(samples.twoAuthors());
 
         mvc.perform(get("/api/v1/authors"))
                 .andExpectAll(
@@ -31,7 +31,7 @@ class AuthorControllerTest extends ControllerTestDependencies {
 
     @Test
     void addAuthor() throws Exception {
-        Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(AuthorSamples.jackDoe());
+        Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(samples.jackDoe());
 
         mvc.perform(post("/api/v1/authors")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -48,7 +48,7 @@ class AuthorControllerTest extends ControllerTestDependencies {
 
     @Test
     void findByValidId() throws Exception {
-        Mockito.when(service.findById(Mockito.anyLong())).thenReturn(AuthorSamples.jackDoe());
+        Mockito.when(service.findById(Mockito.anyLong())).thenReturn(samples.jackDoe());
 
         mvc.perform(get("/api/v1/authors/" + VALID_ID))
                 .andExpectAll(
@@ -70,8 +70,8 @@ class AuthorControllerTest extends ControllerTestDependencies {
 
     @Test
     void updateByValidId() throws Exception {
-        Mockito.when(service.findById(Mockito.eq(VALID_ID))).thenReturn(AuthorSamples.jackDoe());
-        Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(AuthorSamples.jackDoe());
+        Mockito.when(service.findById(Mockito.eq(VALID_ID))).thenReturn(samples.jackDoe());
+        Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(samples.jackDoe());
 
         mvc.perform(put("/api/v1/authors/" + VALID_ID)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -91,7 +91,7 @@ class AuthorControllerTest extends ControllerTestDependencies {
     @Test
     void updateByInvalidId() throws Exception {
         Mockito.when(service.findById(Mockito.eq(INVALID_ID))).thenThrow(NoSuchElementException.class);
-        Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(AuthorSamples.jackDoe());
+        Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(samples.jackDoe());
 
         mvc.perform(put("/api/v1/authors/" + INVALID_ID)
                         .contentType(MediaType.APPLICATION_JSON)

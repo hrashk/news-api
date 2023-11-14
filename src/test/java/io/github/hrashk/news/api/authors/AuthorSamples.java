@@ -1,10 +1,13 @@
 package io.github.hrashk.news.api.authors;
 
+import org.springframework.boot.test.context.TestComponent;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
+@TestComponent
 public class AuthorSamples {
-    static List<Author> twoAuthors() {
+    public List<Author> twoAuthors() {
         var a1 = Author.builder()
                 .id(3L)
                 .firstName("Holy")
@@ -22,7 +25,7 @@ public class AuthorSamples {
         return List.of(a1, a2);
     }
 
-    static Author jackDoe() {
+    public Author jackDoe() {
         return Author.builder()
                 .id(3L)
                 .firstName("Jack")
@@ -32,14 +35,14 @@ public class AuthorSamples {
                 .build();
     }
 
-    static Author withoutId() {
+    public Author withoutId() {
         return Author.builder()
                 .firstName("Jack")
                 .lastName("Doe")
                 .build();
     }
 
-    static Author withId() {
+    public Author withId() {
         return Author.builder()
                 .id(123123L)
                 .firstName("Jack")
