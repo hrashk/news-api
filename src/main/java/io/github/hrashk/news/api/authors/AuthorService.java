@@ -1,7 +1,7 @@
 package io.github.hrashk.news.api.authors;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,8 +11,8 @@ import java.util.List;
 public class AuthorService {
     private final AuthorRepository repository;
 
-    public List<Author> findAll(int pageNumber, int pageSize) {
-        return repository.findAll(PageRequest.of(pageNumber, pageSize)).getContent();
+    public List<Author> findAll(Pageable pageable) {
+        return repository.findAll(pageable).getContent();
     }
 
     public Author addOrReplace(Author author) {

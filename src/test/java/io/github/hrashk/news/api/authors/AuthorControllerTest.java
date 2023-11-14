@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -46,7 +47,7 @@ class AuthorControllerTest {
 
     @Test
     void getFirstPageOfAuthors() throws Exception {
-        when(service.findAll(eq(0), eq(10))).thenReturn(samples.twoAuthors());
+        when(service.findAll(Mockito.any(Pageable.class))).thenReturn(samples.twoAuthors());
 
         mvc.perform(get(samples.baseUrl()))
                 .andExpectAll(
@@ -54,11 +55,16 @@ class AuthorControllerTest {
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
                         content().json(json.findAllResponse(), true)
                 );
+
+        Mockito.verify(service).findAll(Mockito.assertArg(p -> Assertions.assertAll(
+                () -> assertThat(p.getPageNumber()).isEqualTo(0),
+                () -> assertThat(p.getPageSize()).isEqualTo(10)
+        )));
     }
 
     @Test
     void getSecondPageOfAuthors() throws Exception {
-        when(service.findAll(eq(1), eq(7))).thenReturn(samples.twoAuthors());
+        when(service.findAll(Mockito.any(Pageable.class))).thenReturn(samples.twoAuthors());
 
         mvc.perform(get(samples.pageUrl(1, 7)))
                 .andExpectAll(
@@ -66,6 +72,11 @@ class AuthorControllerTest {
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
                         content().json(json.findAllResponse(), true)
                 );
+
+        Mockito.verify(service).findAll(Mockito.assertArg(p -> Assertions.assertAll(
+                () -> assertThat(p.getPageNumber()).isEqualTo(1),
+                () -> assertThat(p.getPageSize()).isEqualTo(7)
+        )));
     }
 
     @Test

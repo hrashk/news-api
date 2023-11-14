@@ -4,6 +4,8 @@ import io.github.hrashk.news.api.authors.Author;
 import io.github.hrashk.news.api.authors.AuthorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,10 +23,8 @@ public class AuthorController {
     private final AuthorMapper mapper;
 
     @GetMapping
-    public ResponseEntity<AuthorListResponse> getAllAuthors(
-            @RequestParam(name = "page", defaultValue = "0") int pageNumber,
-            @RequestParam(name = "size", defaultValue = "10") int pageSize) {
-        List<Author> authors = service.findAll(pageNumber, pageSize);
+    public ResponseEntity<AuthorListResponse> getAllAuthors(@PageableDefault Pageable pageable) {
+        List<Author> authors = service.findAll(pageable);
 
         return ResponseEntity.ok(mapper.toResponse(authors));
     }

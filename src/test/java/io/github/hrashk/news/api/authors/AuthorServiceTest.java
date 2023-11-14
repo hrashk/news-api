@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -32,12 +33,12 @@ class AuthorServiceTest {
 
     @Test
     void firstPage() {
-        assertThat(service.findAll(0, 1)).hasSize(1);
+        assertThat(service.findAll(PageRequest.of(0, 1))).hasSize(1);
     }
 
     @Test
     void secondPage() {
-        assertThat(service.findAll(1, 1)).hasSize(1);
+        assertThat(service.findAll(PageRequest.of(1, 1))).hasSize(1);
     }
 
     @Test
