@@ -1,6 +1,5 @@
 package io.github.hrashk.news.api.authors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.hrashk.news.api.authors.web.AuthorController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,14 +17,14 @@ import java.nio.charset.StandardCharsets;
 abstract class ControllerTestDependencies {
     @Autowired
     protected MockMvc mvc;
-    @Autowired
-    protected ObjectMapper objectMapper;
     @MockBean
     protected AuthorService service;
 
     protected String findAllResponse;
 
     protected String upsertResponse;
+
+    protected String upsertRequest;
 
     @Value("classpath:authors/find_all_response.json")
     void setFindAllResponse(Resource r) throws IOException {
@@ -37,4 +36,8 @@ abstract class ControllerTestDependencies {
         upsertResponse = r.getContentAsString(StandardCharsets.UTF_8);
     }
 
+    @Value("classpath:authors/upsert_request.json")
+    void setUpsertRequest(Resource r) throws IOException {
+        upsertRequest = r.getContentAsString(StandardCharsets.UTF_8);
+    }
 }

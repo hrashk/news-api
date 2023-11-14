@@ -31,12 +31,11 @@ class AuthorControllerTest extends ControllerTestDependencies {
 
     @Test
     void addAuthor() throws Exception {
-        String requestPayload = objectMapper.writeValueAsString(AuthorSamples.jackDoeRequest());
         Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(AuthorSamples.jackDoe());
 
         mvc.perform(post("/api/v1/authors")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestPayload))
+                        .content(upsertRequest))
                 .andExpectAll(
                         status().isCreated(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
@@ -71,13 +70,12 @@ class AuthorControllerTest extends ControllerTestDependencies {
 
     @Test
     void updateByValidId() throws Exception {
-        String requestPayload = objectMapper.writeValueAsString(AuthorSamples.jackDoeRequest());
         Mockito.when(service.findById(Mockito.eq(VALID_ID))).thenReturn(AuthorSamples.jackDoe());
         Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(AuthorSamples.jackDoe());
 
         mvc.perform(put("/api/v1/authors/" + VALID_ID)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestPayload))
+                        .content(upsertRequest))
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
@@ -92,13 +90,12 @@ class AuthorControllerTest extends ControllerTestDependencies {
 
     @Test
     void updateByInvalidId() throws Exception {
-        String requestPayload = objectMapper.writeValueAsString(AuthorSamples.jackDoeRequest());
         Mockito.when(service.findById(Mockito.eq(INVALID_ID))).thenThrow(NoSuchElementException.class);
         Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(AuthorSamples.jackDoe());
 
         mvc.perform(put("/api/v1/authors/" + INVALID_ID)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestPayload))
+                        .content(upsertRequest))
                 .andExpectAll(
                         status().isCreated(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),

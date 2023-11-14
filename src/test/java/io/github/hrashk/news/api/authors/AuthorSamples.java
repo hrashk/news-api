@@ -1,7 +1,5 @@
 package io.github.hrashk.news.api.authors;
 
-import io.github.hrashk.news.api.authors.web.UpsertAuthorRequest;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -47,9 +45,5 @@ public class AuthorSamples {
                 .firstName("Jack")
                 .lastName("Doe")
                 .build();
-    }
-
-    static UpsertAuthorRequest jackDoeRequest() {
-        return new UpsertAuthorRequest("Jack", "Doe");
     }
 }
