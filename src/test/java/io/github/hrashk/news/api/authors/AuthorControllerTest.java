@@ -25,7 +25,7 @@ class AuthorControllerTest extends ControllerTestDependencies {
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        content().json(findAllResponse, true)
+                        content().json(json.findAllResponse(), true)
                 );
     }
 
@@ -35,11 +35,11 @@ class AuthorControllerTest extends ControllerTestDependencies {
 
         mvc.perform(post("/api/v1/authors")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(upsertRequest))
+                        .content(json.upsertRequest()))
                 .andExpectAll(
                         status().isCreated(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        content().json(upsertResponse, true)
+                        content().json(json.upsertResponse(), true)
                 );
 
         Mockito.verify(service).addOrReplace(Mockito.assertArg(a ->
@@ -54,7 +54,7 @@ class AuthorControllerTest extends ControllerTestDependencies {
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        content().json(upsertResponse, true)
+                        content().json(json.upsertResponse(), true)
                 );
     }
 
@@ -75,11 +75,11 @@ class AuthorControllerTest extends ControllerTestDependencies {
 
         mvc.perform(put("/api/v1/authors/" + VALID_ID)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(upsertRequest))
+                        .content(json.upsertRequest()))
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        content().json(upsertResponse, true)
+                        content().json(json.upsertResponse(), true)
                 );
 
         Mockito.verify(service).addOrReplace(Mockito.assertArg(a -> Assertions.assertAll(
@@ -95,11 +95,11 @@ class AuthorControllerTest extends ControllerTestDependencies {
 
         mvc.perform(put("/api/v1/authors/" + INVALID_ID)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(upsertRequest))
+                        .content(json.upsertRequest()))
                 .andExpectAll(
                         status().isCreated(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        content().json(upsertResponse, true)
+                        content().json(json.upsertResponse(), true)
                 );
 
         Mockito.verify(service).addOrReplace(Mockito.assertArg(a ->
