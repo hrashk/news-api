@@ -21,8 +21,10 @@ public class CategoryController {
     private final CategoryMapper mapper;
 
     @GetMapping
-    public ResponseEntity<CategoryListResponse> getAllCategories() {
-        List<Category> news = service.findAll();
+    public ResponseEntity<CategoryListResponse> getAllCategories(
+            @RequestParam(name = "page", defaultValue = "0") int pageNumber,
+            @RequestParam(name = "size", defaultValue = "10") int pageSize) {
+        List<Category> news = service.findAll(pageNumber, pageSize);
 
         return ResponseEntity.ok(mapper.toResponse(news));
     }

@@ -62,4 +62,8 @@ public class CategorySamples {
                 .name("Science Fiction")
                 .build();
     }
+
+    public String pageUrl(int pageNumber, int pageSize) {
+        return "%s?page=%d&size=%d".formatted(baseUrl(), pageNumber, pageSize);
+    }
 }

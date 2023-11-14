@@ -18,6 +18,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,8 +45,8 @@ class CategoryControllerTest {
     }
 
     @Test
-    void getAllCategories() throws Exception {
-        Mockito.when(service.findAll()).thenReturn(samples.twoCategories());
+    void getFirstPageOfCategories() throws Exception {
+        when(service.findAll(eq(0), eq(10))).thenReturn(samples.twoCategories());
 
         mvc.perform(get(samples.baseUrl()))
                 .andExpectAll(
@@ -55,8 +57,20 @@ class CategoryControllerTest {
     }
 
     @Test
+    void getSecondPageOfCategories() throws Exception {
+        when(service.findAll(eq(1), eq(7))).thenReturn(samples.twoCategories());
+
+        mvc.perform(get(samples.pageUrl(1, 7)))
+                .andExpectAll(
+                        status().isOk(),
+                        content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
+                        content().json(json.findAllResponse(), true)
+                );
+    }
+
+    @Test
     void findByValidId() throws Exception {
-        Mockito.when(service.findById(Mockito.eq(samples.validId()))).thenReturn(samples.sciFi());
+        when(service.findById(eq(samples.validId()))).thenReturn(samples.sciFi());
 
         mvc.perform(get(samples.validCategoryUrl()))
                 .andExpectAll(
@@ -68,7 +82,7 @@ class CategoryControllerTest {
 
     @Test
     void findByInvalidId() throws Exception {
-        Mockito.when(service.findById(Mockito.eq(samples.invalidId()))).thenThrow(NoSuchElementException.class);
+        when(service.findById(eq(samples.invalidId()))).thenThrow(NoSuchElementException.class);
 
         mvc.perform(get(samples.invalidCategoryUrl()))
                 .andExpectAll(
@@ -78,7 +92,7 @@ class CategoryControllerTest {
 
     @Test
     void addCategory() throws Exception {
-        Mockito.when(service.addOrReplace(Mockito.any(Category.class))).thenReturn(samples.sciFi());
+        when(service.addOrReplace(Mockito.any(Category.class))).thenReturn(samples.sciFi());
 
         mvc.perform(post(samples.baseUrl())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -95,8 +109,8 @@ class CategoryControllerTest {
 
     @Test
     void updateByValidId() throws Exception {
-        Mockito.when(service.findById(Mockito.eq(samples.validId()))).thenReturn(samples.sciFi());
-        Mockito.when(service.addOrReplace(Mockito.any(Category.class))).thenReturn(samples.sciFi());
+        when(service.findById(eq(samples.validId()))).thenReturn(samples.sciFi());
+        when(service.addOrReplace(Mockito.any(Category.class))).thenReturn(samples.sciFi());
 
         mvc.perform(put(samples.validCategoryUrl())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -115,8 +129,8 @@ class CategoryControllerTest {
 
     @Test
     void updateByInvalidId() throws Exception {
-        Mockito.when(service.findById(Mockito.eq(samples.invalidId()))).thenThrow(NoSuchElementException.class);
-        Mockito.when(service.addOrReplace(Mockito.any(Category.class))).thenReturn(samples.sciFi());
+        when(service.findById(eq(samples.invalidId()))).thenThrow(NoSuchElementException.class);
+        when(service.addOrReplace(Mockito.any(Category.class))).thenReturn(samples.sciFi());
 
         mvc.perform(put(samples.invalidCategoryUrl())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -133,19 +147,19 @@ class CategoryControllerTest {
 
     @Test
     void deleteByValidId() throws Exception {
-        Mockito.when(service.contains(Mockito.anyLong())).thenReturn(true);
+        when(service.contains(Mockito.anyLong())).thenReturn(true);
 
         mvc.perform(delete(samples.validCategoryUrl()))
                 .andExpectAll(
                         status().isNoContent()
                 );
 
-        Mockito.verify(service).removeById(Mockito.eq(samples.validId()));
+        Mockito.verify(service).removeById(eq(samples.validId()));
     }
 
     @Test
     void deleteByInvalidId() throws Exception {
-        Mockito.when(service.contains(Mockito.anyLong())).thenReturn(false);
+        when(service.contains(Mockito.anyLong())).thenReturn(false);
 
         mvc.perform(delete(samples.invalidCategoryUrl()))
                 .andExpectAll(
