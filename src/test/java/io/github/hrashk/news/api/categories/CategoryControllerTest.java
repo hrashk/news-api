@@ -1,6 +1,5 @@
 package io.github.hrashk.news.api.categories;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.hrashk.news.api.categories.web.CategoryController;
 import io.github.hrashk.news.api.categories.web.CategoryMapper;
 import org.junit.jupiter.api.Assertions;
@@ -8,16 +7,14 @@ import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.io.Resource;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.nio.charset.StandardCharsets;
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,12 +29,13 @@ class CategoryControllerTest {
 
     @Autowired
     private MockMvc mvc;
+    @Autowired
+    private CategoryJsonSamples json;
     @MockBean
     private CategoryService service;
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @TestConfiguration
+    @Import({CategoryJsonSamples.class})
     static class AppConfig {
         @Bean
         CategoryMapper mapper() {
@@ -46,28 +44,26 @@ class CategoryControllerTest {
     }
 
     @Test
-    void getAllCategories(@Value("classpath:categories/find_all_response.json") Resource r) throws Exception {
-        String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
+    void getAllCategories() throws Exception {
         Mockito.when(service.findAll()).thenReturn(CategorySamples.twoCategories());
 
         mvc.perform(get("/api/v1/categories"))
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        content().json(expectedResponse, true)
+                        content().json(json.findAllResponse(), true)
                 );
     }
 
     @Test
-    void findByValidId(@Value("classpath:categories/upsert_response.json") Resource r) throws Exception {
-        String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
+    void findByValidId() throws Exception {
         Mockito.when(service.findById(Mockito.eq(VALID_ID))).thenReturn(CategorySamples.sciFi());
 
         mvc.perform(get("/api/v1/categories/" + VALID_ID))
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        content().json(expectedResponse, true)
+                        content().json(json.upsertResponse(), true)
                 );
     }
 
@@ -82,18 +78,16 @@ class CategoryControllerTest {
     }
 
     @Test
-    void addCategory(@Value("classpath:categories/upsert_response.json") Resource r) throws Exception {
-        String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
-        String requestPayload = objectMapper.writeValueAsString(CategorySamples.sciFiRequest());
+    void addCategory() throws Exception {
         Mockito.when(service.addOrReplace(Mockito.any(Category.class))).thenReturn(CategorySamples.sciFi());
 
         mvc.perform(post("/api/v1/categories")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestPayload))
+                        .content(json.upsertRequest()))
                 .andExpectAll(
                         status().isCreated(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        content().json(expectedResponse, true)
+                        content().json(json.upsertResponse(), true)
                 );
 
         Mockito.verify(service).addOrReplace(Mockito.assertArg(a ->
@@ -101,20 +95,17 @@ class CategoryControllerTest {
     }
 
     @Test
-    void updateByValidId(@Value("classpath:categories/upsert_response.json") Resource r) throws Exception {
-        String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
-
-        String requestPayload = objectMapper.writeValueAsString(CategorySamples.sciFiRequest());
+    void updateByValidId() throws Exception {
         Mockito.when(service.findById(Mockito.eq(VALID_ID))).thenReturn(CategorySamples.sciFi());
         Mockito.when(service.addOrReplace(Mockito.any(Category.class))).thenReturn(CategorySamples.sciFi());
 
         mvc.perform(put("/api/v1/categories/" + VALID_ID)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestPayload))
+                        .content(json.upsertRequest()))
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        content().json(expectedResponse, true)
+                        content().json(json.upsertResponse(), true)
                 );
 
         Mockito.verify(service).addOrReplace(Mockito.assertArg(a -> Assertions.assertAll(
@@ -124,20 +115,17 @@ class CategoryControllerTest {
     }
 
     @Test
-    void updateByInvalidId(@Value("classpath:categories/upsert_response.json") Resource r) throws Exception {
-        String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
-
-        String requestPayload = objectMapper.writeValueAsString(CategorySamples.sciFiRequest());
+    void updateByInvalidId() throws Exception {
         Mockito.when(service.findById(Mockito.eq(INVALID_ID))).thenThrow(NoSuchElementException.class);
         Mockito.when(service.addOrReplace(Mockito.any(Category.class))).thenReturn(CategorySamples.sciFi());
 
         mvc.perform(put("/api/v1/categories/" + INVALID_ID)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestPayload))
+                        .content(json.upsertRequest()))
                 .andExpectAll(
                         status().isCreated(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        content().json(expectedResponse, true)
+                        content().json(json.upsertResponse(), true)
                 );
 
         Mockito.verify(service).addOrReplace(Mockito.assertArg(a ->

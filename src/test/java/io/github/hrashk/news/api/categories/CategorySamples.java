@@ -1,7 +1,5 @@
 package io.github.hrashk.news.api.categories;
 
-import io.github.hrashk.news.api.categories.web.UpsertCategoryRequest;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -40,9 +38,5 @@ public final class CategorySamples {
                 .id(123123L)
                 .name("Science Fiction")
                 .build();
-    }
-
-    public static UpsertCategoryRequest sciFiRequest() {
-        return new UpsertCategoryRequest("Science Fiction");
     }
 }
