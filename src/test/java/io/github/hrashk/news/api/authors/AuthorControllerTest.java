@@ -1,23 +1,10 @@
 package io.github.hrashk.news.api.authors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.hrashk.news.api.authors.web.AuthorController;
-import io.github.hrashk.news.api.authors.web.AuthorMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 
-import java.nio.charset.StandardCharsets;
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,44 +12,25 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(AuthorController.class)
-class AuthorControllerTest {
+class AuthorControllerTest extends ControllerTestDependencies {
 
     private static final long VALID_ID = 3L;
     private static final long INVALID_ID = 713L;
-    @Autowired
-    private MockMvc mvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockBean
-    private AuthorService service;
-
-    @TestConfiguration
-    static class AppConfig {
-        @Bean
-        AuthorMapper mapper() {
-            return Mappers.getMapper(AuthorMapper.class);
-        }
-    }
 
     @Test
-    void getAllAuthors(@Value("classpath:authors/find_all_response.json") Resource r) throws Exception {
-        String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
+    void getAllAuthors() throws Exception {
         Mockito.when(service.findAll()).thenReturn(AuthorSamples.twoAuthors());
 
         mvc.perform(get("/api/v1/authors"))
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        content().json(expectedResponse, true)
+                        content().json(findAllResponse, true)
                 );
     }
 
     @Test
-    void addAuthor(@Value("classpath:authors/upsert_response.json") Resource r) throws Exception {
-        String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
+    void addAuthor() throws Exception {
         String requestPayload = objectMapper.writeValueAsString(AuthorSamples.jackDoeRequest());
         Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(AuthorSamples.jackDoe());
 
@@ -72,7 +40,7 @@ class AuthorControllerTest {
                 .andExpectAll(
                         status().isCreated(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        content().json(expectedResponse, true)
+                        content().json(upsertResponse, true)
                 );
 
         Mockito.verify(service).addOrReplace(Mockito.assertArg(a ->
@@ -80,15 +48,14 @@ class AuthorControllerTest {
     }
 
     @Test
-    void findByValidId(@Value("classpath:authors/upsert_response.json") Resource r) throws Exception {
-        String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
+    void findByValidId() throws Exception {
         Mockito.when(service.findById(Mockito.anyLong())).thenReturn(AuthorSamples.jackDoe());
 
         mvc.perform(get("/api/v1/authors/" + VALID_ID))
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        content().json(expectedResponse, true)
+                        content().json(upsertResponse, true)
                 );
     }
 
@@ -103,9 +70,7 @@ class AuthorControllerTest {
     }
 
     @Test
-    void updateByValidId(@Value("classpath:authors/upsert_response.json") Resource r) throws Exception {
-        String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
-
+    void updateByValidId() throws Exception {
         String requestPayload = objectMapper.writeValueAsString(AuthorSamples.jackDoeRequest());
         Mockito.when(service.findById(Mockito.eq(VALID_ID))).thenReturn(AuthorSamples.jackDoe());
         Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(AuthorSamples.jackDoe());
@@ -116,7 +81,7 @@ class AuthorControllerTest {
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        content().json(expectedResponse, true)
+                        content().json(upsertResponse, true)
                 );
 
         Mockito.verify(service).addOrReplace(Mockito.assertArg(a -> Assertions.assertAll(
@@ -126,9 +91,7 @@ class AuthorControllerTest {
     }
 
     @Test
-    void updateByInvalidId(@Value("classpath:authors/upsert_response.json") Resource r) throws Exception {
-        String expectedResponse = r.getContentAsString(StandardCharsets.UTF_8);
-
+    void updateByInvalidId() throws Exception {
         String requestPayload = objectMapper.writeValueAsString(AuthorSamples.jackDoeRequest());
         Mockito.when(service.findById(Mockito.eq(INVALID_ID))).thenThrow(NoSuchElementException.class);
         Mockito.when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(AuthorSamples.jackDoe());
@@ -139,7 +102,7 @@ class AuthorControllerTest {
                 .andExpectAll(
                         status().isCreated(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        content().json(expectedResponse, true)
+                        content().json(upsertResponse, true)
                 );
 
         Mockito.verify(service).addOrReplace(Mockito.assertArg(a ->
