@@ -66,7 +66,7 @@ class AuthorControllerTest {
     void getSecondPageOfAuthors() throws Exception {
         when(service.findAll(Mockito.any(Pageable.class))).thenReturn(samples.twoAuthors());
 
-        mvc.perform(get(samples.pageUrl(1, 7)))
+        mvc.perform(get(samples.baseUrl()).param("page", "1").param("size", "7"))
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),

@@ -60,7 +60,7 @@ class CategoryControllerTest {
     void getSecondPageOfCategories() throws Exception {
         when(service.findAll(eq(1), eq(7))).thenReturn(samples.twoCategories());
 
-        mvc.perform(get(samples.pageUrl(1, 7)))
+        mvc.perform(get(samples.baseUrl()).param("page", "1").param("size", "7"))
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
