@@ -1,9 +1,19 @@
 package io.github.hrashk.news.api.authors;
 
+import io.github.hrashk.news.api.authors.web.AuthorController;
+import io.github.hrashk.news.api.authors.web.AuthorMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.NoSuchElementException;
 
@@ -12,7 +22,25 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class AuthorControllerTest extends ControllerTestDependencies {
+@WebMvcTest(AuthorController.class)
+class AuthorControllerTest {
+    @Autowired
+    protected MockMvc mvc;
+    @Autowired
+    protected AuthorJsonSamples json;
+    @Autowired
+    protected AuthorSamples samples;
+    @MockBean
+    protected AuthorService service;
+
+    @TestConfiguration
+    @Import({AuthorJsonSamples.class, AuthorSamples.class})
+    static class AppConfig {
+        @Bean
+        AuthorMapper mapper() {
+            return Mappers.getMapper(AuthorMapper.class);
+        }
+    }
 
     @Test
     void getAllAuthors() throws Exception {

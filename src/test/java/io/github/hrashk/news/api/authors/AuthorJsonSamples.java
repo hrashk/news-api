@@ -20,17 +20,17 @@ public class AuthorJsonSamples {
     private String upsertRequest;
 
     @Value("classpath:authors/find_all_response.json")
-    void setFindAllResponse(Resource r) throws IOException {
+    void readFindAllResponse(Resource r) throws IOException {
         findAllResponse = r.getContentAsString(StandardCharsets.UTF_8);
     }
 
     @Value("classpath:authors/upsert_response.json")
-    void setUpsertResponse(Resource r) throws IOException {
+    void readUpsertResponse(Resource r) throws IOException {
         upsertResponse = r.getContentAsString(StandardCharsets.UTF_8);
     }
 
     @Value("classpath:authors/upsert_request.json")
-    void setUpsertRequest(Resource r) throws IOException {
+    void readUpsertRequest(Resource r) throws IOException {
         upsertRequest = r.getContentAsString(StandardCharsets.UTF_8);
     }
 }
