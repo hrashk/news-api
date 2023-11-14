@@ -3,6 +3,7 @@ package io.github.hrashk.news.api.categories.web;
 import io.github.hrashk.news.api.categories.Category;
 import io.github.hrashk.news.api.categories.CategoryService;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -22,7 +23,7 @@ public class CategoryController {
     private final CategoryMapper mapper;
 
     @GetMapping
-    public ResponseEntity<CategoryListResponse> getAllCategories(@PageableDefault Pageable pageable) {
+    public ResponseEntity<CategoryListResponse> getAllCategories(@ParameterObject @PageableDefault Pageable pageable) {
         List<Category> news = service.findAll(pageable);
 
         return ResponseEntity.ok(mapper.toResponse(news));

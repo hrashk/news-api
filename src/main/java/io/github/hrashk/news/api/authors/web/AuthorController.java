@@ -3,6 +3,7 @@ package io.github.hrashk.news.api.authors.web;
 import io.github.hrashk.news.api.authors.Author;
 import io.github.hrashk.news.api.authors.AuthorService;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -23,7 +24,7 @@ public class AuthorController {
     private final AuthorMapper mapper;
 
     @GetMapping
-    public ResponseEntity<AuthorListResponse> getAllAuthors(@PageableDefault Pageable pageable) {
+    public ResponseEntity<AuthorListResponse> getAllAuthors(@ParameterObject @PageableDefault Pageable pageable) {
         List<Author> authors = service.findAll(pageable);
 
         return ResponseEntity.ok(mapper.toResponse(authors));
