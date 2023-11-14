@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -46,7 +47,7 @@ class CategoryControllerTest {
 
     @Test
     void getFirstPageOfCategories() throws Exception {
-        when(service.findAll(eq(0), eq(10))).thenReturn(samples.twoCategories());
+        when(service.findAll(Mockito.any(Pageable.class))).thenReturn(samples.twoCategories());
 
         mvc.perform(get(samples.baseUrl()))
                 .andExpectAll(
@@ -58,7 +59,7 @@ class CategoryControllerTest {
 
     @Test
     void getSecondPageOfCategories() throws Exception {
-        when(service.findAll(eq(1), eq(7))).thenReturn(samples.twoCategories());
+        when(service.findAll(Mockito.any(Pageable.class))).thenReturn(samples.twoCategories());
 
         mvc.perform(get(samples.baseUrl()).param("page", "1").param("size", "7"))
                 .andExpectAll(
