@@ -1,8 +1,15 @@
 package io.github.hrashk.news.api.news;
 
+import io.github.hrashk.news.api.authors.Author;
+import io.github.hrashk.news.api.authors.AuthorService;
+import io.github.hrashk.news.api.authors.web.AuthorMapper;
+import io.github.hrashk.news.api.categories.Category;
+import io.github.hrashk.news.api.categories.CategoryService;
+import io.github.hrashk.news.api.categories.web.CategoryMapper;
 import io.github.hrashk.news.api.news.web.NewsController;
 import io.github.hrashk.news.api.news.web.NewsMapper;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mockito;
@@ -34,14 +41,36 @@ class NewsControllerTest {
     private NewsSamples samples;
     @MockBean
     private NewsService service;
+    @MockBean
+    private AuthorService authorService;
+    @MockBean
+    private CategoryService categoryService;
 
     @TestConfiguration
     @Import({NewsSamples.class, NewsJsonSamples.class})
     static class AppConfig {
         @Bean
-        NewsMapper mapper() {
+        NewsMapper newsMapper() {
             return Mappers.getMapper(NewsMapper.class);
         }
+
+        @Bean
+        AuthorMapper authorMapper() {
+            return Mappers.getMapper(AuthorMapper.class);
+        }
+
+        @Bean
+        CategoryMapper categoryMapper() {
+            return Mappers.getMapper(CategoryMapper.class);
+        }
+    }
+
+    @BeforeEach
+    public void defaultServiceConfiguration() {
+        Mockito.when(authorService.findById(Mockito.anyLong()))
+                .thenAnswer(args -> Author.builder().id(args.getArgument(0)).build());
+        Mockito.when(categoryService.findById(Mockito.anyLong()))
+                .thenAnswer(args -> Category.builder().id(args.getArgument(0)).build());
     }
 
     @Test

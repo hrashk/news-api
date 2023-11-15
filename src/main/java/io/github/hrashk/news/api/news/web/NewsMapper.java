@@ -1,7 +1,7 @@
 package io.github.hrashk.news.api.news.web;
 
-import io.github.hrashk.news.api.authors.Author;
-import io.github.hrashk.news.api.categories.Category;
+import io.github.hrashk.news.api.authors.web.AuthorMapper;
+import io.github.hrashk.news.api.categories.web.CategoryMapper;
 import io.github.hrashk.news.api.news.News;
 import io.github.hrashk.news.api.news.NewsService;
 import org.mapstruct.Mapper;
@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = {AuthorMapper.class, CategoryMapper.class})
 public abstract class NewsMapper {
     @Autowired
     protected NewsService service;
@@ -33,16 +33,4 @@ public abstract class NewsMapper {
     @Mapping(target = "author", source = "authorId")
     @Mapping(target = "category", source = "categoryId")
     abstract News toNews(UpsertNewsRequest newsRequest);
-
-    public Author authorFromId(Long id) {
-        return Author.builder()
-                .id(id)
-                .build();
-    }
-
-    public Category categoryFromId(Long id) {
-        return Category.builder()
-                .id(id)
-                .build();
-    }
 }
