@@ -12,12 +12,14 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,8 +45,8 @@ class NewsControllerTest {
     }
 
     @Test
-    void getAllNews() throws Exception {
-        Mockito.when(service.findAll()).thenReturn(samples.twoNews());
+    void firstPageOfNews() throws Exception {
+        when(service.findAll(Mockito.any(Pageable.class))).thenReturn(samples.twoNews());
 
         mvc.perform(get(samples.baseUrl()))
                 .andExpectAll(
@@ -52,6 +54,28 @@ class NewsControllerTest {
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
                         content().json(json.findAllResponse(), true)
                 );
+
+        Mockito.verify(service).findAll(Mockito.assertArg(p -> Assertions.assertAll(
+                () -> assertThat(p.getPageNumber()).isEqualTo(0),
+                () -> assertThat(p.getPageSize()).isEqualTo(10)
+        )));
+    }
+
+    @Test
+    void secondPageOfNews() throws Exception {
+        when(service.findAll(Mockito.any(Pageable.class))).thenReturn(samples.twoNews());
+
+        mvc.perform(get(samples.baseUrl()).param("page", "1").param("size", "7"))
+                .andExpectAll(
+                        status().isOk(),
+                        content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
+                        content().json(json.findAllResponse(), true)
+                );
+
+        Mockito.verify(service).findAll(Mockito.assertArg(p -> Assertions.assertAll(
+                () -> assertThat(p.getPageNumber()).isEqualTo(1),
+                () -> assertThat(p.getPageSize()).isEqualTo(7)
+        )));
     }
 
     @Test

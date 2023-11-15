@@ -1,6 +1,7 @@
 package io.github.hrashk.news.api.news;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,8 +11,8 @@ import java.util.List;
 public class NewsService {
     private final NewsRepository repository;
 
-    public List<News> findAll() {
-        return repository.findAll();
+    public List<News> findAll(Pageable pageable) {
+        return repository.findAll(pageable).getContent();
     }
 
     /**

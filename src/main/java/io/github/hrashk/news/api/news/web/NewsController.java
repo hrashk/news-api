@@ -3,7 +3,10 @@ package io.github.hrashk.news.api.news.web;
 import io.github.hrashk.news.api.news.News;
 import io.github.hrashk.news.api.news.NewsService;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +23,8 @@ public class NewsController {
     private final NewsMapper mapper;
 
     @GetMapping
-    public ResponseEntity<NewsListResponse> getAllNews() {
-        List<News> news = service.findAll();
+    public ResponseEntity<NewsListResponse> getAllNews(@ParameterObject @PageableDefault Pageable pageable) {
+        List<News> news = service.findAll(pageable);
 
         return ResponseEntity.ok(mapper.toResponse(news));
     }
