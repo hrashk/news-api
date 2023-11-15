@@ -102,8 +102,8 @@ class NewsControllerTest {
 
     @Test
     void addNews() throws Exception {
-        News news = samples.greatNews();
-        Mockito.when(service.addOrReplace(Mockito.any(News.class))).thenReturn(news);
+        News expected = samples.greatNews();
+        Mockito.when(service.addOrReplace(Mockito.any(News.class))).thenReturn(expected);
 
         mvc.perform(post(samples.baseUrl())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -114,22 +114,19 @@ class NewsControllerTest {
                         content().json(json.upsertResponse(), true)
                 );
 
-        Mockito.verify(service).addOrReplace(Mockito.assertArg(a -> Assertions.assertAll(
-                () -> assertThat(a.getId()).as("News id").isNull(),
-                () -> assertThat(a.getAuthor().getId()).as("Author id").isEqualTo(news.getAuthor().getId()),
-                () -> assertThat(a.getCategory().getId()).as("Category id").isEqualTo(news.getCategory().getId()),
-                () -> assertThat(a.getHeadline()).as("Headline").isEqualTo(news.getHeadline()),
-                () -> assertThat(a.getContent()).as("Content").isEqualTo(news.getContent())
+        Mockito.verify(service).addOrReplace(Mockito.assertArg(actual -> Assertions.assertAll(
+                () -> samples.assertIdIsNull(actual),
+                () -> samples.assertAreSimilar(expected, actual)
         )));
     }
 
     @Test
     void updateByValidId() throws Exception {
-        News currentNews = samples.sadNews();
-        Mockito.when(service.findById(Mockito.eq(samples.validId()))).thenReturn(currentNews);
+        News current = samples.sadNews();
+        Mockito.when(service.findById(Mockito.eq(samples.validId()))).thenReturn(current);
 
-        News updatedNews = samples.greatNews();
-        Mockito.when(service.addOrReplace(Mockito.any(News.class))).thenReturn(updatedNews);
+        News expected = samples.greatNews();
+        Mockito.when(service.addOrReplace(Mockito.any(News.class))).thenReturn(expected);
 
         mvc.perform(put(samples.validIdUrl())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -140,23 +137,18 @@ class NewsControllerTest {
                         content().json(json.upsertResponse(), true)
                 );
 
-        Mockito.verify(service).addOrReplace(Mockito.assertArg(a -> Assertions.assertAll(
-                () -> assertThat(a.getId()).as("News id").isEqualTo(currentNews.getId()),
-                () -> assertThat(a.getCreatedAt()).as("Created at").isEqualTo(currentNews.getCreatedAt()),
-                () -> assertThat(a.getUpdatedAt()).as("Updated at").isEqualTo(currentNews.getUpdatedAt()),
-
-                () -> assertThat(a.getAuthor().getId()).as("Author id").isEqualTo(updatedNews.getAuthor().getId()),
-                () -> assertThat(a.getCategory().getId()).as("Category id").isEqualTo(updatedNews.getCategory().getId()),
-                () -> assertThat(a.getHeadline()).as("Headline").isEqualTo(updatedNews.getHeadline()),
-                () -> assertThat(a.getContent()).as("Content").isEqualTo(updatedNews.getContent())
+        Mockito.verify(service).addOrReplace(Mockito.assertArg(actual -> Assertions.assertAll(
+                () -> samples.assertHaveSameIds(current, actual),
+                () -> samples.assertHaveSameAuditDates(current, actual),
+                () -> samples.assertAreSimilar(expected, actual)
         )));
     }
 
     @Test
     void updateByInvalidId() throws Exception {
         Mockito.when(service.findById(Mockito.eq(samples.invalidId()))).thenThrow(NoSuchElementException.class);
-        News news = samples.greatNews();
-        Mockito.when(service.addOrReplace(Mockito.any(News.class))).thenReturn(news);
+        News expected = samples.greatNews();
+        Mockito.when(service.addOrReplace(Mockito.any(News.class))).thenReturn(expected);
 
         mvc.perform(put(samples.invalidIdUrl())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -167,12 +159,9 @@ class NewsControllerTest {
                         content().json(json.upsertResponse(), true)
                 );
 
-        Mockito.verify(service).addOrReplace(Mockito.assertArg(a -> Assertions.assertAll(
-                () -> assertThat(a.getId()).as("News id").isNull(),
-                () -> assertThat(a.getAuthor().getId()).as("Author id").isEqualTo(news.getAuthor().getId()),
-                () -> assertThat(a.getCategory().getId()).as("Category id").isEqualTo(news.getCategory().getId()),
-                () -> assertThat(a.getHeadline()).as("Headline").isEqualTo(news.getHeadline()),
-                () -> assertThat(a.getContent()).as("Content").isEqualTo(news.getContent())
+        Mockito.verify(service).addOrReplace(Mockito.assertArg(actual -> Assertions.assertAll(
+                () -> samples.assertIdIsNull(actual),
+                () -> samples.assertAreSimilar(expected, actual)
         )));
     }
 
