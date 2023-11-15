@@ -42,8 +42,8 @@ public class NewsController {
 
     @PostMapping
     public ResponseEntity<NewsResponse> addNews(@RequestBody UpsertNewsRequest authorRequest) {
-        News author = mapper.toNews(authorRequest);
-        News saved = service.addOrReplace(author);
+        News news = mapper.toNews(authorRequest);
+        News saved = service.addOrReplace(news);
 
         NewsResponse response = mapper.toResponse(saved);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -52,10 +52,11 @@ public class NewsController {
     @PutMapping("/{id}")
     public ResponseEntity<NewsResponse> updateNews(@PathVariable Long id, @RequestBody UpsertNewsRequest request) {
         try {
-            News author = service.findById(id);
-            BeanUtils.copyProperties(request, author);
+            News current = service.findById(id);
+            News updated = mapper.toNews(request);
+            BeanUtils.copyProperties(updated, current);
 
-            News saved = service.addOrReplace(author);
+            News saved = service.addOrReplace(current);
 
             return ResponseEntity.ok(mapper.toResponse(saved));
         } catch (NoSuchElementException ex) {

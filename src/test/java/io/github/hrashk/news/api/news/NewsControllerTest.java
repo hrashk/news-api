@@ -122,8 +122,11 @@ class NewsControllerTest {
 
     @Test
     void updateByValidId() throws Exception {
-        Mockito.when(service.findById(Mockito.eq(samples.validId()))).thenReturn(samples.greatNews());
-        Mockito.when(service.addOrReplace(Mockito.any(News.class))).thenReturn(samples.greatNews());
+        News oldEntity = samples.sadNews();
+        Mockito.when(service.findById(Mockito.eq(samples.validId()))).thenReturn(oldEntity);
+
+        News updateEntity = samples.greatNews();
+        Mockito.when(service.addOrReplace(Mockito.any(News.class))).thenReturn(updateEntity);
 
         mvc.perform(put(samples.validIdUrl())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -135,8 +138,14 @@ class NewsControllerTest {
                 );
 
         Mockito.verify(service).addOrReplace(Mockito.assertArg(a -> Assertions.assertAll(
-                () -> assertThat(a.getId()).as("News id").isEqualTo(samples.validId()),
-                () -> assertThat(a.getCreatedAt()).as("News created at").isNotNull()
+                () -> assertThat(a.getId()).as("News id").isEqualTo(oldEntity.getId()),
+                () -> assertThat(a.getCreatedAt()).as("Created at").isEqualTo(oldEntity.getCreatedAt()),
+                () -> assertThat(a.getUpdatedAt()).as("Updated at").isEqualTo(oldEntity.getUpdatedAt()),
+
+                () -> assertThat(a.getAuthor().getId()).as("Author id").isEqualTo(updateEntity.getAuthor().getId()),
+                () -> assertThat(a.getCategory().getId()).as("Category id").isEqualTo(updateEntity.getCategory().getId()),
+                () -> assertThat(a.getHeadline()).as("Headline").isEqualTo(updateEntity.getHeadline()),
+                () -> assertThat(a.getContent()).as("Content").isEqualTo(updateEntity.getContent())
         )));
     }
 
