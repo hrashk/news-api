@@ -2,6 +2,7 @@ package io.github.hrashk.news.api.news.web;
 
 import io.github.hrashk.news.api.news.News;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 
@@ -13,6 +14,8 @@ public interface NewsMapper {
         return new NewsListResponse(toResponseList(news));
     }
 
+    @Mapping(target = "authorId", source = "author.id")
+    @Mapping(target = "categoryId", source = "category.id")
     NewsResponse toResponse(News news);
 
     News toNews(UpsertNewsRequest newsRequest);

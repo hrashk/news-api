@@ -1,5 +1,7 @@
 package io.github.hrashk.news.api.news;
 
+import io.github.hrashk.news.api.authors.Author;
+import io.github.hrashk.news.api.categories.Category;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +27,12 @@ public class News {
 
     private String headline;
     private String content;
+
+    @ManyToOne
+    private Author author;
+
+    @ManyToOne
+    private Category category;
 
     @CreatedDate
     private LocalDateTime createdAt;

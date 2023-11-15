@@ -1,5 +1,7 @@
 package io.github.hrashk.news.api.news;
 
+import io.github.hrashk.news.api.authors.Author;
+import io.github.hrashk.news.api.categories.Category;
 import org.springframework.boot.test.context.TestComponent;
 
 import java.time.LocalDateTime;
@@ -32,6 +34,8 @@ public class NewsSamples {
 
         News n2 = News.builder()
                 .id(22L)
+                .author(Author.builder().id(5L).build())
+                .category(Category.builder().id(13L).build())
                 .headline("Sad news")
                 .content("Dolor sit amet")
                 .createdAt(LocalDateTime.parse("2011-07-17T00:00:00"))
@@ -44,6 +48,8 @@ public class NewsSamples {
     public News greatNews() {
         return News.builder()
                 .id(validId())
+                .author(Author.builder().id(3L).build())
+                .category(Category.builder().id(11L).build())
                 .headline("Great news")
                 .content("Lorem ipsum dolor")
                 .createdAt(LocalDateTime.parse("2011-10-13T00:00:00"))
@@ -53,6 +59,8 @@ public class NewsSamples {
 
     public News withoutId() {
         return News.builder()
+                .author(Author.builder().id(3L).build())
+                .category(Category.builder().id(11L).build())
                 .headline("Great news")
                 .content("Lorem ipsum dolor")
                 .build();
@@ -61,6 +69,8 @@ public class NewsSamples {
     public News withInvalidId() {
         return News.builder()
                 .id(invalidId())
+                .author(Author.builder().id(3L).build())
+                .category(Category.builder().id(11L).build())
                 .headline("Great news")
                 .content("Lorem ipsum dolor")
                 .build();

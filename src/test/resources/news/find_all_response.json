@@ -2,11 +2,15 @@
   "news": [
     {
       "id": 7,
+      "authorId": 3,
+      "categoryId": 11,
       "headline": "Great news",
       "content": "Lorem ipsum dolor"
     },
     {
       "id": 22,
+      "authorId": 5,
+      "categoryId": 13,
       "headline": "Sad news",
       "content": "Dolor sit amet"
     }
