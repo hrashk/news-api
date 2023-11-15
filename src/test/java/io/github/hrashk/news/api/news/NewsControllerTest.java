@@ -31,11 +31,13 @@ class NewsControllerTest {
     private MockMvc mvc;
     @Autowired
     private NewsJsonSamples json;
+    @Autowired
+    private NewsSamples samples;
     @MockBean
     private NewsService service;
 
     @TestConfiguration
-    @Import({NewsJsonSamples.class})
+    @Import({NewsSamples.class, NewsJsonSamples.class})
     static class AppConfig {
         @Bean
         NewsMapper mapper() {
@@ -45,7 +47,7 @@ class NewsControllerTest {
 
     @Test
     void getAllNews() throws Exception {
-        Mockito.when(service.findAll()).thenReturn(NewsSamples.twoNews());
+        Mockito.when(service.findAll()).thenReturn(samples.twoNews());
 
         mvc.perform(get("/api/v1/news"))
                 .andExpectAll(
@@ -57,7 +59,7 @@ class NewsControllerTest {
 
     @Test
     void findByValidId() throws Exception {
-        Mockito.when(service.findById(Mockito.eq(VALID_ID))).thenReturn(NewsSamples.greatNews());
+        Mockito.when(service.findById(Mockito.eq(VALID_ID))).thenReturn(samples.greatNews());
 
         mvc.perform(get("/api/v1/news/" + VALID_ID))
                 .andExpectAll(
@@ -79,7 +81,7 @@ class NewsControllerTest {
 
     @Test
     void addNews() throws Exception {
-        Mockito.when(service.addOrReplace(Mockito.any(News.class))).thenReturn(NewsSamples.greatNews());
+        Mockito.when(service.addOrReplace(Mockito.any(News.class))).thenReturn(samples.greatNews());
 
         mvc.perform(post("/api/v1/news")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -96,8 +98,8 @@ class NewsControllerTest {
 
     @Test
     void updateByValidId() throws Exception {
-        Mockito.when(service.findById(Mockito.eq(VALID_ID))).thenReturn(NewsSamples.greatNews());
-        Mockito.when(service.addOrReplace(Mockito.any(News.class))).thenReturn(NewsSamples.greatNews());
+        Mockito.when(service.findById(Mockito.eq(VALID_ID))).thenReturn(samples.greatNews());
+        Mockito.when(service.addOrReplace(Mockito.any(News.class))).thenReturn(samples.greatNews());
 
         mvc.perform(put("/api/v1/news/" + VALID_ID)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -117,7 +119,7 @@ class NewsControllerTest {
     @Test
     void updateByInvalidId() throws Exception {
         Mockito.when(service.findById(Mockito.eq(INVALID_ID))).thenThrow(NoSuchElementException.class);
-        Mockito.when(service.addOrReplace(Mockito.any(News.class))).thenReturn(NewsSamples.greatNews());
+        Mockito.when(service.addOrReplace(Mockito.any(News.class))).thenReturn(samples.greatNews());
 
         mvc.perform(put("/api/v1/news/" + INVALID_ID)
                         .contentType(MediaType.APPLICATION_JSON)

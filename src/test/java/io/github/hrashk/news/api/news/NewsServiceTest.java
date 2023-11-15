@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ContainerJpaTest
-@Import(NewsService.class)
+@Import({NewsService.class, NewsSamples.class})
 class NewsServiceTest {
     private static final long INVALID_ID = 11333L;
 
@@ -22,11 +22,13 @@ class NewsServiceTest {
 
     @Autowired
     private NewsRepository repository;
+    @Autowired
+    private NewsSamples samples;
     private List<News> savedNews;
 
     @BeforeEach
     public void injectNews() {
-        this.savedNews = repository.saveAll(NewsSamples.twoNews());
+        this.savedNews = repository.saveAll(samples.twoNews());
     }
 
     @Test
@@ -50,14 +52,14 @@ class NewsServiceTest {
 
     @Test
     void saveWithNullId() {
-        News saved = service.addOrReplace(NewsSamples.withoutId());
+        News saved = service.addOrReplace(samples.withoutId());
 
         assertThat(saved.getId()).as("News id").isNotNull();
     }
 
     @Test
     void saveWithNonNullId() {
-        var n = NewsSamples.withId();
+        var n = samples.withId();
         long originalid = n.getId(); // the news object is changed after saving
 
         News saved = service.addOrReplace(n);
