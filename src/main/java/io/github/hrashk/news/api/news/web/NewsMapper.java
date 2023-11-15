@@ -3,35 +3,44 @@ package io.github.hrashk.news.api.news.web;
 import io.github.hrashk.news.api.authors.Author;
 import io.github.hrashk.news.api.categories.Category;
 import io.github.hrashk.news.api.news.News;
+import io.github.hrashk.news.api.news.NewsService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
-public interface NewsMapper {
-    List<NewsResponse> toResponseList(List<News> news);
+public abstract class NewsMapper {
+    @Autowired
+    protected NewsService service;
 
-    default NewsListResponse toResponse(List<News> news) {
+    public News fromId(Long id) {
+        return service.findById(id);
+    }
+
+    abstract List<NewsResponse> toResponseList(List<News> news);
+
+    public NewsListResponse toResponse(List<News> news) {
         return new NewsListResponse(toResponseList(news));
     }
 
     @Mapping(target = "authorId", source = "author.id")
     @Mapping(target = "categoryId", source = "category.id")
-    NewsResponse toResponse(News news);
+    abstract NewsResponse toResponse(News news);
 
     @Mapping(target = "author", source = "authorId")
     @Mapping(target = "category", source = "categoryId")
-    News toNews(UpsertNewsRequest newsRequest);
+    abstract News toNews(UpsertNewsRequest newsRequest);
 
-    default Author authorFromId(Long id) {
+    public Author authorFromId(Long id) {
         return Author.builder()
                 .id(id)
                 .build();
     }
 
-    default Category categoryFromId(Long id) {
+    public Category categoryFromId(Long id) {
         return Category.builder()
                 .id(id)
                 .build();

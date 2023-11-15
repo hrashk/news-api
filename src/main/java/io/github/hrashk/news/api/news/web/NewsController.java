@@ -32,7 +32,7 @@ public class NewsController {
     @GetMapping("/{id}")
     public ResponseEntity<NewsResponse> getNewsById(@PathVariable Long id) {
         try {
-            News news = service.findById(id);
+            News news = mapper.fromId(id);
 
             return ResponseEntity.ok(mapper.toResponse(news));
         } catch (NoSuchElementException ex) {
@@ -52,9 +52,9 @@ public class NewsController {
     @PutMapping("/{id}")
     public ResponseEntity<NewsResponse> updateNews(@PathVariable Long id, @RequestBody UpsertNewsRequest request) {
         try {
-            News current = service.findById(id);
-            News updated = mapper.toNews(request);
-            BeanUtils.copyProperties(updated, current);
+            News current = mapper.fromId(id);
+            News requested = mapper.toNews(request);
+            BeanUtils.copyProperties(requested, current);
 
             News saved = service.addOrReplace(current);
 
