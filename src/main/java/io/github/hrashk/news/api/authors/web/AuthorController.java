@@ -35,14 +35,8 @@ public class AuthorController {
         Author author = mapper.toAuthor(authorRequest);
         Author saved = service.addOrReplace(author);
 
-        return created(mapper.toResponse(saved));
-    }
-
-    private static ResponseEntity<AuthorResponse> created(AuthorResponse response) {
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(response);
+        AuthorResponse response = mapper.toResponse(saved);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{id}")

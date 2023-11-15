@@ -42,14 +42,8 @@ public class NewsController {
         News author = mapper.toNews(authorRequest);
         News saved = service.addOrReplace(author);
 
-        return created(mapper.toResponse(saved));
-    }
-
-    private static ResponseEntity<NewsResponse> created(NewsResponse response) {
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(response);
+        NewsResponse response = mapper.toResponse(saved);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{id}")

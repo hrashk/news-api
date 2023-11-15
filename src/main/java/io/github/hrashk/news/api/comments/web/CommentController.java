@@ -42,14 +42,8 @@ public class CommentController {
         Comment author = mapper.toComment(authorRequest);
         Comment saved = service.addOrReplace(author);
 
-        return created(mapper.toResponse(saved));
-    }
-
-    private static ResponseEntity<CommentResponse> created(CommentResponse response) {
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(response);
+        CommentResponse response = mapper.toResponse(saved);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{id}")

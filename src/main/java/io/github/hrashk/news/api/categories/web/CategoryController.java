@@ -45,14 +45,8 @@ public class CategoryController {
         Category author = mapper.toCategory(authorRequest);
         Category saved = service.addOrReplace(author);
 
-        return created(mapper.toResponse(saved));
-    }
-
-    private static ResponseEntity<CategoryResponse> created(CategoryResponse response) {
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(response);
+        CategoryResponse response = mapper.toResponse(saved);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{id}")
