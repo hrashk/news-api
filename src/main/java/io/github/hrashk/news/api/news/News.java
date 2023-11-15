@@ -28,10 +28,10 @@ public class News {
     private String headline;
     private String content;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Author author;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Category category;
 
     @CreatedDate

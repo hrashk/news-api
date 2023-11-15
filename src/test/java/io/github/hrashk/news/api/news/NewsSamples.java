@@ -40,6 +40,16 @@ public class NewsSamples {
         return List.of(n1, n2);
     }
 
+    public List<News> twoNewsWithNewDependencies() {
+        List<News> news = twoNews();
+        news.forEach(n -> {
+            n.getAuthor().setId(null);
+            n.getCategory().setId(null);
+        });
+
+        return news;
+    }
+
     public News greatNews() {
         return News.builder()
                 .id(validId())
@@ -66,8 +76,8 @@ public class NewsSamples {
 
     public News withoutId() {
         return News.builder()
-                .author(Author.builder().id(3L).build())
-                .category(Category.builder().id(11L).build())
+                .author(Author.builder().build())
+                .category(Category.builder().build())
                 .headline("Great news")
                 .content("Lorem ipsum dolor")
                 .build();
