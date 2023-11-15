@@ -32,7 +32,7 @@ public class CategoryController {
     @GetMapping("/{id}")
     public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable Long id) {
         try {
-            Category news = service.findById(id);
+            Category news = mapper.fromId(id);
 
             return ResponseEntity.ok(mapper.toResponse(news));
         } catch (NoSuchElementException ex) {
@@ -52,7 +52,7 @@ public class CategoryController {
     @PutMapping("/{id}")
     public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id, @RequestBody UpsertCategoryRequest request) {
         try {
-            Category author = service.findById(id);
+            Category author = mapper.fromId(id);
             BeanUtils.copyProperties(request, author);
 
             Category saved = service.addOrReplace(author);
