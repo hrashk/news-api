@@ -113,8 +113,11 @@ class NewsControllerTest {
                         content().json(json.upsertResponse(), true)
                 );
 
-        Mockito.verify(service).addOrReplace(Mockito.assertArg(a ->
-                assertThat(a.getId()).as("News id").isNull()));
+        Mockito.verify(service).addOrReplace(Mockito.assertArg(a -> Assertions.assertAll(
+                () -> assertThat(a.getId()).as("News id").isNull(),
+                () -> assertThat(a.getAuthor()).as("Author").isNotNull(),
+                () -> assertThat(a.getCategory()).as("Category").isNotNull()
+        )));
     }
 
     @Test
