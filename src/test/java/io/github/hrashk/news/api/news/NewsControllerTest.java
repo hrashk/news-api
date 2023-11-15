@@ -24,9 +24,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(NewsController.class)
 class NewsControllerTest {
-    private static final long VALID_ID = 7L;
-    private static final long INVALID_ID = 522L;
-
     @Autowired
     private MockMvc mvc;
     @Autowired
@@ -49,7 +46,7 @@ class NewsControllerTest {
     void getAllNews() throws Exception {
         Mockito.when(service.findAll()).thenReturn(samples.twoNews());
 
-        mvc.perform(get("/api/v1/news"))
+        mvc.perform(get(samples.baseUrl()))
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
@@ -59,9 +56,9 @@ class NewsControllerTest {
 
     @Test
     void findByValidId() throws Exception {
-        Mockito.when(service.findById(Mockito.eq(VALID_ID))).thenReturn(samples.greatNews());
+        Mockito.when(service.findById(Mockito.eq(samples.validId()))).thenReturn(samples.greatNews());
 
-        mvc.perform(get("/api/v1/news/" + VALID_ID))
+        mvc.perform(get(samples.validIdUrl()))
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
@@ -71,9 +68,9 @@ class NewsControllerTest {
 
     @Test
     void findByInvalidId() throws Exception {
-        Mockito.when(service.findById(Mockito.eq(INVALID_ID))).thenThrow(NoSuchElementException.class);
+        Mockito.when(service.findById(Mockito.eq(samples.invalidId()))).thenThrow(NoSuchElementException.class);
 
-        mvc.perform(get("/api/v1/news/" + INVALID_ID))
+        mvc.perform(get(samples.invalidIdUrl()))
                 .andExpectAll(
                         status().isNotFound()
                 );
@@ -83,7 +80,7 @@ class NewsControllerTest {
     void addNews() throws Exception {
         Mockito.when(service.addOrReplace(Mockito.any(News.class))).thenReturn(samples.greatNews());
 
-        mvc.perform(post("/api/v1/news")
+        mvc.perform(post(samples.baseUrl())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.upsertRequest()))
                 .andExpectAll(
@@ -98,10 +95,10 @@ class NewsControllerTest {
 
     @Test
     void updateByValidId() throws Exception {
-        Mockito.when(service.findById(Mockito.eq(VALID_ID))).thenReturn(samples.greatNews());
+        Mockito.when(service.findById(Mockito.eq(samples.validId()))).thenReturn(samples.greatNews());
         Mockito.when(service.addOrReplace(Mockito.any(News.class))).thenReturn(samples.greatNews());
 
-        mvc.perform(put("/api/v1/news/" + VALID_ID)
+        mvc.perform(put(samples.validIdUrl())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.upsertRequest()))
                 .andExpectAll(
@@ -111,17 +108,17 @@ class NewsControllerTest {
                 );
 
         Mockito.verify(service).addOrReplace(Mockito.assertArg(a -> Assertions.assertAll(
-                () -> assertThat(a.getId()).as("News id").isEqualTo(VALID_ID),
+                () -> assertThat(a.getId()).as("News id").isEqualTo(samples.validId()),
                 () -> assertThat(a.getCreatedAt()).as("News created at").isNotNull()
         )));
     }
 
     @Test
     void updateByInvalidId() throws Exception {
-        Mockito.when(service.findById(Mockito.eq(INVALID_ID))).thenThrow(NoSuchElementException.class);
+        Mockito.when(service.findById(Mockito.eq(samples.invalidId()))).thenThrow(NoSuchElementException.class);
         Mockito.when(service.addOrReplace(Mockito.any(News.class))).thenReturn(samples.greatNews());
 
-        mvc.perform(put("/api/v1/news/" + INVALID_ID)
+        mvc.perform(put(samples.invalidIdUrl())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.upsertRequest()))
                 .andExpectAll(
@@ -138,19 +135,19 @@ class NewsControllerTest {
     void deleteByValidId() throws Exception {
         Mockito.when(service.contains(Mockito.anyLong())).thenReturn(true);
 
-        mvc.perform(delete("/api/v1/news/" + VALID_ID))
+        mvc.perform(delete(samples.validIdUrl()))
                 .andExpectAll(
                         status().isNoContent()
                 );
 
-        Mockito.verify(service).removeById(Mockito.eq(VALID_ID));
+        Mockito.verify(service).removeById(Mockito.eq(samples.validId()));
     }
 
     @Test
     void deleteByInvalidId() throws Exception {
         Mockito.when(service.contains(Mockito.anyLong())).thenReturn(false);
 
-        mvc.perform(delete("/api/v1/news/" + INVALID_ID))
+        mvc.perform(delete(samples.invalidIdUrl()))
                 .andExpectAll(
                         status().isNotFound()
                 );

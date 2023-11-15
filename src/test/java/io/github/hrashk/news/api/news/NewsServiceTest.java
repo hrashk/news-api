@@ -15,8 +15,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @ContainerJpaTest
 @Import({NewsService.class, NewsSamples.class})
 class NewsServiceTest {
-    private static final long INVALID_ID = 11333L;
-
     @Autowired
     private NewsService service;
 
@@ -46,7 +44,7 @@ class NewsServiceTest {
 
     @Test
     void findByInvalidId() {
-        assertThatThrownBy(() -> service.findById(INVALID_ID))
+        assertThatThrownBy(() -> service.findById(samples.invalidId()))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
@@ -59,7 +57,7 @@ class NewsServiceTest {
 
     @Test
     void saveWithNonNullId() {
-        var n = samples.withId();
+        var n = samples.withInvalidId();
         long originalid = n.getId(); // the news object is changed after saving
 
         News saved = service.addOrReplace(n);
@@ -76,7 +74,7 @@ class NewsServiceTest {
 
     @Test
     void doesNotContainInvalidId() {
-        assertThat(service.contains(INVALID_ID)).isFalse();
+        assertThat(service.contains(samples.invalidId())).isFalse();
     }
 
     @Test

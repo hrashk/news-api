@@ -1,6 +1,5 @@
 package io.github.hrashk.news.api.news;
 
-import io.github.hrashk.news.api.news.web.UpsertNewsRequest;
 import org.springframework.boot.test.context.TestComponent;
 
 import java.time.LocalDateTime;
@@ -8,6 +7,25 @@ import java.util.List;
 
 @TestComponent
 public class NewsSamples {
+    public String baseUrl() {
+        return "/api/v1/news";
+    }
+
+    public Long validId() {
+        return 7L;
+    }
+
+    public Long invalidId() {
+        return 522L;
+    }
+
+    public String validIdUrl() {
+        return baseUrl() + "/" + validId();
+    }
+
+    public String invalidIdUrl() {
+        return baseUrl() + "/" + invalidId();
+    }
 
     public List<News> twoNews() {
         News n1 = greatNews();
@@ -25,7 +43,7 @@ public class NewsSamples {
 
     public News greatNews() {
         return News.builder()
-                .id(7L)
+                .id(validId())
                 .headline("Great news")
                 .content("Lorem ipsum dolor")
                 .createdAt(LocalDateTime.parse("2011-10-13T00:00:00"))
@@ -40,15 +58,11 @@ public class NewsSamples {
                 .build();
     }
 
-    public News withId() {
+    public News withInvalidId() {
         return News.builder()
-                .id(123123L)
+                .id(invalidId())
                 .headline("Great news")
                 .content("Lorem ipsum dolor")
                 .build();
-    }
-
-    public UpsertNewsRequest greatNewsRequest() {
-        return new UpsertNewsRequest("Great news", "Lorem ipsum dolor");
     }
 }
