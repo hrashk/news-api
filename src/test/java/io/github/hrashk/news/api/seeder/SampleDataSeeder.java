@@ -1,4 +1,4 @@
-package io.github.hrashk.news.api;
+package io.github.hrashk.news.api.seeder;
 
 import io.github.hrashk.news.api.authors.AuthorRepository;
 import io.github.hrashk.news.api.categories.CategoryRepository;
@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.TestComponent;
 
 @TestComponent
 @RequiredArgsConstructor
-public class SampleDataInjector implements CommandLineRunner {
+public class SampleDataSeeder implements CommandLineRunner {
     private final AuthorRepository authorsRepo;
     private final NewsRepository newsRepo;
     private final CategoryRepository categoryRepo;

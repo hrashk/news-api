@@ -1,5 +1,6 @@
 package io.github.hrashk.news.api;
 
+import io.github.hrashk.news.api.seeder.SampleDataSeeder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -9,7 +10,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 @TestConfiguration(proxyBeanMethods = false)
-@Import(SampleDataInjector.class)
+@Import(SampleDataSeeder.class)
 public class TestNewsApiApplication {
 
     @Bean

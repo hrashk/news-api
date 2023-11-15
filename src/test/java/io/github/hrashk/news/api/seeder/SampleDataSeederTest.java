@@ -1,5 +1,6 @@
-package io.github.hrashk.news.api;
+package io.github.hrashk.news.api.seeder;
 
+import io.github.hrashk.news.api.ContainerJpaTest;
 import io.github.hrashk.news.api.authors.AuthorRepository;
 import io.github.hrashk.news.api.categories.CategoryRepository;
 import io.github.hrashk.news.api.news.NewsRepository;
@@ -11,8 +12,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @ContainerJpaTest
-@Import(SampleDataInjector.class) // will run automatically
-class SampleDataInjectorTest {
+@Import(SampleDataSeeder.class) // will run automatically
+class SampleDataSeederTest {
     @Autowired
     private AuthorRepository authorsRepo;
     @Autowired
