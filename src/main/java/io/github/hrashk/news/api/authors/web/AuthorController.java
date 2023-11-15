@@ -42,7 +42,7 @@ public class AuthorController {
     @GetMapping("/{id}")
     public ResponseEntity<AuthorResponse> getAuthorById(@PathVariable Long id) {
         try {
-            Author a = service.findById(id);
+            Author a = mapper.fromId(id);
 
             return ResponseEntity.ok(mapper.toResponse(a));
         } catch (NoSuchElementException ex) {
@@ -53,7 +53,7 @@ public class AuthorController {
     @PutMapping("/{id}")
     public ResponseEntity<AuthorResponse> updateAuthor(@PathVariable Long id, @RequestBody UpsertAuthorRequest request) {
         try {
-            Author author = service.findById(id);
+            Author author = mapper.fromId(id);
             BeanUtils.copyProperties(request, author);
 
             Author saved = service.addOrReplace(author);
