@@ -137,12 +137,12 @@ class NewsControllerTest {
 
     @Test
     void addNews() throws Exception {
-        News expected = samples.greatNews();
+        News expected = samples.sadNews();
         Mockito.when(service.addOrReplace(Mockito.any(News.class))).thenReturn(expected);
 
         mvc.perform(post(samples.baseUrl())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(json.upsertRequest()))
+                        .content(json.insertRequest()))
                 .andExpectAll(
                         status().isCreated(),
                         content().json(json.insertResponse(), true)
@@ -161,7 +161,7 @@ class NewsControllerTest {
 
         mvc.perform(post(samples.baseUrl())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(json.upsertRequest()))
+                        .content(json.updateRequest()))
                 .andExpectAll(
                         status().isNotFound(),
                         jsonPath("message").value(containsString("Author"))
@@ -175,7 +175,7 @@ class NewsControllerTest {
 
         mvc.perform(put(samples.validIdUrl())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(json.upsertRequest()))
+                        .content(json.updateRequest()))
                 .andExpectAll(
                         status().isNotFound(),
                         jsonPath("message").value(containsString("Category"))
@@ -192,7 +192,7 @@ class NewsControllerTest {
 
         mvc.perform(put(samples.validIdUrl())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(json.upsertRequest()))
+                        .content(json.updateRequest()))
                 .andExpectAll(
                         status().isOk(),
                         content().json(json.updateResponse(), true)
@@ -209,12 +209,12 @@ class NewsControllerTest {
     void updatingWithInvalidNewsIdCreatesNewEntity() throws Exception {
         Mockito.when(service.findById(Mockito.eq(samples.invalidId())))
                 .thenThrow(new NewsNotFoundException(samples.invalidId()));
-        News expected = samples.greatNews();
+        News expected = samples.sadNews();
         Mockito.when(service.addOrReplace(Mockito.any(News.class))).thenReturn(expected);
 
         mvc.perform(put(samples.invalidIdUrl())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(json.upsertRequest()))
+                        .content(json.insertRequest()))
                 .andExpectAll(
                         status().isCreated(),
                         content().json(json.insertResponse(), true)
@@ -234,7 +234,7 @@ class NewsControllerTest {
 
         mvc.perform(put(samples.validIdUrl())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(json.upsertRequest()))
+                        .content(json.updateRequest()))
                 .andExpectAll(
                         status().isNotFound(),
                         jsonPath("message").value(containsString("Author"))
@@ -249,7 +249,7 @@ class NewsControllerTest {
 
         mvc.perform(put(samples.validIdUrl())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(json.upsertRequest()))
+                        .content(json.updateRequest()))
                 .andExpectAll(
                         status().isNotFound(),
                         jsonPath("message").value(containsString("Category"))
