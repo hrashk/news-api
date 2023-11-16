@@ -1,6 +1,7 @@
 package io.github.hrashk.news.api.categories.web;
 
 import io.github.hrashk.news.api.categories.Category;
+import io.github.hrashk.news.api.categories.CategoryNotFoundException;
 import io.github.hrashk.news.api.categories.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -13,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping(value = "/api/v1/categories", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -31,13 +31,9 @@ public class CategoryController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable Long id) {
-        try {
-            Category news = mapper.fromId(id);
+        Category news = mapper.fromId(id);
 
-            return ResponseEntity.ok(mapper.toResponse(news));
-        } catch (NoSuchElementException ex) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(mapper.toResponse(news));
     }
 
     @PostMapping
@@ -58,7 +54,7 @@ public class CategoryController {
             Category saved = service.addOrReplace(author);
 
             return ResponseEntity.ok(mapper.toResponse(saved));
-        } catch (NoSuchElementException ex) {
+        } catch (CategoryNotFoundException ex) {
             return addCategory(request);
         }
     }

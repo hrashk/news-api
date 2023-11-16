@@ -16,14 +16,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.NoSuchElementException;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CategoryController.class)
 class CategoryControllerTest {
@@ -83,11 +81,13 @@ class CategoryControllerTest {
 
     @Test
     void findByInvalidId() throws Exception {
-        when(service.findById(eq(samples.invalidId()))).thenThrow(NoSuchElementException.class);
+        when(service.findById(eq(samples.invalidId())))
+                .thenThrow(new CategoryNotFoundException(samples.invalidId()));
 
         mvc.perform(get(samples.invalidCategoryUrl()))
                 .andExpectAll(
-                        status().isNotFound()
+                        status().isNotFound(),
+                        jsonPath("message").value(containsString("Category"))
                 );
     }
 
@@ -109,7 +109,7 @@ class CategoryControllerTest {
     }
 
     @Test
-    void updateByValidId() throws Exception {
+    void updateCategory() throws Exception {
         when(service.findById(eq(samples.validId()))).thenReturn(samples.sciFi());
         when(service.addOrReplace(Mockito.any(Category.class))).thenReturn(samples.sciFi());
 
@@ -129,8 +129,9 @@ class CategoryControllerTest {
     }
 
     @Test
-    void updateByInvalidId() throws Exception {
-        when(service.findById(eq(samples.invalidId()))).thenThrow(NoSuchElementException.class);
+    void updateWithInvalidIdCreatesNewEntity() throws Exception {
+        when(service.findById(eq(samples.invalidId())))
+                .thenThrow(new CategoryNotFoundException(samples.invalidId()));
         when(service.addOrReplace(Mockito.any(Category.class))).thenReturn(samples.sciFi());
 
         mvc.perform(put(samples.invalidCategoryUrl())
