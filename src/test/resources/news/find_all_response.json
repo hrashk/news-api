@@ -5,14 +5,16 @@
       "authorId": 3,
       "categoryId": 11,
       "headline": "Great news",
-      "content": "Lorem ipsum dolor"
+      "content": "Lorem ipsum dolor",
+      "commentsCount": 2
     },
     {
       "id": 22,
       "authorId": 5,
       "categoryId": 13,
       "headline": "Sad news",
-      "content": "Dolor sit amet"
+      "content": "Dolor sit amet",
+      "commentsCount": 0
     }
   ]
 }

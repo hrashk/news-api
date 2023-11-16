@@ -8,6 +8,7 @@ import io.github.hrashk.news.api.categories.Category;
 import io.github.hrashk.news.api.categories.CategoryNotFoundException;
 import io.github.hrashk.news.api.categories.CategoryService;
 import io.github.hrashk.news.api.categories.web.CategoryMapper;
+import io.github.hrashk.news.api.comments.web.CommentMapper;
 import io.github.hrashk.news.api.news.web.NewsController;
 import io.github.hrashk.news.api.news.web.NewsMapper;
 import io.github.hrashk.news.api.util.AssertionHelpers;
@@ -64,6 +65,11 @@ class NewsControllerTest {
         CategoryMapper categoryMapper() {
             return Mappers.getMapper(CategoryMapper.class);
         }
+
+        @Bean
+        CommentMapper commentMapper() {
+            return Mappers.getMapper(CommentMapper.class);
+        }
     }
 
     @BeforeEach
@@ -113,7 +119,7 @@ class NewsControllerTest {
         mvc.perform(get(samples.validIdUrl()))
                 .andExpectAll(
                         status().isOk(),
-                        content().json(json.upsertResponse(), true)
+                        content().json(json.updateResponse(), true)
                 );
     }
 
@@ -139,7 +145,7 @@ class NewsControllerTest {
                         .content(json.upsertRequest()))
                 .andExpectAll(
                         status().isCreated(),
-                        content().json(json.upsertResponse(), true)
+                        content().json(json.insertResponse(), true)
                 );
 
         Mockito.verify(service).addOrReplace(Mockito.assertArg(actual -> Assertions.assertAll(
@@ -189,7 +195,7 @@ class NewsControllerTest {
                         .content(json.upsertRequest()))
                 .andExpectAll(
                         status().isOk(),
-                        content().json(json.upsertResponse(), true)
+                        content().json(json.updateResponse(), true)
                 );
 
         Mockito.verify(service).addOrReplace(Mockito.assertArg(actual -> Assertions.assertAll(
@@ -211,7 +217,7 @@ class NewsControllerTest {
                         .content(json.upsertRequest()))
                 .andExpectAll(
                         status().isCreated(),
-                        content().json(json.upsertResponse(), true)
+                        content().json(json.insertResponse(), true)
                 );
 
         Mockito.verify(service).addOrReplace(Mockito.assertArg(actual -> Assertions.assertAll(

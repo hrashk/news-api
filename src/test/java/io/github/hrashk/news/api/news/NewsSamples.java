@@ -2,13 +2,20 @@ package io.github.hrashk.news.api.news;
 
 import io.github.hrashk.news.api.authors.Author;
 import io.github.hrashk.news.api.categories.Category;
+import io.github.hrashk.news.api.comment.CommentSamples;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
+import org.springframework.context.annotation.Import;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @TestComponent
+@Import(CommentSamples.class)
+@RequiredArgsConstructor
 public class NewsSamples {
+    private final CommentSamples commentSamples;
+
     public String baseUrl() {
         return "/api/v1/news";
     }
@@ -54,6 +61,7 @@ public class NewsSamples {
                 .category(Category.builder().id(11L).build())
                 .headline("Great news")
                 .content("Lorem ipsum dolor")
+                .comments(commentSamples.twoComments())
                 .createdAt(LocalDateTime.parse("2011-10-13T00:00:00"))
                 .updatedAt(LocalDateTime.parse("2011-10-13T00:00:00"))
                 .build();

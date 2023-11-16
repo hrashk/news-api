@@ -15,18 +15,25 @@ import java.nio.charset.StandardCharsets;
 public class NewsJsonSamples {
     private String findAllResponse;
 
-    private String upsertResponse;
+    private String updateResponse;
 
     private String upsertRequest;
+
+    private String insertResponse;
 
     @Value("classpath:news/find_all_response.json")
     void readFindAllResponse(Resource r) throws IOException {
         findAllResponse = r.getContentAsString(StandardCharsets.UTF_8);
     }
 
-    @Value("classpath:news/upsert_response.json")
-    void readUpsertResponse(Resource r) throws IOException {
-        upsertResponse = r.getContentAsString(StandardCharsets.UTF_8);
+    @Value("classpath:news/update_response.json")
+    void readUpdateResponse(Resource r) throws IOException {
+        updateResponse = r.getContentAsString(StandardCharsets.UTF_8);
+    }
+
+    @Value("classpath:news/insert_response.json")
+    void readInsertResponse(Resource r) throws IOException {
+        insertResponse = r.getContentAsString(StandardCharsets.UTF_8);
     }
 
     @Value("classpath:news/upsert_request.json")

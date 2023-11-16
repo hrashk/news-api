@@ -2,6 +2,7 @@ package io.github.hrashk.news.api.news.web;
 
 import io.github.hrashk.news.api.authors.web.AuthorMapper;
 import io.github.hrashk.news.api.categories.web.CategoryMapper;
+import io.github.hrashk.news.api.comments.web.CommentMapper;
 import io.github.hrashk.news.api.news.News;
 import io.github.hrashk.news.api.news.NewsService;
 import org.mapstruct.Mapper;
@@ -11,7 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = {AuthorMapper.class, CategoryMapper.class})
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
+        uses = {AuthorMapper.class, CategoryMapper.class, CommentMapper.class})
 public abstract class NewsMapper {
     @Autowired
     protected NewsService service;
