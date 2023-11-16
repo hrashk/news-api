@@ -18,7 +18,7 @@ public class SampleDataSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) {
         authorsRepo.saveAll(generator.sampleAuthors(10));
-        newsRepo.saveAll(generator.sampleNews(10));
         categoryRepo.saveAll(generator.sampleCategories(10));
+        newsRepo.saveAll(generator.sampleNews(10));
     }
 }

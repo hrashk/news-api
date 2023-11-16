@@ -44,8 +44,10 @@ public class SampleDataGenerator {
     private News aRandomNews(long id) {
         return News.builder()
                 .id(id)
+                .author(Author.builder().id(random.nextLong(1, 10)).build())
+                .category(Category.builder().id(random.nextLong(1, 10)).build())
                 .headline(faker.lorem().sentence())
-                .content(faker.lorem().paragraph())
+                .content(faker.lorem().sentence())
                 .build();
     }
 
