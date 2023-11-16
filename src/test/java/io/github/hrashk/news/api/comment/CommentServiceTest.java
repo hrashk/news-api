@@ -2,6 +2,7 @@ package io.github.hrashk.news.api.comment;
 
 import io.github.hrashk.news.api.ContainerJpaTest;
 import io.github.hrashk.news.api.comments.Comment;
+import io.github.hrashk.news.api.comments.CommentNotFoundException;
 import io.github.hrashk.news.api.comments.CommentRepository;
 import io.github.hrashk.news.api.comments.CommentService;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -48,7 +48,7 @@ class CommentServiceTest {
     @Test
     void findByInvalidId() {
         assertThatThrownBy(() -> service.findById(INVALID_ID))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(CommentNotFoundException.class);
     }
 
     @Test

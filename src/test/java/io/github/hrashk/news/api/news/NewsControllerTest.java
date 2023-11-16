@@ -1,9 +1,11 @@
 package io.github.hrashk.news.api.news;
 
 import io.github.hrashk.news.api.authors.Author;
+import io.github.hrashk.news.api.authors.AuthorNotFoundException;
 import io.github.hrashk.news.api.authors.AuthorService;
 import io.github.hrashk.news.api.authors.web.AuthorMapper;
 import io.github.hrashk.news.api.categories.Category;
+import io.github.hrashk.news.api.categories.CategoryNotFoundException;
 import io.github.hrashk.news.api.categories.CategoryService;
 import io.github.hrashk.news.api.categories.web.CategoryMapper;
 import io.github.hrashk.news.api.news.web.NewsController;
@@ -23,13 +25,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.NoSuchElementException;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(NewsController.class)
 class NewsControllerTest {
@@ -121,11 +121,13 @@ class NewsControllerTest {
 
     @Test
     void findByInvalidId() throws Exception {
-        Mockito.when(service.findById(Mockito.eq(samples.invalidId()))).thenThrow(NoSuchElementException.class);
+        Mockito.when(service.findById(Mockito.eq(samples.invalidId())))
+                .thenThrow(new NewsNotFoundException(samples.invalidId()));
 
         mvc.perform(get(samples.invalidIdUrl()))
                 .andExpectAll(
-                        status().isNotFound()
+                        status().isNotFound(),
+                        jsonPath("message").value(containsString("News"))
                 );
     }
 
@@ -174,8 +176,9 @@ class NewsControllerTest {
     }
 
     @Test
-    void updateByInvalidId() throws Exception {
-        Mockito.when(service.findById(Mockito.eq(samples.invalidId()))).thenThrow(NoSuchElementException.class);
+    void updateWithInvalidNewsId() throws Exception {
+        Mockito.when(service.findById(Mockito.eq(samples.invalidId())))
+                .thenThrow(new NewsNotFoundException(samples.invalidId()));
         News expected = samples.greatNews();
         Mockito.when(service.addOrReplace(Mockito.any(News.class))).thenReturn(expected);
 
@@ -192,6 +195,36 @@ class NewsControllerTest {
                 () -> samples.assertIdIsNull(actual),
                 () -> samples.assertAreSimilar(expected, actual)
         )));
+    }
+
+    @Test
+    void updateWithInvalidAuthorId() throws Exception {
+        Mockito.when(service.findById(Mockito.anyLong())).thenReturn(samples.sadNews());
+        Mockito.when(authorService.findById(Mockito.anyLong()))
+                .thenThrow(new AuthorNotFoundException(1L));
+
+        mvc.perform(put(samples.validIdUrl())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json.upsertRequest()))
+                .andExpectAll(
+                        status().isNotFound(),
+                        jsonPath("message").value(containsString("Author"))
+                );
+    }
+
+    @Test
+    void updateWithInvalidCategoryId() throws Exception {
+        Mockito.when(service.findById(Mockito.anyLong())).thenReturn(samples.sadNews());
+        Mockito.when(categoryService.findById(Mockito.anyLong()))
+                .thenThrow(new CategoryNotFoundException(1L));
+
+        mvc.perform(put(samples.validIdUrl())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json.upsertRequest()))
+                .andExpectAll(
+                        status().isNotFound(),
+                        jsonPath("message").value(containsString("Category"))
+                );
     }
 
     @Test

@@ -1,6 +1,7 @@
 package io.github.hrashk.news.api.news.web;
 
 import io.github.hrashk.news.api.news.News;
+import io.github.hrashk.news.api.news.NewsNotFoundException;
 import io.github.hrashk.news.api.news.NewsService;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -13,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping(value = "/api/v1/news", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -31,13 +31,9 @@ public class NewsController {
 
     @GetMapping("/{id}")
     public ResponseEntity<NewsResponse> getNewsById(@PathVariable Long id) {
-        try {
-            News news = mapper.fromId(id);
+        News news = mapper.fromId(id);
 
-            return ResponseEntity.ok(mapper.toResponse(news));
-        } catch (NoSuchElementException ex) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(mapper.toResponse(news));
     }
 
     @PostMapping
@@ -59,7 +55,7 @@ public class NewsController {
             News saved = service.addOrReplace(current);
 
             return ResponseEntity.ok(mapper.toResponse(saved));
-        } catch (NoSuchElementException ex) {
+        } catch (NewsNotFoundException ex) {
             return addNews(request);
         }
     }

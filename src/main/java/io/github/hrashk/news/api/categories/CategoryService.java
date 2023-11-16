@@ -19,7 +19,7 @@ public class CategoryService {
      * @throws java.util.NoSuchElementException if id is not found
      */
     public Category findById(Long id) {
-        return repository.findById(id).orElseThrow();
+        return repository.findById(id).orElseThrow(() -> new CategoryNotFoundException(id));
     }
 
     public Category addOrReplace(Category category) {

@@ -14,11 +14,8 @@ public class CommentService {
         return repository.findAll();
     }
 
-    /**
-     * @throws java.util.NoSuchElementException if id is not found
-     */
     public Comment findById(Long id) {
-        return repository.findById(id).orElseThrow();
+        return repository.findById(id).orElseThrow(() -> new CommentNotFoundException(id));
     }
 
     public Comment addOrReplace(Comment category) {

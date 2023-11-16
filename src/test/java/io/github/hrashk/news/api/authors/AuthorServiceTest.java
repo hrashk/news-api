@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -72,7 +71,7 @@ class AuthorServiceTest {
     @Test
     void findByInvalidId() {
         assertThatThrownBy(() -> service.findById(samples.invalidId()))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(AuthorNotFoundException.class);
     }
 
     @Test

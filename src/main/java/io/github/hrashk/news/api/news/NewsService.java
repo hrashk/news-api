@@ -15,11 +15,8 @@ public class NewsService {
         return repository.findAll(pageable).getContent();
     }
 
-    /**
-     * @throws java.util.NoSuchElementException if id is not found
-     */
     public News findById(Long id) {
-        return repository.findById(id).orElseThrow();
+        return repository.findById(id).orElseThrow(() -> new NewsNotFoundException(id));
     }
 
     public News addOrReplace(News news) {
