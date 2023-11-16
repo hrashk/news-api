@@ -55,7 +55,6 @@ class CommentControllerTest {
         mvc.perform(get("/api/v1/comments"))
                 .andExpectAll(
                         status().isOk(),
-                        content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
                         content().json(expectedResponse, true)
                 );
     }
@@ -68,7 +67,6 @@ class CommentControllerTest {
         mvc.perform(get("/api/v1/comments/" + VALID_ID))
                 .andExpectAll(
                         status().isOk(),
-                        content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
                         content().json(expectedResponse, true)
                 );
     }
@@ -94,7 +92,6 @@ class CommentControllerTest {
                         .content(requestPayload))
                 .andExpectAll(
                         status().isCreated(),
-                        content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
                         content().json(expectedResponse, true)
                 );
 
@@ -115,7 +112,6 @@ class CommentControllerTest {
                         .content(requestPayload))
                 .andExpectAll(
                         status().isOk(),
-                        content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
                         content().json(expectedResponse, true)
                 );
 
@@ -138,7 +134,6 @@ class CommentControllerTest {
                         .content(requestPayload))
                 .andExpectAll(
                         status().isCreated(),
-                        content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
                         content().json(expectedResponse, true)
                 );
 

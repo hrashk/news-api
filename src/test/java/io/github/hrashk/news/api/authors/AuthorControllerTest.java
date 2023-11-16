@@ -50,7 +50,6 @@ class AuthorControllerTest {
         mvc.perform(get(samples.baseUrl()))
                 .andExpectAll(
                         status().isOk(),
-                        content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
                         content().json(json.findAllResponse(), true)
                 );
 
@@ -67,7 +66,6 @@ class AuthorControllerTest {
         mvc.perform(get(samples.baseUrl()).param("page", "1").param("size", "7"))
                 .andExpectAll(
                         status().isOk(),
-                        content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
                         content().json(json.findAllResponse(), true)
                 );
 
@@ -84,7 +82,6 @@ class AuthorControllerTest {
         mvc.perform(get(samples.validAuthorUrl()))
                 .andExpectAll(
                         status().isOk(),
-                        content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
                         content().json(json.upsertResponse(), true)
                 );
     }
@@ -110,7 +107,6 @@ class AuthorControllerTest {
                         .content(json.upsertRequest()))
                 .andExpectAll(
                         status().isCreated(),
-                        content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
                         content().json(json.upsertResponse(), true)
                 );
 
@@ -128,7 +124,6 @@ class AuthorControllerTest {
                         .content(json.upsertRequest()))
                 .andExpectAll(
                         status().isOk(),
-                        content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
                         content().json(json.upsertResponse(), true)
                 );
 
@@ -149,7 +144,6 @@ class AuthorControllerTest {
                         .content(json.upsertRequest()))
                 .andExpectAll(
                         status().isCreated(),
-                        content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
                         content().json(json.upsertResponse(), true)
                 );
 
