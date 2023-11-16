@@ -22,10 +22,15 @@ public abstract class NewsMapper {
         return service.findById(id);
     }
 
-    abstract List<NewsResponse> toResponseList(List<News> news);
+    @Mapping(target = "authorId", source = "author.id")
+    @Mapping(target = "categoryId", source = "category.id")
+    @Mapping(target = "commentsCount", expression = "java( news.getComments() == null ? 0 : news.getComments().size() )")
+    abstract NewsWithCountResponse toCountResponse(News news);
+
+    abstract List<NewsWithCountResponse> toCountResponseList(List<News> news);
 
     public NewsListResponse toResponse(List<News> news) {
-        return new NewsListResponse(toResponseList(news));
+        return new NewsListResponse(toCountResponseList(news));
     }
 
     @Mapping(target = "authorId", source = "author.id")

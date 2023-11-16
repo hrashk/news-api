@@ -47,8 +47,9 @@ public class NewsSamples {
     public List<News> twoNewsWithNewDependencies() {
         List<News> news = twoNews();
         news.forEach(n -> {
-            n.getAuthor().setId(null);
-            n.getCategory().setId(null);
+            n.setAuthor(null);
+            n.setCategory(null);
+            n.setComments(null);
         });
 
         return news;
