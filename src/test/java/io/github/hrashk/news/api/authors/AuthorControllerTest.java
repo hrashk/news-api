@@ -16,14 +16,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.NoSuchElementException;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AuthorController.class)
 class AuthorControllerTest {
@@ -80,6 +78,30 @@ class AuthorControllerTest {
     }
 
     @Test
+    void findByValidId() throws Exception {
+        when(service.findById(Mockito.anyLong())).thenReturn(samples.jackDoe());
+
+        mvc.perform(get(samples.validAuthorUrl()))
+                .andExpectAll(
+                        status().isOk(),
+                        content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
+                        content().json(json.upsertResponse(), true)
+                );
+    }
+
+    @Test
+    void findByInvalidId() throws Exception {
+        when(service.findById(Mockito.anyLong()))
+                .thenThrow(new AuthorNotFoundException(1L));
+
+        mvc.perform(get(samples.invalidAuthorUrl()))
+                .andExpectAll(
+                        status().isNotFound(),
+                        jsonPath("message").value(containsString("Author"))
+                );
+    }
+
+    @Test
     void addAuthor() throws Exception {
         when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(samples.jackDoe());
 
@@ -97,29 +119,7 @@ class AuthorControllerTest {
     }
 
     @Test
-    void findByValidId() throws Exception {
-        when(service.findById(Mockito.anyLong())).thenReturn(samples.jackDoe());
-
-        mvc.perform(get(samples.validAuthorUrl()))
-                .andExpectAll(
-                        status().isOk(),
-                        content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        content().json(json.upsertResponse(), true)
-                );
-    }
-
-    @Test
-    void findByInvalidId() throws Exception {
-        when(service.findById(Mockito.anyLong())).thenThrow(NoSuchElementException.class);
-
-        mvc.perform(get(samples.invalidAuthorUrl()))
-                .andExpectAll(
-                        status().isNotFound()
-                );
-    }
-
-    @Test
-    void updateByValidId() throws Exception {
+    void updateAuthor() throws Exception {
         when(service.findById(eq(samples.validId()))).thenReturn(samples.jackDoe());
         when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(samples.jackDoe());
 
@@ -139,8 +139,9 @@ class AuthorControllerTest {
     }
 
     @Test
-    void updateByInvalidId() throws Exception {
-        when(service.findById(eq(samples.invalidId()))).thenThrow(NoSuchElementException.class);
+    void updatingWithInvalidIdCreatesNewEntity() throws Exception {
+        when(service.findById(eq(samples.invalidId())))
+                .thenThrow(new AuthorNotFoundException(1L));
         when(service.addOrReplace(Mockito.any(Author.class))).thenReturn(samples.jackDoe());
 
         mvc.perform(put(samples.invalidAuthorUrl())
@@ -169,7 +170,7 @@ class AuthorControllerTest {
     }
 
     @Test
-    void deleteByInvalidId() throws Exception {
+    void deletingByInvalidIdFails() throws Exception {
         when(service.contains(Mockito.anyLong())).thenReturn(false);
 
         mvc.perform(delete(samples.invalidAuthorUrl()))

@@ -1,6 +1,7 @@
 package io.github.hrashk.news.api.authors.web;
 
 import io.github.hrashk.news.api.authors.Author;
+import io.github.hrashk.news.api.authors.AuthorNotFoundException;
 import io.github.hrashk.news.api.authors.AuthorService;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -13,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping(value = "/api/v1/authors", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -41,13 +41,9 @@ public class AuthorController {
 
     @GetMapping("/{id}")
     public ResponseEntity<AuthorResponse> getAuthorById(@PathVariable Long id) {
-        try {
-            Author a = mapper.fromId(id);
+        Author a = mapper.fromId(id);
 
-            return ResponseEntity.ok(mapper.toResponse(a));
-        } catch (NoSuchElementException ex) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(mapper.toResponse(a));
     }
 
     @PutMapping("/{id}")
@@ -59,7 +55,7 @@ public class AuthorController {
             Author saved = service.addOrReplace(author);
 
             return ResponseEntity.ok(mapper.toResponse(saved));
-        } catch (NoSuchElementException ex) {
+        } catch (AuthorNotFoundException ex) {
             return addAuthor(request);
         }
     }
