@@ -1,5 +1,6 @@
 package io.github.hrashk.news.api.comments;
 
+import io.github.hrashk.news.api.news.News;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,6 +25,9 @@ public class Comment {
     private Long id;
 
     private String text;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    private News news;
 
     @CreatedDate
     private LocalDateTime createdAt;

@@ -2,6 +2,7 @@ package io.github.hrashk.news.api.news;
 
 import io.github.hrashk.news.api.authors.Author;
 import io.github.hrashk.news.api.categories.Category;
+import io.github.hrashk.news.api.comments.Comment;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +13,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 
 @Entity
 @Table(name = "news")
@@ -33,6 +35,9 @@ public class News {
 
     @ManyToOne(cascade = CascadeType.ALL)
     private Category category;
+
+    @OneToMany(mappedBy = "news")
+    private Collection<Comment> comments;
 
     @CreatedDate
     private LocalDateTime createdAt;
