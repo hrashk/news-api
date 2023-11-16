@@ -121,7 +121,7 @@ class NewsControllerTest {
     }
 
     @Test
-    void findByInvalidId() throws Exception {
+    void findingByInvalidIdFails() throws Exception {
         Mockito.when(service.findById(Mockito.eq(samples.invalidId())))
                 .thenThrow(new NewsNotFoundException(samples.invalidId()));
 
@@ -153,7 +153,7 @@ class NewsControllerTest {
     }
 
     @Test
-    void updateByValidId() throws Exception {
+    void updateWithValidNewsId() throws Exception {
         News current = samples.sadNews();
         Mockito.when(service.findById(Mockito.eq(samples.validId()))).thenReturn(current);
 
@@ -177,7 +177,7 @@ class NewsControllerTest {
     }
 
     @Test
-    void updateWithInvalidNewsId() throws Exception {
+    void updatingWithInvalidNewsIdCreatesNewEntity() throws Exception {
         Mockito.when(service.findById(Mockito.eq(samples.invalidId())))
                 .thenThrow(new NewsNotFoundException(samples.invalidId()));
         News expected = samples.greatNews();
@@ -199,7 +199,7 @@ class NewsControllerTest {
     }
 
     @Test
-    void updateWithInvalidAuthorId() throws Exception {
+    void updatingWithInvalidAuthorIdFails() throws Exception {
         Mockito.when(service.findById(Mockito.anyLong())).thenReturn(samples.sadNews());
         Mockito.when(authorService.findById(Mockito.anyLong()))
                 .thenThrow(new AuthorNotFoundException(1L));
@@ -214,7 +214,7 @@ class NewsControllerTest {
     }
 
     @Test
-    void updateWithInvalidCategoryId() throws Exception {
+    void updatingWithInvalidCategoryIdFails() throws Exception {
         Mockito.when(service.findById(Mockito.anyLong())).thenReturn(samples.sadNews());
         Mockito.when(categoryService.findById(Mockito.anyLong()))
                 .thenThrow(new CategoryNotFoundException(1L));
@@ -241,7 +241,7 @@ class NewsControllerTest {
     }
 
     @Test
-    void deleteByInvalidId() throws Exception {
+    void deletingByInvalidIdFails() throws Exception {
         Mockito.when(service.contains(Mockito.anyLong())).thenReturn(false);
 
         mvc.perform(delete(samples.invalidIdUrl()))
