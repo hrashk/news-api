@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@DataJpaTest
+@DataJpaTest(properties = {"logging.level.org.hibernate.orm.jdbc.bind=trace"})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ContextConfiguration(initializers = PostgreSQLInitializer.class)
 public @interface ContainerJpaTest {
