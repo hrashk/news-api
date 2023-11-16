@@ -10,6 +10,7 @@ import io.github.hrashk.news.api.categories.CategoryService;
 import io.github.hrashk.news.api.categories.web.CategoryMapper;
 import io.github.hrashk.news.api.news.web.NewsController;
 import io.github.hrashk.news.api.news.web.NewsMapper;
+import io.github.hrashk.news.api.util.AssertionHelpers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -146,8 +147,8 @@ class NewsControllerTest {
                 );
 
         Mockito.verify(service).addOrReplace(Mockito.assertArg(actual -> Assertions.assertAll(
-                () -> samples.assertIdIsNull(actual),
-                () -> samples.assertAreSimilar(expected, actual)
+                () -> AssertionHelpers.assertIdIsNull(actual),
+                () -> AssertionHelpers.assertAreSimilar(expected, actual)
         )));
     }
 
@@ -169,9 +170,9 @@ class NewsControllerTest {
                 );
 
         Mockito.verify(service).addOrReplace(Mockito.assertArg(actual -> Assertions.assertAll(
-                () -> samples.assertHaveSameIds(current, actual),
-                () -> samples.assertHaveSameAuditDates(current, actual),
-                () -> samples.assertAreSimilar(expected, actual)
+                () -> AssertionHelpers.assertHaveSameIds(current, actual),
+                () -> AssertionHelpers.assertHaveSameAuditDates(current, actual),
+                () -> AssertionHelpers.assertAreSimilar(expected, actual)
         )));
     }
 
@@ -192,8 +193,8 @@ class NewsControllerTest {
                 );
 
         Mockito.verify(service).addOrReplace(Mockito.assertArg(actual -> Assertions.assertAll(
-                () -> samples.assertIdIsNull(actual),
-                () -> samples.assertAreSimilar(expected, actual)
+                () -> AssertionHelpers.assertIdIsNull(actual),
+                () -> AssertionHelpers.assertAreSimilar(expected, actual)
         )));
     }
 
