@@ -153,7 +153,35 @@ class NewsControllerTest {
     }
 
     @Test
-    void updateWithValidNewsId() throws Exception {
+    void addingWithInvalidAuthorIdFails() throws Exception {
+        Mockito.when(authorService.findById(Mockito.anyLong()))
+                .thenThrow(new AuthorNotFoundException(1L));
+
+        mvc.perform(post(samples.baseUrl())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json.upsertRequest()))
+                .andExpectAll(
+                        status().isNotFound(),
+                        jsonPath("message").value(containsString("Author"))
+                );
+    }
+
+    @Test
+    void addingWithInvalidCategoryIdFails() throws Exception {
+        Mockito.when(categoryService.findById(Mockito.anyLong()))
+                .thenThrow(new CategoryNotFoundException(1L));
+
+        mvc.perform(put(samples.validIdUrl())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json.upsertRequest()))
+                .andExpectAll(
+                        status().isNotFound(),
+                        jsonPath("message").value(containsString("Category"))
+                );
+    }
+
+    @Test
+    void updateNews() throws Exception {
         News current = samples.sadNews();
         Mockito.when(service.findById(Mockito.eq(samples.validId()))).thenReturn(current);
 
