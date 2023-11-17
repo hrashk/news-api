@@ -1,7 +1,9 @@
 package io.github.hrashk.news.api;
 
 import io.github.hrashk.news.api.authors.web.AuthorListResponse;
+import io.github.hrashk.news.api.authors.web.AuthorResponse;
 import io.github.hrashk.news.api.categories.web.CategoryListResponse;
+import io.github.hrashk.news.api.categories.web.CategoryResponse;
 import io.github.hrashk.news.api.news.web.NewsListResponse;
 import io.github.hrashk.news.api.news.web.NewsResponse;
 import io.github.hrashk.news.api.news.web.UpsertNewsRequest;
@@ -16,6 +18,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
+
+import java.util.List;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -35,24 +40,30 @@ class NewsApiApplicationTests {
         seeder.seed(10);
     }
 
-    @Test
-    void fetchAuthors() {
-        ResponseEntity<AuthorListResponse> entity = rest.getForEntity("/api/v1/authors", AuthorListResponse.class);
+    List<AuthorResponse> fetchAuthors() {
+        ResponseEntity<AuthorListResponse> response = rest.getForEntity("/api/v1/authors", AuthorListResponse.class);
 
-        assertAll(
-                () -> assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK),
-                () -> assertThat(entity.getBody().authors()).hasSizeGreaterThan(5)
-        );
-    }
-
-    @Test
-    void fetchCategories() {
-        ResponseEntity<CategoryListResponse> response = rest.getForEntity("/api/v1/categories", CategoryListResponse.class);
+        List<AuthorResponse> authors = Objects.requireNonNull(response.getBody()).authors();
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
-                () -> assertThat(response.getBody().categories()).hasSizeGreaterThan(5)
+                () -> assertThat(authors).hasSizeGreaterThan(5)
         );
+
+        return authors;
+    }
+
+    List<CategoryResponse> fetchCategories() {
+        ResponseEntity<CategoryListResponse> response = rest.getForEntity("/api/v1/categories", CategoryListResponse.class);
+
+        List<CategoryResponse> categories = Objects.requireNonNull(response.getBody()).categories();
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(categories).hasSizeGreaterThan(5)
+        );
+
+        return categories;
     }
 
     @Test
@@ -69,7 +80,10 @@ class NewsApiApplicationTests {
 
     @Test
     void addNews() {
-        UpsertNewsRequest request = new UpsertNewsRequest(9L, 10L, "", "");
+        var authors = fetchAuthors();
+        var categories = fetchCategories();
+
+        UpsertNewsRequest request = new UpsertNewsRequest(authors.get(3).id(), categories.get(4).id(), "", "");
         ResponseEntity<NewsResponse> response = rest.postForEntity("/api/v1/news", request, NewsResponse.class);
 
         assertAll(
