@@ -28,6 +28,7 @@ public class News {
     private Long id;
 
     private String headline;
+    @Lob
     private String content;
 
     @ManyToOne(cascade = CascadeType.ALL)

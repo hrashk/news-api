@@ -63,7 +63,7 @@ public class DataSeeder {
                 .author(Author.builder().id(random.nextLong(1, 10)).build())
                 .category(Category.builder().id(random.nextLong(1, 10)).build())
                 .headline(faker.lorem().sentence())
-                .content(faker.lorem().sentence())
+                .content(faker.lorem().paragraph())
                 .build();
     }
 
