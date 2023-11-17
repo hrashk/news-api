@@ -12,21 +12,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @ContainerJpaTest
-@Import(SampleDataSeeder.class) // will run automatically
-class SampleDataSeederTest {
+@Import(DataSeeder.class)
+class DataSeederTest {
     @Autowired
     private AuthorRepository authorsRepo;
     @Autowired
     private NewsRepository newsRepo;
     @Autowired
     private CategoryRepository categoryRepo;
+    @Autowired
+    private DataSeeder seeder;
 
     @Test
     void sampleDataIsLoaded() {
+        seeder.seed(10);
+
         assertAll(
-                () -> assertThat(authorsRepo.count()).as("Authors count").isGreaterThan(0L),
-                () -> assertThat(newsRepo.count()).as("News count").isGreaterThan(0L),
-                () -> assertThat(categoryRepo.count()).as("Categories count").isGreaterThan(0L)
+                () -> assertThat(authorsRepo.count()).as("Authors count").isGreaterThan(5L),
+                () -> assertThat(newsRepo.count()).as("News count").isGreaterThan(5L),
+                () -> assertThat(categoryRepo.count()).as("Categories count").isGreaterThan(5L)
         );
     }
 }

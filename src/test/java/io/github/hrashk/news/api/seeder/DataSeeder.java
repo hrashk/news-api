@@ -1,9 +1,14 @@
 package io.github.hrashk.news.api.seeder;
 
 import io.github.hrashk.news.api.authors.Author;
+import io.github.hrashk.news.api.authors.AuthorRepository;
 import io.github.hrashk.news.api.categories.Category;
+import io.github.hrashk.news.api.categories.CategoryRepository;
 import io.github.hrashk.news.api.news.News;
+import io.github.hrashk.news.api.news.NewsRepository;
+import lombok.RequiredArgsConstructor;
 import net.datafaker.Faker;
+import org.springframework.boot.test.context.TestComponent;
 
 import java.util.List;
 import java.util.Random;
@@ -11,9 +16,20 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.LongFunction;
 import java.util.stream.LongStream;
 
-public class SampleDataGenerator {
+@TestComponent
+@RequiredArgsConstructor
+public class DataSeeder {
+    private final AuthorRepository authorsRepo;
+    private final NewsRepository newsRepo;
+    private final CategoryRepository categoryRepo;
     private final Random random = ThreadLocalRandom.current();
     private final Faker faker = new Faker(random);
+
+    public void seed(int count) {
+        authorsRepo.saveAll(sampleAuthors(count));
+        categoryRepo.saveAll(sampleCategories(count));
+        newsRepo.saveAll(sampleNews(count));
+    }
 
     public List<Author> sampleAuthors(int count) {
         return generateSample(count, this::aRandomAuthor);

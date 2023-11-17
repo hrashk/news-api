@@ -5,7 +5,8 @@ import io.github.hrashk.news.api.categories.web.CategoryListResponse;
 import io.github.hrashk.news.api.news.web.NewsListResponse;
 import io.github.hrashk.news.api.news.web.NewsResponse;
 import io.github.hrashk.news.api.news.web.UpsertNewsRequest;
-import io.github.hrashk.news.api.seeder.SampleDataSeeder;
+import io.github.hrashk.news.api.seeder.DataSeeder;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -22,10 +23,17 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ContextConfiguration(initializers = PostgreSQLInitializer.class)
-@Import(SampleDataSeeder.class)
+@Import(DataSeeder.class)
 class NewsApiApplicationTests {
     @Autowired
     private TestRestTemplate rest;
+    @Autowired
+    private DataSeeder seeder;
+
+    @BeforeEach
+    void injectSampleData() {
+        seeder.seed(10);
+    }
 
     @Test
     void fetchAuthors() {
