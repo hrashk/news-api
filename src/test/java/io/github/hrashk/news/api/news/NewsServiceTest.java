@@ -26,7 +26,7 @@ class NewsServiceTest {
 
     @BeforeEach
     public void injectNews() {
-        this.savedNews = repository.saveAll(samples.twoNewsWithNewDependencies());
+        this.savedNews = repository.saveAll(samples.twoNewNews());
     }
 
     @Test

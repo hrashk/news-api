@@ -45,6 +45,14 @@ public class AuthorSamples {
         return List.of(a1, a2);
     }
 
+    public List<Author> twoNewAuthors() {
+        var authors = twoAuthors();
+
+        authors.forEach(a -> a.setId(null));
+
+        return authors;
+    }
+
     public Author jackDoe() {
         return Author.builder()
                 .id(validId())

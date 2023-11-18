@@ -28,7 +28,7 @@ class CommentServiceTest {
 
     @BeforeEach
     public void injectComment() {
-        this.savedComment = repository.saveAll(samples.twoComments());
+        this.savedComment = repository.saveAll(samples.twoNewComments());
     }
 
     @Test

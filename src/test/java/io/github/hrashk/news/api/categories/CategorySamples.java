@@ -41,6 +41,13 @@ public class CategorySamples {
         return List.of(n1, n2);
     }
 
+    public List<Category> twoNewCategories() {
+        var cats = twoCategories();
+
+        cats.forEach(c -> c.setId(null));
+        return cats;
+    }
+
     public Category sciFi() {
         return Category.builder()
                 .id(validId())

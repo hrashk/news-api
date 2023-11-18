@@ -25,7 +25,7 @@ class CategoryServiceTest {
 
     @BeforeEach
     public void injectCategory() {
-        this.savedCategory = repository.saveAll(samples.twoCategories());
+        this.savedCategory = repository.saveAll(samples.twoNewCategories());
     }
 
     @Test
