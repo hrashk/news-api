@@ -48,10 +48,10 @@ public class CategoryController {
     @PutMapping("/{id}")
     public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id, @RequestBody UpsertCategoryRequest request) {
         try {
-            Category author = mapper.fromId(id);
-            BeanUtils.copyProperties(request, author);
+            Category category = mapper.fromId(id);
+            BeanUtils.copyProperties(request, category);
 
-            Category saved = service.addOrReplace(author);
+            Category saved = service.addOrReplace(category);
 
             return ResponseEntity.ok(mapper.toResponse(saved));
         } catch (CategoryNotFoundException ex) {
@@ -61,11 +61,10 @@ public class CategoryController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
-        if (service.contains(id)) {
-            service.removeById(id);
+        Category category = mapper.fromId(id);
 
-            return ResponseEntity.noContent().build();
-        } else
-            return ResponseEntity.notFound().build();
+        service.delete(category);
+
+        return ResponseEntity.noContent().build();
     }
 }

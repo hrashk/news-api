@@ -143,19 +143,20 @@ class CategoryControllerTest {
 
     @Test
     void deleteByValidId() throws Exception {
-        when(service.contains(Mockito.anyLong())).thenReturn(true);
+        when(service.findById(Mockito.anyLong())).thenReturn(samples.sciFi());
 
         mvc.perform(delete(samples.validCategoryUrl()))
                 .andExpectAll(
                         status().isNoContent()
                 );
 
-        Mockito.verify(service).removeById(eq(samples.validId()));
+        Mockito.verify(service).delete(Mockito.assertArg(c ->
+                assertThat(c).hasFieldOrPropertyWithValue("id", samples.validId())));
     }
 
     @Test
     void deleteByInvalidId() throws Exception {
-        when(service.contains(Mockito.anyLong())).thenReturn(false);
+        when(service.findById(Mockito.anyLong())).thenThrow(new CategoryNotFoundException(samples.invalidId()));
 
         mvc.perform(delete(samples.invalidCategoryUrl()))
                 .andExpectAll(

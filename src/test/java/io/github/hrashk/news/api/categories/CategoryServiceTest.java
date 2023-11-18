@@ -70,23 +70,12 @@ class CategoryServiceTest {
     }
 
     @Test
-    void containsValidId() {
-        Category first = savedCategory.get(0);
-
-        assertThat(service.contains(first.getId())).isTrue();
-    }
-
-    @Test
-    void doesNotContainInvalidId() {
-        assertThat(service.contains(samples.invalidId())).isFalse();
-    }
-
-    @Test
     void removeById() {
         Long id = savedCategory.get(0).getId();
 
-        service.removeById(id);
+        service.delete(savedCategory.get(0));
 
-        assertThat(service.contains(id)).isFalse();
+        assertThatThrownBy(() -> service.findById(id))
+                .isInstanceOf(CategoryNotFoundException.class);
     }
 }

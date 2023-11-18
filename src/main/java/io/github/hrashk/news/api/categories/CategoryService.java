@@ -15,9 +15,6 @@ public class CategoryService {
         return repository.findAll(pageable).getContent();
     }
 
-    /**
-     * @throws java.util.NoSuchElementException if id is not found
-     */
     public Category findById(Long id) {
         return repository.findById(id).orElseThrow(() -> new CategoryNotFoundException(id));
     }
@@ -26,11 +23,7 @@ public class CategoryService {
         return repository.save(category);
     }
 
-    public boolean contains(Long id) {
-        return repository.existsById(id);
-    }
-
-    public void removeById(Long id) {
-        repository.deleteById(id);
+    public void delete(Category category) {
+        repository.delete(category);
     }
 }
