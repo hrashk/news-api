@@ -1,5 +1,7 @@
 package io.github.hrashk.news.api.authors;
 
+import io.github.hrashk.news.api.comments.Comment;
+import io.github.hrashk.news.api.news.News;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,6 +12,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 
 @Entity
 @Table(name = "authors")
@@ -25,6 +28,12 @@ public class Author {
 
     private String firstName;
     private String lastName;
+
+    @OneToMany(mappedBy = "author", cascade = CascadeType.REMOVE)
+    private Collection<News> news;
+
+    @OneToMany(mappedBy = "author", cascade = CascadeType.REMOVE)
+    private Collection<Comment> comments;
 
     @CreatedDate
     private LocalDateTime createdAt;
