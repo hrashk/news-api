@@ -23,11 +23,7 @@ public class AuthorService {
         return repository.findById(id).orElseThrow(() -> new AuthorNotFoundException(id));
     }
 
-    public boolean contains(Long id) {
-        return repository.existsById(id);
-    }
-
-    public void removeById(Long id) {
-        repository.deleteById(id);
+    public void delete(Author author) {
+        repository.delete(author);
     }
 }

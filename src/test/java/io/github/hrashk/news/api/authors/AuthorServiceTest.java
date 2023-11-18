@@ -75,23 +75,12 @@ class AuthorServiceTest {
     }
 
     @Test
-    void containsValidId() {
-        Author first = savedEntities.get(0);
-
-        assertThat(service.contains(first.getId())).isTrue();
-    }
-
-    @Test
-    void doesNotContainInvalidId() {
-        assertThat(service.contains(samples.invalidId())).isFalse();
-    }
-
-    @Test
     void removeById() {
         Long id = savedEntities.get(0).getId();
 
-        service.removeById(id);
+        service.delete(savedEntities.get(0));
 
-        assertThat(service.contains(id)).isFalse();
+        assertThatThrownBy(() -> service.findById(id))
+                .isInstanceOf(AuthorNotFoundException.class);
     }
 }
