@@ -1,6 +1,5 @@
-package io.github.hrashk.news.api.comment;
+package io.github.hrashk.news.api.comments;
 
-import io.github.hrashk.news.api.comments.Comment;
 import org.springframework.boot.test.context.TestComponent;
 
 import java.time.LocalDateTime;
@@ -37,14 +36,14 @@ public class CommentSamples {
 
     public Comment withoutId() {
         return Comment.builder()
-                .text("Smiley comment")
+                .text("Smiley comments")
                 .build();
     }
 
     public Comment withId() {
         return Comment.builder()
                 .id(123123L)
-                .text("Smiley comment")
+                .text("Smiley comments")
                 .build();
     }
 }

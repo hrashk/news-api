@@ -1,19 +1,29 @@
 package io.github.hrashk.news.api.comments.web;
 
 import io.github.hrashk.news.api.comments.Comment;
+import io.github.hrashk.news.api.comments.CommentService;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingConstants;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
-public interface CommentMapper {
-    List<CommentResponse> toResponseList(List<Comment> news);
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+public abstract class CommentMapper {
+    @Autowired
+    protected CommentService service;
 
-    default CommentListResponse toResponse(List<Comment> news) {
-        return new CommentListResponse(toResponseList(news));
+    abstract List<CommentResponse> toResponseList(List<Comment> comments);
+
+    public CommentListResponse toResponse(List<Comment> comments) {
+        return new CommentListResponse(toResponseList(comments));
     }
 
-    CommentResponse toResponse(Comment news);
+    abstract CommentResponse toResponse(Comment comment);
 
-    Comment toComment(UpsertCommentRequest newsRequest);
+    abstract Comment toComment(UpsertCommentRequest commentRequest);
+
+    public Comment fromId(Long id) {
+        return service.findById(id);
+    }
 }

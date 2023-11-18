@@ -2,7 +2,7 @@ package io.github.hrashk.news.api.news;
 
 import io.github.hrashk.news.api.authors.Author;
 import io.github.hrashk.news.api.categories.Category;
-import io.github.hrashk.news.api.comment.CommentSamples;
+import io.github.hrashk.news.api.comments.CommentSamples;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
 import org.springframework.context.annotation.Import;

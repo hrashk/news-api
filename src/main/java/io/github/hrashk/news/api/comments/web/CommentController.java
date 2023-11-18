@@ -28,7 +28,7 @@ public class CommentController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CommentResponse> getCommentById(@PathVariable Long id) {
-        Comment comment = service.findById(id);
+        Comment comment = mapper.fromId(id);
 
         return ResponseEntity.ok(mapper.toResponse(comment));
     }
@@ -45,7 +45,7 @@ public class CommentController {
     @PutMapping("/{id}")
     public ResponseEntity<CommentResponse> updateComment(@PathVariable Long id, @RequestBody UpsertCommentRequest request) {
         try {
-            Comment author = service.findById(id);
+            Comment author = mapper.fromId(id);
             BeanUtils.copyProperties(request, author);
 
             Comment saved = service.addOrReplace(author);
@@ -58,7 +58,7 @@ public class CommentController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long id) {
-        Comment comment = service.findById(id);
+        Comment comment = mapper.fromId(id);
 
         service.delete(comment);
 

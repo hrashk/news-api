@@ -1,10 +1,6 @@
-package io.github.hrashk.news.api.comment;
+package io.github.hrashk.news.api.comments;
 
 import io.github.hrashk.news.api.ContainerJpaTest;
-import io.github.hrashk.news.api.comments.Comment;
-import io.github.hrashk.news.api.comments.CommentNotFoundException;
-import io.github.hrashk.news.api.comments.CommentRepository;
-import io.github.hrashk.news.api.comments.CommentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

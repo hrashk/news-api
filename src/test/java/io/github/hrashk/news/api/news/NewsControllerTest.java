@@ -8,6 +8,7 @@ import io.github.hrashk.news.api.categories.Category;
 import io.github.hrashk.news.api.categories.CategoryNotFoundException;
 import io.github.hrashk.news.api.categories.CategoryService;
 import io.github.hrashk.news.api.categories.web.CategoryMapper;
+import io.github.hrashk.news.api.comments.CommentService;
 import io.github.hrashk.news.api.comments.web.CommentMapper;
 import io.github.hrashk.news.api.news.web.NewsController;
 import io.github.hrashk.news.api.news.web.NewsMapper;
@@ -47,6 +48,8 @@ class NewsControllerTest {
     private AuthorService authorService;
     @MockBean
     private CategoryService categoryService;
+    @MockBean
+    private CommentService commentService;
 
     @TestConfiguration
     @Import({NewsSamples.class, NewsJsonSamples.class})
