@@ -4,8 +4,10 @@ import io.github.hrashk.news.api.authors.web.AuthorListResponse;
 import io.github.hrashk.news.api.authors.web.AuthorResponse;
 import io.github.hrashk.news.api.categories.web.CategoryListResponse;
 import io.github.hrashk.news.api.categories.web.CategoryResponse;
+import io.github.hrashk.news.api.exceptions.ErrorInfo;
 import io.github.hrashk.news.api.news.web.NewsListResponse;
 import io.github.hrashk.news.api.news.web.NewsResponse;
+import io.github.hrashk.news.api.news.web.NewsWithCountResponse;
 import io.github.hrashk.news.api.news.web.UpsertNewsRequest;
 import io.github.hrashk.news.api.seeder.DataSeeder;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +17,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
@@ -67,15 +71,61 @@ class NewsApiApplicationTests {
     }
 
     @Test
-    void fetchNews() {
+    void deleteNews() {
+        var news = fetchNews().get(2);
+
+        deleteNews(news.id());
+    }
+
+    @Test
+    void deleteAuthor() {
+        var news = fetchNews().get(3);
+
+        deleteAuthor(news.authorId());
+    }
+
+    @Test
+    void deletingCategoryWithNewsFails() {
+        var news = fetchNews().get(4);
+
+        ResponseEntity<ErrorInfo> response = rest.exchange("/api/v1/categories/{id}",
+                HttpMethod.DELETE, HttpEntity.EMPTY, ErrorInfo.class, news.categoryId());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    private void deleteEntity(String name, Long id) {
+        ResponseEntity<Void> response = rest.exchange("/api/v1/{name}/{id}", HttpMethod.DELETE, HttpEntity.EMPTY, Void.class, name, id);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+        ResponseEntity<ErrorInfo> errorResponse = rest.getForEntity("/api/v1/{name}/{id}", ErrorInfo.class, name, id);
+        assertThat(errorResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    private void deleteNews(Long id) {
+        deleteEntity("news", id);
+    }
+
+    private void deleteAuthor(Long id) {
+        deleteEntity("authors", id);
+    }
+
+    private void deleteCategory(Long id) {
+        deleteEntity("categories", id);
+    }
+
+    private List<NewsWithCountResponse> fetchNews() {
         ResponseEntity<NewsListResponse> entity = rest.getForEntity("/api/v1/news", NewsListResponse.class);
 
+        List<NewsWithCountResponse> news = Objects.requireNonNull(entity.getBody()).news();
         assertAll(
                 () -> assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK),
-                () -> assertThat(entity.getBody().news()).hasSizeGreaterThan(5)
+                () -> assertThat(news).hasSizeGreaterThan(5)
         );
 
-        assertThat(entity.getBody().news()).allSatisfy(n -> assertThat(n).hasNoNullFieldsOrProperties());
+        assertThat(news).allSatisfy(n -> assertThat(n).hasNoNullFieldsOrProperties());
+
+        return news;
     }
 
     @Test
