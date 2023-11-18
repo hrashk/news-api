@@ -62,11 +62,10 @@ public class NewsController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNews(@PathVariable Long id) {
-        if (service.contains(id)) {
-            service.removeById(id);
+        News news = mapper.fromId(id);
 
-            return ResponseEntity.noContent().build();
-        } else
-            return ResponseEntity.notFound().build();
+        service.delete(news);
+
+        return ResponseEntity.noContent().build();
     }
 }

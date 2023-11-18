@@ -71,23 +71,12 @@ class NewsServiceTest {
     }
 
     @Test
-    void containsValidId() {
-        News first = savedNews.get(0);
-
-        assertThat(service.contains(first.getId())).isTrue();
-    }
-
-    @Test
-    void doesNotContainInvalidId() {
-        assertThat(service.contains(samples.invalidId())).isFalse();
-    }
-
-    @Test
     void removeById() {
         Long id = savedNews.get(0).getId();
 
-        service.removeById(id);
+        service.delete(savedNews.get(0));
 
-        assertThat(service.contains(id)).isFalse();
+        assertThatThrownBy(() -> service.findById(id))
+                .isInstanceOf(NewsNotFoundException.class);
     }
 }

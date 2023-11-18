@@ -258,19 +258,20 @@ class NewsControllerTest {
 
     @Test
     void deleteByValidId() throws Exception {
-        Mockito.when(service.contains(Mockito.anyLong())).thenReturn(true);
+        Mockito.when(service.findById(Mockito.eq(samples.validId()))).thenReturn(samples.greatNews());
 
         mvc.perform(delete(samples.validIdUrl()))
                 .andExpectAll(
                         status().isNoContent()
                 );
 
-        Mockito.verify(service).removeById(Mockito.eq(samples.validId()));
+        Mockito.verify(service).delete(Mockito.assertArg(n ->
+                assertThat(n).hasFieldOrPropertyWithValue("id", samples.validId())));
     }
 
     @Test
     void deletingByInvalidIdFails() throws Exception {
-        Mockito.when(service.contains(Mockito.anyLong())).thenReturn(false);
+        Mockito.when(service.findById(Mockito.anyLong())).thenThrow(NewsNotFoundException.class);
 
         mvc.perform(delete(samples.invalidIdUrl()))
                 .andExpectAll(
