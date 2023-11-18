@@ -31,6 +31,18 @@ public class DataSeeder {
         newsRepo.saveAll(sampleNews(count));
     }
 
+    long authorsCount() {
+        return authorsRepo.count();
+    }
+
+    long categoriesCount() {
+        return categoryRepo.count();
+    }
+
+    long newsCount() {
+        return newsRepo.count();
+    }
+
     public List<Author> sampleAuthors(int count) {
         return generateSample(count, this::aRandomAuthor);
     }
