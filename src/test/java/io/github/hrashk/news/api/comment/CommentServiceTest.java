@@ -72,23 +72,12 @@ class CommentServiceTest {
     }
 
     @Test
-    void containsValidId() {
-        Comment first = savedComment.get(0);
-
-        assertThat(service.contains(first.getId())).isTrue();
-    }
-
-    @Test
-    void doesNotContainInvalidId() {
-        assertThat(service.contains(INVALID_ID)).isFalse();
-    }
-
-    @Test
     void removeById() {
         Long id = savedComment.get(0).getId();
 
-        service.removeById(id);
+        service.delete(savedComment.get(0));
 
-        assertThat(service.contains(id)).isFalse();
+        assertThatThrownBy(() -> service.findById(id))
+                .isInstanceOf(CommentNotFoundException.class);
     }
 }

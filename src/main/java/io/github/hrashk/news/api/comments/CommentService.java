@@ -22,11 +22,7 @@ public class CommentService {
         return repository.save(category);
     }
 
-    public boolean contains(Long id) {
-        return repository.existsById(id);
-    }
-
-    public void removeById(Long id) {
-        repository.deleteById(id);
+    public void delete(Comment comment) {
+        repository.delete(comment);
     }
 }

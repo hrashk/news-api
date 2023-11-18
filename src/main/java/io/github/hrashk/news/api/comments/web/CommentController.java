@@ -21,20 +21,16 @@ public class CommentController {
 
     @GetMapping
     public ResponseEntity<CommentListResponse> getAllCategories() {
-        List<Comment> news = service.findAll();
+        List<Comment> comment = service.findAll();
 
-        return ResponseEntity.ok(mapper.toResponse(news));
+        return ResponseEntity.ok(mapper.toResponse(comment));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CommentResponse> getCommentById(@PathVariable Long id) {
-        try {
-            Comment news = service.findById(id);
+        Comment comment = service.findById(id);
 
-            return ResponseEntity.ok(mapper.toResponse(news));
-        } catch (NoSuchElementException ex) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(mapper.toResponse(comment));
     }
 
     @PostMapping
@@ -62,11 +58,10 @@ public class CommentController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long id) {
-        if (service.contains(id)) {
-            service.removeById(id);
+        Comment comment = service.findById(id);
 
-            return ResponseEntity.noContent().build();
-        } else
-            return ResponseEntity.notFound().build();
+        service.delete(comment);
+
+        return ResponseEntity.noContent().build();
     }
 }
