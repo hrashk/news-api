@@ -26,9 +26,9 @@ public class DataSeeder {
     private final Faker faker = new Faker(random);
 
     public void seed(int count) {
-        authorsRepo.saveAll(sampleAuthors(count));
-        categoryRepo.saveAll(sampleCategories(count));
-        newsRepo.saveAll(sampleNews(count));
+        List<Author> authors = authorsRepo.saveAll(sampleAuthors(count));
+        List<Category> categories = categoryRepo.saveAll(sampleCategories(count));
+        newsRepo.saveAll(sampleNews(count, authors, categories));
     }
 
     long authorsCount() {
@@ -47,8 +47,8 @@ public class DataSeeder {
         return generateSample(count, this::aRandomAuthor);
     }
 
-    public Iterable<News> sampleNews(int count) {
-        return generateSample(count, this::aRandomNews);
+    public Iterable<News> sampleNews(int count, List<Author> authors, List<Category> categories) {
+        return generateSample(count, id -> aRandomNews(id, authors, categories));
     }
 
     public Iterable<Category> sampleCategories(int count) {
@@ -69,14 +69,18 @@ public class DataSeeder {
                 .build();
     }
 
-    private News aRandomNews(long id) {
+    private News aRandomNews(long id, List<Author> authors, List<Category> categories) {
         return News.builder()
                 .id(id)
-                .author(Author.builder().id(random.nextLong(1, 10)).build())
-                .category(Category.builder().id(random.nextLong(1, 10)).build())
+                .author(randomItem(authors))
+                .category(randomItem(categories))
                 .headline(faker.lorem().sentence())
                 .content(faker.lorem().paragraph())
                 .build();
+    }
+
+    private <T> T randomItem(List<T> items) {
+        return items.get(random.nextInt(items.size()));
     }
 
     private Category aRandomCategory(long id) {
