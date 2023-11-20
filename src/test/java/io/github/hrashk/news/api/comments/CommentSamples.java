@@ -20,14 +20,6 @@ public class CommentSamples {
         return List.of(n1, n2);
     }
 
-    public List<Comment> twoNewComments() {
-        var comments = twoComments();
-
-        comments.forEach(c -> c.setId(null));
-
-        return comments;
-    }
-
     public Comment smiley() {
         return Comment.builder()
                 .id(7L)
