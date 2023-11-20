@@ -12,6 +12,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 
 @Entity
@@ -20,7 +21,7 @@ import java.util.Collection;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 public class Author {
     @Id
     @GeneratedValue
@@ -32,14 +33,24 @@ public class Author {
     private String lastName;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.REMOVE)
-    private Collection<News> news;
+    private Collection<News> news = new ArrayList<>();
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.REMOVE)
-    private Collection<Comment> comments;
+    private Collection<Comment> comments = new ArrayList<>();
 
     @CreatedDate
     private LocalDateTime createdAt;
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    public void addComment(Comment comment) {
+        comment.setAuthor(this);
+        comments.add(comment);
+    }
+
+    public void addNews(News newsItem) {
+        newsItem.setAuthor(this);
+        news.add(newsItem);
+    }
 }

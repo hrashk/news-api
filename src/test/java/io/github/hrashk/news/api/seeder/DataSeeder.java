@@ -75,7 +75,7 @@ public final class DataSeeder {
     }
 
     private Author aRandomAuthor(long id) {
-        return Author.builder()
+        return new Author().toBuilder()
                 .firstName(faker.name().firstName())
                 .lastName(faker.name().lastName())
                 .build();
@@ -88,20 +88,29 @@ public final class DataSeeder {
     }
 
     private News aRandomNews(long id) {
-        return News.builder()
-                .author(randomItem(authors))
+        Author author = randomItem(authors);
+
+        News newsItem = new News().toBuilder()
                 .category(randomItem(categories))
                 .headline(faker.lorem().sentence())
                 .content(faker.lorem().paragraph(10))
                 .build();
+        author.addNews(newsItem);
+
+        return newsItem;
     }
 
     public Comment aRandomComment(long ignored) {
-        return Comment.builder()
+        Author author = randomItem(authors);
+        News newsItem = randomItem(news);
+
+        Comment comment = Comment.builder()
                 .text(faker.lorem().paragraph(10))
-                .author(randomItem(authors))
-                .news(randomItem(news))
                 .build();
+        author.addComment(comment);
+        newsItem.addComment(comment);
+
+        return comment;
     }
 
     private <T> T randomItem(List<T> items) {
