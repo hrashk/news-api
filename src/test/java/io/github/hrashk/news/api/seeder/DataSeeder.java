@@ -4,6 +4,8 @@ import io.github.hrashk.news.api.authors.Author;
 import io.github.hrashk.news.api.authors.AuthorRepository;
 import io.github.hrashk.news.api.categories.Category;
 import io.github.hrashk.news.api.categories.CategoryRepository;
+import io.github.hrashk.news.api.comments.Comment;
+import io.github.hrashk.news.api.comments.CommentRepository;
 import io.github.hrashk.news.api.news.News;
 import io.github.hrashk.news.api.news.NewsRepository;
 import lombok.Getter;
@@ -26,17 +28,28 @@ public final class DataSeeder {
     private final AuthorRepository authorsRepo;
     private final NewsRepository newsRepo;
     private final CategoryRepository categoryRepo;
+    private final CommentRepository commentRepository;
+
     private final Random random = ThreadLocalRandom.current();
     private final Faker faker = new Faker(random);
 
     private List<Author> authors;
     private List<Category> categories;
     private List<News> news;
+    private List<Comment> comments;
 
     public void seed(int count) {
         authors = authorsRepo.saveAll(sampleAuthors(count));
+        authorsRepo.flush();
+
         categories = categoryRepo.saveAll(sampleCategories(count));
+        categoryRepo.flush();
+
         news = newsRepo.saveAll(sampleNews(count));
+        newsRepo.flush();
+
+        comments = commentRepository.saveAll(sampleComments(count));
+        commentRepository.flush();
     }
 
     public List<Author> sampleAuthors(int count) {
@@ -49,6 +62,10 @@ public final class DataSeeder {
 
     public Iterable<News> sampleNews(int count) {
         return generateSample(count, this::aRandomNews);
+    }
+
+    private Iterable<Comment> sampleComments(int count) {
+        return generateSample(count, this::aRandomComment);
     }
 
     private <T> List<T> generateSample(int count, LongFunction<T> entityGenerator) {
@@ -75,7 +92,15 @@ public final class DataSeeder {
                 .author(randomItem(authors))
                 .category(randomItem(categories))
                 .headline(faker.lorem().sentence())
-                .content(faker.lorem().paragraph())
+                .content(faker.lorem().paragraph(10))
+                .build();
+    }
+
+    private Comment aRandomComment(long id) {
+        return Comment.builder()
+                .text(faker.lorem().paragraph(10))
+                .author(randomItem(authors))
+                .news(randomItem(news))
                 .build();
     }
 
