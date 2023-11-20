@@ -25,7 +25,7 @@ public class Comment {
     @GeneratedValue
     private Long id;
 
-    @Lob
+    @Column(columnDefinition = "text")
     private String text;
 
     @ManyToOne

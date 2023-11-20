@@ -39,17 +39,21 @@ public final class DataSeeder {
     private List<Comment> comments;
 
     public void seed(int count) {
-        authors = authorsRepo.saveAll(sampleAuthors(count));
+        authorsRepo.saveAll(sampleAuthors(count));
         authorsRepo.flush();
+        authors = authorsRepo.findAll();
 
-        categories = categoryRepo.saveAll(sampleCategories(count));
+        categoryRepo.saveAll(sampleCategories(count));
         categoryRepo.flush();
+        categories = categoryRepo.findAll();
 
-        news = newsRepo.saveAll(sampleNews(count));
+        newsRepo.saveAll(sampleNews(count));
         newsRepo.flush();
+        news = newsRepo.findAll();
 
-        comments = commentRepository.saveAll(sampleComments(count));
+        commentRepository.saveAll(sampleComments(count));
         commentRepository.flush();
+        comments = commentRepository.findAll();
     }
 
     public List<Author> sampleAuthors(int count) {

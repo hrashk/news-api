@@ -28,16 +28,17 @@ public class News {
     private Long id;
 
     private String headline;
-    @Lob
+
+    @Column(columnDefinition = "text")
     private String content;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToOne
     private Author author;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToOne
     private Category category;
 
-    @OneToMany(mappedBy = "news", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "news", cascade = CascadeType.REMOVE)
     private Collection<Comment> comments;
 
     @CreatedDate
