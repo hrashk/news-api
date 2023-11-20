@@ -44,32 +44,6 @@ class NewsApiApplicationTests {
         seeder.seed(10);
     }
 
-    List<AuthorResponse> fetchAuthors() {
-        ResponseEntity<AuthorListResponse> response = rest.getForEntity("/api/v1/authors", AuthorListResponse.class);
-
-        List<AuthorResponse> authors = Objects.requireNonNull(response.getBody()).authors();
-
-        assertAll(
-                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
-                () -> assertThat(authors).hasSizeGreaterThan(5)
-        );
-
-        return authors;
-    }
-
-    List<CategoryResponse> fetchCategories() {
-        ResponseEntity<CategoryListResponse> response = rest.getForEntity("/api/v1/categories", CategoryListResponse.class);
-
-        List<CategoryResponse> categories = Objects.requireNonNull(response.getBody()).categories();
-
-        assertAll(
-                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
-                () -> assertThat(categories).hasSizeGreaterThan(5)
-        );
-
-        return categories;
-    }
-
     @Test
     void deleteNews() {
         var news = fetchNews().get(2);
@@ -78,7 +52,7 @@ class NewsApiApplicationTests {
     }
 
     @Test
-    void deleteAuthor() {
+    void deleteAuthorWithNews() {
         var news = fetchNews().get(3);
 
         deleteAuthor(news.authorId());
@@ -92,6 +66,60 @@ class NewsApiApplicationTests {
                 HttpMethod.DELETE, HttpEntity.EMPTY, ErrorInfo.class, news.categoryId());
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void addNews() {
+        var authors = fetchAuthors();
+        var categories = fetchCategories();
+
+        UpsertNewsRequest request = new UpsertNewsRequest(authors.get(3).id(), categories.get(4).id(), "", "");
+        ResponseEntity<NewsResponse> response = rest.postForEntity("/api/v1/news", request, NewsResponse.class);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED),
+                () -> assertThat(response.getBody()).hasNoNullFieldsOrPropertiesExcept("comments")
+        );
+    }
+
+    private List<AuthorResponse> fetchAuthors() {
+        ResponseEntity<AuthorListResponse> response = rest.getForEntity("/api/v1/authors", AuthorListResponse.class);
+
+        List<AuthorResponse> authors = Objects.requireNonNull(response.getBody()).authors();
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(authors).hasSizeGreaterThan(5)
+        );
+
+        return authors;
+    }
+
+    private List<CategoryResponse> fetchCategories() {
+        ResponseEntity<CategoryListResponse> response = rest.getForEntity("/api/v1/categories", CategoryListResponse.class);
+
+        List<CategoryResponse> categories = Objects.requireNonNull(response.getBody()).categories();
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(categories).hasSizeGreaterThan(5)
+        );
+
+        return categories;
+    }
+
+    private List<NewsWithCountResponse> fetchNews() {
+        ResponseEntity<NewsListResponse> entity = rest.getForEntity("/api/v1/news", NewsListResponse.class);
+
+        List<NewsWithCountResponse> news = Objects.requireNonNull(entity.getBody()).news();
+        assertAll(
+                () -> assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(news).hasSizeGreaterThan(5)
+        );
+
+        assertThat(news).allSatisfy(n -> assertThat(n).hasNoNullFieldsOrProperties());
+
+        return news;
     }
 
     private void deleteEntity(String name, Long id) {
@@ -112,33 +140,5 @@ class NewsApiApplicationTests {
 
     private void deleteCategory(Long id) {
         deleteEntity("categories", id);
-    }
-
-    private List<NewsWithCountResponse> fetchNews() {
-        ResponseEntity<NewsListResponse> entity = rest.getForEntity("/api/v1/news", NewsListResponse.class);
-
-        List<NewsWithCountResponse> news = Objects.requireNonNull(entity.getBody()).news();
-        assertAll(
-                () -> assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK),
-                () -> assertThat(news).hasSizeGreaterThan(5)
-        );
-
-        assertThat(news).allSatisfy(n -> assertThat(n).hasNoNullFieldsOrProperties());
-
-        return news;
-    }
-
-    @Test
-    void addNews() {
-        var authors = fetchAuthors();
-        var categories = fetchCategories();
-
-        UpsertNewsRequest request = new UpsertNewsRequest(authors.get(3).id(), categories.get(4).id(), "", "");
-        ResponseEntity<NewsResponse> response = rest.postForEntity("/api/v1/news", request, NewsResponse.class);
-
-        assertAll(
-                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED),
-                () -> assertThat(response.getBody()).hasNoNullFieldsOrPropertiesExcept("comments")
-        );
     }
 }
