@@ -18,6 +18,7 @@ class DataSeederTest {
     void sampleDataIsLoaded() {
         int size = 10;
         seeder.seed(size);
+        seeder.flush();
 
         assertAll(
                 () -> assertThat(seeder.authors()).as("Authors").hasSize(size),
