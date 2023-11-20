@@ -37,17 +37,4 @@ public class CommentSamples {
                 .updatedAt(LocalDateTime.parse("2011-08-21T00:00:00"))
                 .build();
     }
-
-    public Comment withoutId() {
-        return Comment.builder()
-                .text("Smiley comments")
-                .build();
-    }
-
-    public Comment withId() {
-        return Comment.builder()
-                .id(invalidId())
-                .text("Smiley comments")
-                .build();
-    }
 }

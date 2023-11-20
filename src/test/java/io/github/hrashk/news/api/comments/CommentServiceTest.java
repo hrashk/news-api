@@ -13,14 +13,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ContainerJpaTest
-@Import({CommentService.class, CommentSamples.class, DataSeeder.class})
+@Import({CommentService.class, DataSeeder.class})
 class CommentServiceTest {
 
     @Autowired
     private CommentService service;
 
-    @Autowired
-    private CommentSamples samples;
     @Autowired
     private DataSeeder seeder;
 
@@ -47,25 +45,25 @@ class CommentServiceTest {
 
     @Test
     void findByInvalidId() {
-        assertThatThrownBy(() -> service.findById(samples.invalidId()))
+        assertThatThrownBy(() -> service.findById(-1L))
                 .isInstanceOf(CommentNotFoundException.class);
     }
 
     @Test
     void saveWithNullId() {
-        Comment saved = service.addOrReplace(samples.withoutId());
+        Comment saved = service.addOrReplace(seeder.aRandomComment(-1L));
 
         assertThat(saved.getId()).as("Comment id").isNotNull();
     }
 
     @Test
     void saveWithNonNullId() {
-        var comment = samples.withId();
-        long originalId = comment.getId(); // the comment object is changed after saving
+        var comment = seeder.aRandomComment(-1L);
+        comment.setId(-1L);
 
         Comment saved = service.addOrReplace(comment);
 
-        assertThat(saved.getId()).as("Comment id").isNotEqualTo(originalId);
+        assertThat(saved.getId()).as("Comment id").isGreaterThan(0);
     }
 
     @Test

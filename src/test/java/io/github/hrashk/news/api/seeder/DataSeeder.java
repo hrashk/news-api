@@ -96,7 +96,7 @@ public final class DataSeeder {
                 .build();
     }
 
-    private Comment aRandomComment(long id) {
+    public Comment aRandomComment(long ignored) {
         return Comment.builder()
                 .text(faker.lorem().paragraph(10))
                 .author(randomItem(authors))
