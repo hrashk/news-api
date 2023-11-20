@@ -1,6 +1,7 @@
 package io.github.hrashk.news.api.news;
 
 import io.github.hrashk.news.api.ContainerJpaTest;
+import io.github.hrashk.news.api.seeder.DataSeeder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,30 +14,30 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ContainerJpaTest
-@Import({NewsService.class, NewsSamples.class})
+@Import({NewsService.class, DataSeeder.class})
 class NewsServiceTest {
     @Autowired
     private NewsService service;
 
     @Autowired
-    private NewsRepository repository;
-    @Autowired
-    private NewsSamples samples;
+    private DataSeeder seeder;
+
     private List<News> savedNews;
 
     @BeforeEach
-    public void injectNews() {
-        this.savedNews = repository.saveAll(samples.twoNewNews());
+    public void seedNews() {
+        seeder.seed(5);
+        savedNews = seeder.news();
     }
 
     @Test
     void firstPage() {
-        assertThat(service.findAll(PageRequest.of(0, 1))).hasSize(1);
+        assertThat(service.findAll(PageRequest.of(0, 3))).hasSize(3);
     }
 
     @Test
     void secondPage() {
-        assertThat(service.findAll(PageRequest.of(1, 1))).hasSize(1);
+        assertThat(service.findAll(PageRequest.of(1, 2))).hasSize(2);
     }
 
     @Test
@@ -49,32 +50,36 @@ class NewsServiceTest {
 
     @Test
     void findByInvalidId() {
-        assertThatThrownBy(() -> service.findById(samples.invalidId()))
+        assertThatThrownBy(() -> service.findById(-1L))
                 .isInstanceOf(NewsNotFoundException.class);
     }
 
     @Test
     void saveWithNullId() {
-        News saved = service.addOrReplace(samples.withoutId());
+        var n = seeder.aRandomNews(-1L);
+
+        News saved = service.addOrReplace(n);
 
         assertThat(saved.getId()).as("News id").isNotNull();
     }
 
     @Test
     void saveWithNonNullId() {
-        var n = samples.withInvalidId();
-        long originalid = n.getId(); // the news object is changed after saving
+        var n = seeder.aRandomNews(-1L);
 
         News saved = service.addOrReplace(n);
 
-        assertThat(saved.getId()).as("News id").isNotEqualTo(originalid);
+        assertThat(saved.getId()).as("News id").isGreaterThan(0L);
     }
 
     @Test
-    void removeById() {
-        Long id = savedNews.get(0).getId();
+    void deleteWithComments() {
+        News news = savedNews.stream()
+                .filter(n -> !n.getComments().isEmpty())
+                .findAny().get();
+        Long id = news.getId();
 
-        service.delete(savedNews.get(0));
+        service.delete(news);
 
         assertThatThrownBy(() -> service.findById(id))
                 .isInstanceOf(NewsNotFoundException.class);

@@ -45,18 +45,6 @@ public class NewsSamples {
         return List.of(n1, n2);
     }
 
-    public List<News> twoNewNews() {
-        List<News> news = twoNews();
-        news.forEach(n -> {
-            n.setId(null);
-            n.setAuthor(null);
-            n.setCategory(null);
-            n.setComments(null);
-        });
-
-        return news;
-    }
-
     public News greatNews() {
         List<Comment> comments = commentSamples.twoComments();
         Author author = Author.builder().id(3L).build();
@@ -89,25 +77,6 @@ public class NewsSamples {
                 .content("Dolor sit amet")
                 .createdAt(LocalDateTime.parse("2011-07-17T00:00:00"))
                 .updatedAt(LocalDateTime.parse("2011-08-21T00:00:00"))
-                .build();
-    }
-
-    public News withoutId() {
-        return News.builder()
-                .author(Author.builder().build())
-                .category(Category.builder().build())
-                .headline("Great news")
-                .content("Lorem ipsum dolor")
-                .build();
-    }
-
-    public News withInvalidId() {
-        return News.builder()
-                .id(invalidId())
-                .author(Author.builder().id(3L).build())
-                .category(Category.builder().id(11L).build())
-                .headline("Great news")
-                .content("Lorem ipsum dolor")
                 .build();
     }
 }

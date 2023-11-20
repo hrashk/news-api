@@ -87,7 +87,7 @@ public final class DataSeeder {
                 .build();
     }
 
-    private News aRandomNews(long id) {
+    public News aRandomNews(long ignored) {
         Author author = randomItem(authors);
 
         News newsItem = new News().toBuilder()
