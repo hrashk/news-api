@@ -23,6 +23,7 @@ public class Category {
     @GeneratedValue
     private Long id;
 
+    @Column(nullable = false)
     private String name;
 
     @CreatedDate

@@ -26,7 +26,9 @@ public class Author {
     @GeneratedValue
     private Long id;
 
+    @Column(nullable = false)
     private String firstName;
+    @Column(nullable = false)
     private String lastName;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.REMOVE)

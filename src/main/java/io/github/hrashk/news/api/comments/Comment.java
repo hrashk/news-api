@@ -25,13 +25,13 @@ public class Comment {
     @GeneratedValue
     private Long id;
 
-    @Column(columnDefinition = "text")
+    @Column(columnDefinition = "text", nullable = false)
     private String text;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     private News news;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     private Author author;
 
     @CreatedDate

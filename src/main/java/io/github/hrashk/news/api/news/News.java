@@ -27,15 +27,16 @@ public class News {
     @GeneratedValue
     private Long id;
 
+    @Column(nullable = false)
     private String headline;
 
-    @Column(columnDefinition = "text")
+    @Column(columnDefinition = "text", nullable = false)
     private String content;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     private Author author;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     private Category category;
 
     @OneToMany(mappedBy = "news", cascade = CascadeType.REMOVE)
