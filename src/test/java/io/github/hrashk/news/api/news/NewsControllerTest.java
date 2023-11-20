@@ -1,10 +1,10 @@
 package io.github.hrashk.news.api.news;
 
-import io.github.hrashk.news.api.ControllerTestDependencies;
 import io.github.hrashk.news.api.authors.AuthorNotFoundException;
 import io.github.hrashk.news.api.categories.CategoryNotFoundException;
 import io.github.hrashk.news.api.news.web.NewsController;
 import io.github.hrashk.news.api.util.AssertionHelpers;
+import io.github.hrashk.news.api.util.ControllerTestDependencies;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

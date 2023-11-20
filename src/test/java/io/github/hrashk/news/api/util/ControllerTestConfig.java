@@ -1,4 +1,4 @@
-package io.github.hrashk.news.api;
+package io.github.hrashk.news.api.util;
 
 import io.github.hrashk.news.api.authors.web.AuthorMapper;
 import io.github.hrashk.news.api.categories.web.CategoryMapper;

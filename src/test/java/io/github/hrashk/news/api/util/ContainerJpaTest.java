@@ -1,4 +1,4 @@
-package io.github.hrashk.news.api;
+package io.github.hrashk.news.api.util;
 
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;

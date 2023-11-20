@@ -1,7 +1,7 @@
 package io.github.hrashk.news.api.news;
 
-import io.github.hrashk.news.api.ContainerJpaTest;
 import io.github.hrashk.news.api.seeder.DataSeeder;
+import io.github.hrashk.news.api.util.ContainerJpaTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

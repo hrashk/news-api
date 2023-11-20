@@ -1,4 +1,4 @@
-package io.github.hrashk.news.api;
+package io.github.hrashk.news.api.util;
 
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;
