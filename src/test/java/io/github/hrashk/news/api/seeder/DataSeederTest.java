@@ -16,12 +16,16 @@ class DataSeederTest {
 
     @Test
     void sampleDataIsLoaded() {
-        seeder.seed(10);
+        int size = 10;
+        seeder.seed(size);
 
         assertAll(
-                () -> assertThat(seeder.authorsCount()).as("Authors count").isGreaterThan(5L),
-                () -> assertThat(seeder.newsCount()).as("News count").isGreaterThan(5L),
-                () -> assertThat(seeder.categoriesCount()).as("Categories count").isGreaterThan(5L)
+                () -> assertThat(seeder.authors()).as("Authors").hasSize(size),
+                () -> assertThat(seeder.authors()).as("Author ids").noneMatch(a -> a.getId() == null),
+                () -> assertThat(seeder.news()).as("News").hasSize(size),
+                () -> assertThat(seeder.news()).as("News ids").noneMatch(a -> a.getId() == null),
+                () -> assertThat(seeder.categories()).as("Categories").hasSize(size),
+                () -> assertThat(seeder.categories()).as("Categor ids").noneMatch(a -> a.getId() == null)
         );
     }
 }
