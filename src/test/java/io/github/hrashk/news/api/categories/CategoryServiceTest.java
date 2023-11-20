@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
-import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -85,9 +84,7 @@ class CategoryServiceTest {
 
     @Test
     void deletingWithNewsFails() {
-        Category categoryWithNews = savedCategories.stream()
-                .filter(c -> seeder.news().stream().anyMatch(n -> Objects.equals(n.getCategory(), c)))
-                .findAny().get();
+        Category categoryWithNews = seeder.news().get(0).getCategory();
 
         assertThatThrownBy(() -> service.delete(categoryWithNews))
                 .isInstanceOf(ValidationException.class);
