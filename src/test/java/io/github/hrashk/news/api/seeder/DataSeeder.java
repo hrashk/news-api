@@ -81,7 +81,7 @@ public final class DataSeeder {
                 .build();
     }
 
-    private Category aRandomCategory(long id) {
+    public Category aRandomCategory(long id) {
         return Category.builder()
                 .name(faker.book().genre())
                 .build();

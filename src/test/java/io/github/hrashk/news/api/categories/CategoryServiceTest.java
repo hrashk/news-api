@@ -1,6 +1,8 @@
 package io.github.hrashk.news.api.categories;
 
 import io.github.hrashk.news.api.ContainerJpaTest;
+import io.github.hrashk.news.api.seeder.DataSeeder;
+import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,39 +10,40 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ContainerJpaTest
-@Import({CategoryService.class, CategorySamples.class})
+@Import({CategoryService.class, DataSeeder.class})
 class CategoryServiceTest {
     @Autowired
     private CategoryService service;
     @Autowired
-    private CategorySamples samples;
-    @Autowired
-    private CategoryRepository repository;
-    private List<Category> savedCategory;
+    private DataSeeder seeder;
+
+    private List<Category> savedCategories;
 
     @BeforeEach
-    public void injectCategory() {
-        this.savedCategory = repository.saveAll(samples.twoNewCategories());
+    public void seedCategories() {
+        seeder.seed(5);
+        savedCategories = seeder.categories();
     }
 
     @Test
     void firstPage() {
-        assertThat(service.findAll(PageRequest.of(0, 1))).hasSize(1);
+        assertThat(service.findAll(PageRequest.of(0, 3))).hasSize(3);
     }
 
     @Test
     void secondPage() {
-        assertThat(service.findAll(PageRequest.of(1, 1))).hasSize(1);
+        assertThat(service.findAll(PageRequest.of(1, 2))).hasSize(2);
     }
 
     @Test
     void findByValidId() {
-        Category news = savedCategory.get(0);
+        Category news = savedCategories.get(0);
         Long validId = news.getId();
 
         assertThat(service.findById(validId)).isEqualTo(news);
@@ -48,34 +51,45 @@ class CategoryServiceTest {
 
     @Test
     void findByInvalidId() {
-        assertThatThrownBy(() -> service.findById(samples.invalidId()))
+        assertThatThrownBy(() -> service.findById(-1L))
                 .isInstanceOf(CategoryNotFoundException.class);
     }
 
     @Test
     void saveWithNullId() {
-        Category saved = service.addOrReplace(samples.withoutId());
+        Category saved = service.addOrReplace(seeder.aRandomCategory(-1L));
 
         assertThat(saved.getId()).as("Category id").isNotNull();
     }
 
     @Test
     void saveWithNonNullId() {
-        var n = samples.withInvalidId();
-        long originalId = n.getId(); // the news object is changed after saving
+        var n = seeder.aRandomCategory(-1L);
+        n.setId(-1L);
 
         Category saved = service.addOrReplace(n);
 
-        assertThat(saved.getId()).as("Category id").isNotEqualTo(originalId);
+        assertThat(saved.getId()).as("Category id").isGreaterThan(0L);
     }
 
     @Test
-    void removeById() {
-        Long id = savedCategory.get(0).getId();
+    void delete() {
+        Category categoryWithoutNews = service.addOrReplace(seeder.aRandomCategory(-1L));
+        Long id = categoryWithoutNews.getId();
 
-        service.delete(savedCategory.get(0));
+        service.delete(categoryWithoutNews);
 
         assertThatThrownBy(() -> service.findById(id))
                 .isInstanceOf(CategoryNotFoundException.class);
+    }
+
+    @Test
+    void deletingWithNewsFails() {
+        Category categoryWithNews = savedCategories.stream()
+                .filter(c -> seeder.news().stream().anyMatch(n -> Objects.equals(n.getCategory(), c)))
+                .findAny().get();
+
+        assertThatThrownBy(() -> service.delete(categoryWithNews))
+                .isInstanceOf(ValidationException.class);
     }
 }
