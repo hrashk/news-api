@@ -74,7 +74,7 @@ public final class DataSeeder {
                 .toList();
     }
 
-    private Author aRandomAuthor(long id) {
+    public Author aRandomAuthor(long id) {
         return new Author().toBuilder()
                 .firstName(faker.name().firstName())
                 .lastName(faker.name().lastName())
