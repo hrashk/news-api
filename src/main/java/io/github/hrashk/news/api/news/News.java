@@ -4,10 +4,7 @@ import io.github.hrashk.news.api.authors.Author;
 import io.github.hrashk.news.api.categories.Category;
 import io.github.hrashk.news.api.comments.Comment;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -41,6 +38,7 @@ public class News {
     private Category category;
 
     @OneToMany(mappedBy = "news", cascade = CascadeType.REMOVE)
+    @ToString.Exclude
     private Collection<Comment> comments = new ArrayList<>();
 
     @CreatedDate

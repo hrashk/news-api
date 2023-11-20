@@ -3,10 +3,7 @@ package io.github.hrashk.news.api.authors;
 import io.github.hrashk.news.api.comments.Comment;
 import io.github.hrashk.news.api.news.News;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -33,9 +30,11 @@ public class Author {
     private String lastName;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.REMOVE)
+    @ToString.Exclude
     private Collection<News> news = new ArrayList<>();
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.REMOVE)
+    @ToString.Exclude
     private Collection<Comment> comments = new ArrayList<>();
 
     @CreatedDate
