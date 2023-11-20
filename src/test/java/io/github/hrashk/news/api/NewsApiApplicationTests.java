@@ -45,10 +45,8 @@ class NewsApiApplicationTests {
     }
 
     @Test
-    void deleteNews() {
-        var news = fetchNews().get(2);
-
-        deleteNews(news.id());
+    void deleteNewsWithComments() {
+        deleteNews(seeder.comments().get(3).getNews().getId());
     }
 
     @Test
@@ -56,6 +54,11 @@ class NewsApiApplicationTests {
         var news = fetchNews().get(3);
 
         deleteAuthor(news.authorId());
+    }
+
+    @Test
+    void deleteAuthorWithComments() {
+        deleteAuthor(seeder.comments().get(2).getAuthor().getId());
     }
 
     @Test
