@@ -2,6 +2,7 @@ package io.github.hrashk.news.api.news;
 
 import io.github.hrashk.news.api.authors.Author;
 import io.github.hrashk.news.api.categories.Category;
+import io.github.hrashk.news.api.comments.Comment;
 import io.github.hrashk.news.api.comments.CommentSamples;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
@@ -57,16 +58,26 @@ public class NewsSamples {
     }
 
     public News greatNews() {
-        return News.builder()
+        List<Comment> comments = commentSamples.twoComments();
+        Author author = Author.builder().id(3L).build();
+
+        News news = News.builder()
                 .id(validId())
-                .author(Author.builder().id(3L).build())
+                .author(author)
                 .category(Category.builder().id(11L).build())
                 .headline("Great news")
                 .content("Lorem ipsum dolor")
-                .comments(commentSamples.twoComments())
+                .comments(comments)
                 .createdAt(LocalDateTime.parse("2011-10-13T00:00:00"))
                 .updatedAt(LocalDateTime.parse("2011-10-13T00:00:00"))
                 .build();
+
+        comments.forEach(c -> {
+            c.setNews(news);
+            c.setAuthor(author);
+        });
+
+        return news;
     }
 
     public News sadNews() {

@@ -14,7 +14,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @ContainerJpaTest
 @Import({CommentService.class, CommentSamples.class})
 class CommentServiceTest {
-    private static final long INVALID_ID = 11333L;
 
     @Autowired
     private CommentService service;
@@ -38,15 +37,15 @@ class CommentServiceTest {
 
     @Test
     void findByValidId() {
-        Comment news = savedComment.get(0);
-        Long validId = news.getId();
+        Comment comment = savedComment.get(0);
+        Long validId = comment.getId();
 
-        assertThat(service.findById(validId)).isEqualTo(news);
+        assertThat(service.findById(validId)).isEqualTo(comment);
     }
 
     @Test
     void findByInvalidId() {
-        assertThatThrownBy(() -> service.findById(INVALID_ID))
+        assertThatThrownBy(() -> service.findById(samples.invalidId()))
                 .isInstanceOf(CommentNotFoundException.class);
     }
 
@@ -59,12 +58,12 @@ class CommentServiceTest {
 
     @Test
     void saveWithNonNullId() {
-        var n = samples.withId();
-        long originalid = n.getId(); // the news object is changed after saving
+        var comment = samples.withId();
+        long originalId = comment.getId(); // the comment object is changed after saving
 
-        Comment saved = service.addOrReplace(n);
+        Comment saved = service.addOrReplace(comment);
 
-        assertThat(saved.getId()).as("Comment id").isNotEqualTo(originalid);
+        assertThat(saved.getId()).as("Comment id").isNotEqualTo(originalId);
     }
 
     @Test

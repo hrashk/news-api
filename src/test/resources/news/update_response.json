@@ -7,10 +7,14 @@
   "comments": [
     {
       "id": 7,
+      "newsId": 7,
+      "authorId": 3,
       "text": "Smiley comment"
     },
     {
       "id": 22,
+      "newsId": 7,
+      "authorId": 3,
       "text": "Simrky comment"
     }
   ]

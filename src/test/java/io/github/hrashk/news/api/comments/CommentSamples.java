@@ -7,6 +7,10 @@ import java.util.List;
 
 @TestComponent
 public class CommentSamples {
+    public long invalidId() {
+        return 123123L;
+    }
+
 
     public List<Comment> twoComments() {
         Comment n1 = smiley();
@@ -33,7 +37,7 @@ public class CommentSamples {
                 .build();
     }
 
-    private static Comment smirky() {
+    public Comment smirky() {
         return Comment.builder()
                 .id(22L)
                 .text("Simrky comment")
@@ -50,7 +54,7 @@ public class CommentSamples {
 
     public Comment withId() {
         return Comment.builder()
-                .id(123123L)
+                .id(invalidId())
                 .text("Smiley comments")
                 .build();
     }

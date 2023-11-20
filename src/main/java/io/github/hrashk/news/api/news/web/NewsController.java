@@ -26,35 +26,35 @@ public class NewsController {
     public ResponseEntity<NewsListResponse> getAllNews(@ParameterObject @PageableDefault Pageable pageable) {
         List<News> news = service.findAll(pageable);
 
-        return ResponseEntity.ok(mapper.toResponse(news));
+        return ResponseEntity.ok(mapper.toNewsListResponse(news));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<NewsResponse> getNewsById(@PathVariable Long id) {
-        News news = mapper.fromId(id);
+        News news = mapper.mapToNews(id);
 
-        return ResponseEntity.ok(mapper.toResponse(news));
+        return ResponseEntity.ok(mapper.map(news));
     }
 
     @PostMapping
     public ResponseEntity<NewsResponse> addNews(@RequestBody UpsertNewsRequest authorRequest) {
-        News news = mapper.toNews(authorRequest);
+        News news = mapper.map(authorRequest);
         News saved = service.addOrReplace(news);
 
-        NewsResponse response = mapper.toResponse(saved);
+        NewsResponse response = mapper.map(saved);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<NewsResponse> updateNews(@PathVariable Long id, @RequestBody UpsertNewsRequest request) {
         try {
-            News current = mapper.fromId(id);
-            News requested = mapper.toNews(request);
+            News current = mapper.mapToNews(id);
+            News requested = mapper.map(request);
             BeanUtils.copyProperties(requested, current);
 
             News saved = service.addOrReplace(current);
 
-            return ResponseEntity.ok(mapper.toResponse(saved));
+            return ResponseEntity.ok(mapper.map(saved));
         } catch (NewsNotFoundException ex) {
             return addNews(request);
         }
@@ -62,7 +62,7 @@ public class NewsController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNews(@PathVariable Long id) {
-        News news = mapper.fromId(id);
+        News news = mapper.mapToNews(id);
 
         service.delete(news);
 

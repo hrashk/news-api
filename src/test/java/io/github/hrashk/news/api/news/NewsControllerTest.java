@@ -9,7 +9,6 @@ import io.github.hrashk.news.api.categories.CategoryNotFoundException;
 import io.github.hrashk.news.api.categories.CategoryService;
 import io.github.hrashk.news.api.categories.web.CategoryMapper;
 import io.github.hrashk.news.api.comments.CommentService;
-import io.github.hrashk.news.api.comments.web.CommentMapper;
 import io.github.hrashk.news.api.news.web.NewsController;
 import io.github.hrashk.news.api.news.web.NewsMapper;
 import io.github.hrashk.news.api.util.AssertionHelpers;
@@ -67,11 +66,6 @@ class NewsControllerTest {
         @Bean
         CategoryMapper categoryMapper() {
             return Mappers.getMapper(CategoryMapper.class);
-        }
-
-        @Bean
-        CommentMapper commentMapper() {
-            return Mappers.getMapper(CommentMapper.class);
         }
     }
 

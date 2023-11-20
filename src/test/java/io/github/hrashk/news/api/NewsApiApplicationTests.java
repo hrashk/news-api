@@ -4,6 +4,7 @@ import io.github.hrashk.news.api.authors.web.AuthorListResponse;
 import io.github.hrashk.news.api.authors.web.AuthorResponse;
 import io.github.hrashk.news.api.categories.web.CategoryListResponse;
 import io.github.hrashk.news.api.categories.web.CategoryResponse;
+import io.github.hrashk.news.api.comments.web.CommentResponse;
 import io.github.hrashk.news.api.exceptions.ErrorInfo;
 import io.github.hrashk.news.api.news.web.NewsListResponse;
 import io.github.hrashk.news.api.news.web.NewsResponse;
@@ -46,14 +47,39 @@ class NewsApiApplicationTests {
 
     @Test
     void deleteNewsWithComments() {
-        deleteNews(seeder.comments().get(3).getNews().getId());
+        deleteNews(findNewsWithComments());
+    }
+
+    private Long findNewsWithComments() {
+        return fetchNews().stream()
+                .filter(n -> n.commentsCount() > 0)
+                .map(NewsWithCountResponse::id)
+                .findFirst().orElseThrow();
     }
 
     @Test
     void deleteAuthorWithNews() {
-        var news = fetchNews().get(3);
+        deleteAuthor(findAuthorWithComments());
+    }
 
-        deleteAuthor(news.authorId());
+    private Long findAuthorWithComments() {
+        Long newsId = findNewsWithComments();
+
+        List<CommentResponse> comments = fetchComments(newsId);
+
+        return comments.get(0).authorId();
+    }
+
+    private List<CommentResponse> fetchComments(Long newsId) {
+        ResponseEntity<NewsResponse> response = rest.getForEntity("/api/v1/news/{id}", NewsResponse.class, newsId);
+        List<CommentResponse> comments = Objects.requireNonNull(response.getBody()).comments();
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(comments).isNotEmpty()
+        );
+
+        return comments;
     }
 
     @Test
@@ -126,6 +152,8 @@ class NewsApiApplicationTests {
     }
 
     private void deleteEntity(String name, Long id) {
+        assertThat(id).isNotNull();
+
         ResponseEntity<Void> response = rest.exchange("/api/v1/{name}/{id}", HttpMethod.DELETE, HttpEntity.EMPTY, Void.class, name, id);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
