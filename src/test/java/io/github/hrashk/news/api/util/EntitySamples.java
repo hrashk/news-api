@@ -14,17 +14,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EntitySamples {
     public List<News> twoNews() {
-        News n1 = greatNews();
-
-        News n2 = sadNews();
-
-        return List.of(n1, n2);
+        return List.of(greatNews(), sadNews());
     }
 
     public News greatNews() {
         News news = new News().toBuilder()
                 .id(7L)
-                .category(Category.builder().id(11L).build())
+                .category(sciFi())
                 .headline("Great news")
                 .content("Lorem ipsum dolor")
                 .createdAt(LocalDateTime.parse("2011-10-13T00:00:00"))
@@ -42,38 +38,38 @@ public class EntitySamples {
     }
 
     public News sadNews() {
-        return new News().toBuilder()
+        News news = new News().toBuilder()
                 .id(22L)
-                .author(Author.builder().id(5L).build())
-                .category(Category.builder().id(13L).build())
+                .category(romance())
                 .headline("Sad news")
                 .content("Dolor sit amet")
                 .createdAt(LocalDateTime.parse("2011-07-17T00:00:00"))
                 .updatedAt(LocalDateTime.parse("2011-08-21T00:00:00"))
                 .build();
+
+        Author author = new Author().toBuilder().id(5L).build();
+        author.addNews(news);
+
+        return news;
     }
 
 
     public List<Comment> twoComments() {
-        Comment n1 = smiley(7L);
-
-        Comment n2 = smirky(22L);
-
-        return List.of(n1, n2);
+        return List.of(smiley(), smirky());
     }
 
-    public Comment smiley(Long id) {
+    public Comment smiley() {
         return Comment.builder()
-                .id(id)
+                .id(7L)
                 .text("Smiley comment")
                 .createdAt(LocalDateTime.parse("2011-10-13T00:00:00"))
                 .updatedAt(LocalDateTime.parse("2011-10-13T00:00:00"))
                 .build();
     }
 
-    public Comment smirky(Long id) {
+    public Comment smirky() {
         return Comment.builder()
-                .id(id)
+                .id(22L)
                 .text("Simrky comment")
                 .createdAt(LocalDateTime.parse("2011-07-17T00:00:00"))
                 .updatedAt(LocalDateTime.parse("2011-08-21T00:00:00"))
@@ -81,24 +77,24 @@ public class EntitySamples {
     }
 
     public List<Category> twoCategories() {
-        Category n1 = sciFi();
-
-        Category n2 = Category.builder()
-                .id(22L)
-                .name("Romance")
-                .createdAt(LocalDateTime.parse("2011-07-17T00:00:00"))
-                .updatedAt(LocalDateTime.parse("2011-08-21T00:00:00"))
-                .build();
-
-        return List.of(n1, n2);
+        return List.of(sciFi(), romance());
     }
 
     public Category sciFi() {
-        return Category.builder()
+        return new Category().toBuilder()
                 .id(7L)
                 .name("Science Fiction")
                 .createdAt(LocalDateTime.parse("2011-10-13T00:00:00"))
                 .updatedAt(LocalDateTime.parse("2011-10-13T00:00:00"))
+                .build();
+    }
+
+    public Category romance() {
+        return new Category().toBuilder()
+                .id(22L)
+                .name("Romance")
+                .createdAt(LocalDateTime.parse("2011-07-17T00:00:00"))
+                .updatedAt(LocalDateTime.parse("2011-08-21T00:00:00"))
                 .build();
     }
 }

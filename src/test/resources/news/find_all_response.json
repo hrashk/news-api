@@ -3,7 +3,7 @@
     {
       "id": 7,
       "authorId": 3,
-      "categoryId": 11,
+      "categoryId": 7,
       "headline": "Great news",
       "content": "Lorem ipsum dolor",
       "commentsCount": 2
@@ -11,7 +11,7 @@
     {
       "id": 22,
       "authorId": 5,
-      "categoryId": 13,
+      "categoryId": 22,
       "headline": "Sad news",
       "content": "Dolor sit amet",
       "commentsCount": 0
