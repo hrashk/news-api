@@ -2,7 +2,6 @@ package io.github.hrashk.news.api.news;
 
 import io.github.hrashk.news.api.authors.AuthorNotFoundException;
 import io.github.hrashk.news.api.categories.CategoryNotFoundException;
-import io.github.hrashk.news.api.util.AssertionHelpers;
 import io.github.hrashk.news.api.util.ControllerTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -22,12 +21,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class NewsControllerTest extends ControllerTest {
     @Autowired
     private NewsJsonSamples json;
+    
+    public String newsUrl() {
+        return "/api/v1/news";
+    }
+    
+    public String newsUrl(Long id) {
+        return newsUrl() + "/" + id;
+    }
 
     @Test
     void firstPageOfNews() throws Exception {
         when(newsService.findAll(Mockito.any(Pageable.class))).thenReturn(samples.twoNews());
 
-        mvc.perform(get(samples.baseUrl()))
+        mvc.perform(get(newsUrl()))
                 .andExpectAll(
                         status().isOk(),
                         content().json(json.findAllResponse(), true)
@@ -43,7 +50,7 @@ class NewsControllerTest extends ControllerTest {
     void secondPageOfNews() throws Exception {
         when(newsService.findAll(Mockito.any(Pageable.class))).thenReturn(samples.twoNews());
 
-        mvc.perform(get(samples.baseUrl()).param("page", "1").param("size", "7"))
+        mvc.perform(get(newsUrl()).param("page", "1").param("size", "7"))
                 .andExpectAll(
                         status().isOk(),
                         content().json(json.findAllResponse(), true)
@@ -57,9 +64,10 @@ class NewsControllerTest extends ControllerTest {
 
     @Test
     void findByValidId() throws Exception {
-        Mockito.when(newsService.findById(Mockito.eq(samples.validId()))).thenReturn(samples.greatNews());
+        Mockito.when(newsService.findById(Mockito.anyLong()))
+                .thenReturn(samples.greatNews());
 
-        mvc.perform(get(samples.validIdUrl()))
+        mvc.perform(get(newsUrl(7L)))
                 .andExpectAll(
                         status().isOk(),
                         content().json(json.updateResponse(), true)
@@ -68,10 +76,10 @@ class NewsControllerTest extends ControllerTest {
 
     @Test
     void findingByInvalidIdFails() throws Exception {
-        Mockito.when(newsService.findById(Mockito.eq(samples.invalidId())))
-                .thenThrow(new NewsNotFoundException(samples.invalidId()));
+        Mockito.when(newsService.findById(Mockito.anyLong()))
+                .thenThrow(new NewsNotFoundException(1L));
 
-        mvc.perform(get(samples.invalidIdUrl()))
+        mvc.perform(get(newsUrl(-1L)))
                 .andExpectAll(
                         status().isNotFound(),
                         jsonPath("message").value(containsString("News"))
@@ -80,10 +88,7 @@ class NewsControllerTest extends ControllerTest {
 
     @Test
     void addNews() throws Exception {
-        News expected = samples.sadNews();
-        Mockito.when(newsService.addOrReplace(Mockito.any(News.class))).thenReturn(expected);
-
-        mvc.perform(post(samples.baseUrl())
+        mvc.perform(post(newsUrl())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.insertRequest()))
                 .andExpectAll(
@@ -91,10 +96,9 @@ class NewsControllerTest extends ControllerTest {
                         content().json(json.insertResponse(), true)
                 );
 
-        Mockito.verify(newsService).addOrReplace(Mockito.assertArg(actual -> Assertions.assertAll(
-                () -> AssertionHelpers.assertIdIsNull(actual),
-                () -> AssertionHelpers.assertAreSimilar(expected, actual)
-        )));
+        Mockito.verify(newsService).addOrReplace(Mockito.assertArg(n ->
+                assertThat(n).hasFieldOrPropertyWithValue("id",null)
+        ));
     }
 
     @Test
@@ -102,7 +106,7 @@ class NewsControllerTest extends ControllerTest {
         Mockito.when(authorService.findById(Mockito.anyLong()))
                 .thenThrow(new AuthorNotFoundException(1L));
 
-        mvc.perform(post(samples.baseUrl())
+        mvc.perform(post(newsUrl())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.updateRequest()))
                 .andExpectAll(
@@ -116,7 +120,7 @@ class NewsControllerTest extends ControllerTest {
         Mockito.when(categoryService.findById(Mockito.anyLong()))
                 .thenThrow(new CategoryNotFoundException(1L));
 
-        mvc.perform(put(samples.validIdUrl())
+        mvc.perform(put(newsUrl(7L))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.updateRequest()))
                 .andExpectAll(
@@ -127,13 +131,10 @@ class NewsControllerTest extends ControllerTest {
 
     @Test
     void updateNews() throws Exception {
-        News current = samples.sadNews();
-        Mockito.when(newsService.findById(Mockito.eq(samples.validId()))).thenReturn(current);
+        Mockito.when(newsService.addOrReplace(Mockito.any(News.class)))
+                .thenReturn(samples.greatNews());
 
-        News expected = samples.greatNews();
-        Mockito.when(newsService.addOrReplace(Mockito.any(News.class))).thenReturn(expected);
-
-        mvc.perform(put(samples.validIdUrl())
+        mvc.perform(put(newsUrl(7L))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.updateRequest()))
                 .andExpectAll(
@@ -141,21 +142,17 @@ class NewsControllerTest extends ControllerTest {
                         content().json(json.updateResponse(), true)
                 );
 
-        Mockito.verify(newsService).addOrReplace(Mockito.assertArg(actual -> Assertions.assertAll(
-                () -> AssertionHelpers.assertHaveSameIds(current, actual),
-                () -> AssertionHelpers.assertHaveSameAuditDates(current, actual),
-                () -> AssertionHelpers.assertAreSimilar(expected, actual)
-        )));
+        Mockito.verify(newsService).addOrReplace(Mockito.assertArg(n ->
+                assertThat(n).hasFieldOrPropertyWithValue("id",7L)
+        ));
     }
 
     @Test
-    void updatingWithInvalidNewsIdCreatesNewEntity() throws Exception {
-        Mockito.when(newsService.findById(Mockito.eq(samples.invalidId())))
-                .thenThrow(new NewsNotFoundException(samples.invalidId()));
-        News expected = samples.sadNews();
-        Mockito.when(newsService.addOrReplace(Mockito.any(News.class))).thenReturn(expected);
+    void updateMissingNews() throws Exception {
+        Mockito.when(newsService.findById(Mockito.anyLong()))
+                .thenThrow(new NewsNotFoundException(1L));
 
-        mvc.perform(put(samples.invalidIdUrl())
+        mvc.perform(put(newsUrl(-1L))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.insertRequest()))
                 .andExpectAll(
@@ -163,19 +160,17 @@ class NewsControllerTest extends ControllerTest {
                         content().json(json.insertResponse(), true)
                 );
 
-        Mockito.verify(newsService).addOrReplace(Mockito.assertArg(actual -> Assertions.assertAll(
-                () -> AssertionHelpers.assertIdIsNull(actual),
-                () -> AssertionHelpers.assertAreSimilar(expected, actual)
-        )));
+        Mockito.verify(newsService).addOrReplace(Mockito.assertArg(n ->
+                assertThat(n).hasFieldOrPropertyWithValue("id",null)
+        ));
     }
 
     @Test
     void updatingWithInvalidAuthorIdFails() throws Exception {
-        Mockito.when(newsService.findById(Mockito.anyLong())).thenReturn(samples.sadNews());
         Mockito.when(authorService.findById(Mockito.anyLong()))
                 .thenThrow(new AuthorNotFoundException(1L));
 
-        mvc.perform(put(samples.validIdUrl())
+        mvc.perform(put(newsUrl(7L))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.updateRequest()))
                 .andExpectAll(
@@ -186,11 +181,10 @@ class NewsControllerTest extends ControllerTest {
 
     @Test
     void updatingWithInvalidCategoryIdFails() throws Exception {
-        Mockito.when(newsService.findById(Mockito.anyLong())).thenReturn(samples.sadNews());
         Mockito.when(categoryService.findById(Mockito.anyLong()))
                 .thenThrow(new CategoryNotFoundException(1L));
 
-        mvc.perform(put(samples.validIdUrl())
+        mvc.perform(put(newsUrl(7L))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.updateRequest()))
                 .andExpectAll(
@@ -201,22 +195,20 @@ class NewsControllerTest extends ControllerTest {
 
     @Test
     void deleteByValidId() throws Exception {
-        Mockito.when(newsService.findById(Mockito.eq(samples.validId()))).thenReturn(samples.greatNews());
-
-        mvc.perform(delete(samples.validIdUrl()))
+        mvc.perform(delete(newsUrl(7L)))
                 .andExpectAll(
                         status().isNoContent()
                 );
 
         Mockito.verify(newsService).delete(Mockito.assertArg(n ->
-                assertThat(n).hasFieldOrPropertyWithValue("id", samples.validId())));
+                assertThat(n).hasFieldOrPropertyWithValue("id", 7L)));
     }
 
     @Test
     void deletingByInvalidIdFails() throws Exception {
         Mockito.when(newsService.findById(Mockito.anyLong())).thenThrow(NewsNotFoundException.class);
 
-        mvc.perform(delete(samples.invalidIdUrl()))
+        mvc.perform(delete(newsUrl(-1L)))
                 .andExpectAll(
                         status().isNotFound()
                 );

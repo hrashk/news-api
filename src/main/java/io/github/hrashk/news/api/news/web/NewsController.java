@@ -3,9 +3,9 @@ package io.github.hrashk.news.api.news.web;
 import io.github.hrashk.news.api.news.News;
 import io.github.hrashk.news.api.news.NewsNotFoundException;
 import io.github.hrashk.news.api.news.NewsService;
+import io.github.hrashk.news.api.util.BeanCopyUtils;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -50,7 +50,7 @@ public class NewsController {
         try {
             News current = mapper.mapToNews(id);
             News requested = mapper.map(request);
-            BeanUtils.copyProperties(requested, current);
+            BeanCopyUtils.copyProperties(requested, current);
 
             News saved = service.addOrReplace(current);
 

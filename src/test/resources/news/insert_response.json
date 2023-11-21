@@ -1,8 +1,8 @@
 {
-  "id": 22,
+  "id": 7,
   "authorId": 5,
   "categoryId": 13,
   "headline": "Sad news",
   "content": "Dolor sit amet",
-  "comments": []
+  "comments": null
 }

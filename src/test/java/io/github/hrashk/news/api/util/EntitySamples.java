@@ -13,26 +13,6 @@ import java.util.List;
 @TestComponent
 @RequiredArgsConstructor
 public class EntitySamples {
-    public String baseUrl() {
-        return "/api/v1/news";
-    }
-
-    public Long validId() {
-        return 7L;
-    }
-
-    public Long invalidId() {
-        return 522L;
-    }
-
-    public String validIdUrl() {
-        return baseUrl() + "/" + validId();
-    }
-
-    public String invalidIdUrl() {
-        return baseUrl() + "/" + invalidId();
-    }
-
     public List<News> twoNews() {
         News n1 = greatNews();
 
@@ -43,7 +23,7 @@ public class EntitySamples {
 
     public News greatNews() {
         News news = new News().toBuilder()
-                .id(validId())
+                .id(7L)
                 .category(Category.builder().id(11L).build())
                 .headline("Great news")
                 .content("Lorem ipsum dolor")
