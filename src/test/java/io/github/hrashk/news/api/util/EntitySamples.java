@@ -1,9 +1,10 @@
-package io.github.hrashk.news.api.news;
+package io.github.hrashk.news.api.util;
 
 import io.github.hrashk.news.api.authors.Author;
 import io.github.hrashk.news.api.categories.Category;
 import io.github.hrashk.news.api.comments.Comment;
 import io.github.hrashk.news.api.comments.CommentSamples;
+import io.github.hrashk.news.api.news.News;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.TestComponent;
 import org.springframework.context.annotation.Import;
@@ -14,7 +15,7 @@ import java.util.List;
 @TestComponent
 @Import(CommentSamples.class)
 @RequiredArgsConstructor
-public class NewsSamples {
+public class EntitySamples {
     private final CommentSamples commentSamples;
 
     public String baseUrl() {

@@ -6,8 +6,10 @@ import io.github.hrashk.news.api.news.web.NewsMapper;
 import org.mapstruct.factory.Mappers;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 
 @TestConfiguration
+@Import(EntitySamples.class)
 public class ControllerTestConfig {
     @Bean
     NewsMapper newsMapper() {
