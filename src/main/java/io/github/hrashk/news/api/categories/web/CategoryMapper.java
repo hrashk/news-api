@@ -13,17 +13,17 @@ public abstract class CategoryMapper {
     @Autowired
     protected CategoryService service;
 
-    abstract List<CategoryResponse> toResponseList(List<Category> news);
+    abstract List<CategoryResponse> map(Iterable<Category> categories);
 
-    public CategoryListResponse toResponse(List<Category> news) {
-        return new CategoryListResponse(toResponseList(news));
+    public CategoryListResponse wrap(Iterable<Category> categories) {
+        return new CategoryListResponse(map(categories));
     }
 
-    abstract CategoryResponse toResponse(Category news);
+    abstract CategoryResponse map(Category category);
 
-    abstract Category toCategory(UpsertCategoryRequest newsRequest);
+    abstract Category map(UpsertCategoryRequest categoryRequest);
 
-    public Category fromId(Long id) {
+    public Category map(Long id) {
         return service.findById(id);
     }
 }

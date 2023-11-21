@@ -39,12 +39,28 @@ public abstract class ControllerTest {
     public void stubAuthorService() {
         Mockito.when(authorService.findById(Mockito.anyLong()))
                 .thenAnswer(args -> new Author().toBuilder().id(args.getArgument(0)).build());
+
+        Mockito.when(authorService.addOrReplace(Mockito.any(Author.class)))
+                .thenAnswer(args -> {
+                    Author a = args.getArgument(0);
+                    return a.toBuilder()
+                            .id(a.getId() == null ? 7L : a.getId())
+                            .build();
+                });
     }
 
     @BeforeEach
     public void stubCategoryService() {
         Mockito.when(categoryService.findById(Mockito.anyLong()))
                 .thenAnswer(args -> new Category().toBuilder().id(args.getArgument(0)).build());
+
+        Mockito.when(categoryService.addOrReplace(Mockito.any(Category.class)))
+                .thenAnswer(args -> {
+                    Category c = args.getArgument(0);
+                    return c.toBuilder()
+                            .id(c.getId() == null ? 7L : c.getId())
+                            .build();
+                });
     }
 
     @BeforeEach

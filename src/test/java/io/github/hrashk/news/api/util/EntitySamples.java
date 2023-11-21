@@ -79,4 +79,26 @@ public class EntitySamples {
                 .updatedAt(LocalDateTime.parse("2011-08-21T00:00:00"))
                 .build();
     }
+
+    public List<Category> twoCategories() {
+        Category n1 = sciFi();
+
+        Category n2 = Category.builder()
+                .id(22L)
+                .name("Romance")
+                .createdAt(LocalDateTime.parse("2011-07-17T00:00:00"))
+                .updatedAt(LocalDateTime.parse("2011-08-21T00:00:00"))
+                .build();
+
+        return List.of(n1, n2);
+    }
+
+    public Category sciFi() {
+        return Category.builder()
+                .id(7L)
+                .name("Science Fiction")
+                .createdAt(LocalDateTime.parse("2011-10-13T00:00:00"))
+                .updatedAt(LocalDateTime.parse("2011-10-13T00:00:00"))
+                .build();
+    }
 }
