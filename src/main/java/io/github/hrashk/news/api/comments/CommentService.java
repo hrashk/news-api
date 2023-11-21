@@ -18,8 +18,8 @@ public class CommentService {
         return repository.findById(id).orElseThrow(() -> new CommentNotFoundException(id));
     }
 
-    public Comment addOrReplace(Comment category) {
-        return repository.save(category);
+    public Comment addOrReplace(Comment comment) {
+        return repository.save(comment);
     }
 
     public void delete(Comment comment) {

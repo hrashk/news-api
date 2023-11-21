@@ -41,7 +41,15 @@ public abstract class ControllerTest {
                 .thenAnswer(args -> Category.builder().id(args.getArgument(0)).build());
         Mockito.when(newsService.findById(Mockito.anyLong()))
                 .thenAnswer(args -> new News().toBuilder().id(args.getArgument(0)).build());
+
         Mockito.when(commentService.findById(Mockito.anyLong()))
                 .thenAnswer(args -> Comment.builder().id(args.getArgument(0)).build());
+        Mockito.when(commentService.addOrReplace(Mockito.any(Comment.class)))
+                .thenAnswer(args -> {
+                    Comment c = args.getArgument(0);
+                    return c.toBuilder()
+                            .id(c.getId() == null ? 7L : c.getId())
+                            .build();
+                });
     }
 }

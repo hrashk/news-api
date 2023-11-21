@@ -4,8 +4,8 @@ import io.github.hrashk.news.api.comments.Comment;
 import io.github.hrashk.news.api.comments.CommentNotFoundException;
 import io.github.hrashk.news.api.comments.CommentService;
 import io.github.hrashk.news.api.news.web.NewsMapper;
+import io.github.hrashk.news.api.util.BeanCopyUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +39,7 @@ public class CommentController {
         try {
             Comment comment = mapper.mapToComment(id);
             Comment requested = mapper.map(request);
-            BeanUtils.copyProperties(requested, comment);
+            BeanCopyUtils.copyProperties(requested, comment);
 
             Comment saved = service.addOrReplace(comment);
 
