@@ -3,7 +3,6 @@ package io.github.hrashk.news.api.comments;
 import io.github.hrashk.news.api.authors.AuthorNotFoundException;
 import io.github.hrashk.news.api.news.NewsNotFoundException;
 import io.github.hrashk.news.api.util.ControllerTest;
-import io.github.hrashk.news.api.util.EntitySamples;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +18,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Import({CommentJsonSamples.class})
 class CommentControllerTest extends ControllerTest {
-    @Autowired
-    private EntitySamples samples;
     @Autowired
     private CommentJsonSamples jsonSamples;
 

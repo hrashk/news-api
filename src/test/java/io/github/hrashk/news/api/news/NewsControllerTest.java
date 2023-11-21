@@ -4,7 +4,6 @@ import io.github.hrashk.news.api.authors.AuthorNotFoundException;
 import io.github.hrashk.news.api.categories.CategoryNotFoundException;
 import io.github.hrashk.news.api.util.AssertionHelpers;
 import io.github.hrashk.news.api.util.ControllerTest;
-import io.github.hrashk.news.api.util.EntitySamples;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -23,8 +22,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class NewsControllerTest extends ControllerTest {
     @Autowired
     private NewsJsonSamples json;
-    @Autowired
-    private EntitySamples samples;
 
     @Test
     void firstPageOfNews() throws Exception {
