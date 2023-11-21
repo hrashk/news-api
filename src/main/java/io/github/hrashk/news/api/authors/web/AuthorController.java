@@ -27,34 +27,34 @@ public class AuthorController {
     public ResponseEntity<AuthorListResponse> getAllAuthors(@ParameterObject @PageableDefault Pageable pageable) {
         List<Author> authors = service.findAll(pageable);
 
-        return ResponseEntity.ok(mapper.toResponse(authors));
+        return ResponseEntity.ok(mapper.wrap(authors));
     }
 
     @PostMapping
     public ResponseEntity<AuthorResponse> addAuthor(@RequestBody UpsertAuthorRequest authorRequest) {
-        Author author = mapper.toAuthor(authorRequest);
+        Author author = mapper.map(authorRequest);
         Author saved = service.addOrReplace(author);
 
-        AuthorResponse response = mapper.toResponse(saved);
+        AuthorResponse response = mapper.map(saved);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<AuthorResponse> getAuthorById(@PathVariable Long id) {
-        Author a = mapper.fromId(id);
+        Author a = mapper.map(id);
 
-        return ResponseEntity.ok(mapper.toResponse(a));
+        return ResponseEntity.ok(mapper.map(a));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<AuthorResponse> updateAuthor(@PathVariable Long id, @RequestBody UpsertAuthorRequest request) {
         try {
-            Author author = mapper.fromId(id);
+            Author author = mapper.map(id);
             BeanUtils.copyProperties(request, author);
 
             Author saved = service.addOrReplace(author);
 
-            return ResponseEntity.ok(mapper.toResponse(saved));
+            return ResponseEntity.ok(mapper.map(saved));
         } catch (AuthorNotFoundException ex) {
             return addAuthor(request);
         }
@@ -62,7 +62,7 @@ public class AuthorController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAuthor(@PathVariable Long id) {
-        Author author = mapper.fromId(id);
+        Author author = mapper.map(id);
 
         service.delete(author);
 

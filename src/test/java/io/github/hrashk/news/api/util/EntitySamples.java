@@ -97,4 +97,28 @@ public class EntitySamples {
                 .updatedAt(LocalDateTime.parse("2011-08-21T00:00:00"))
                 .build();
     }
+
+    public List<Author> twoAuthors() {
+        return List.of(jackDoe(), hollyMolly());
+    }
+
+    public Author jackDoe() {
+        return new Author().toBuilder()
+                .id(3L)
+                .firstName("Jack")
+                .lastName("Doe")
+                .createdAt(LocalDateTime.parse("2011-07-17T00:00:00"))
+                .updatedAt(LocalDateTime.parse("2011-08-21T00:00:00"))
+                .build();
+    }
+
+    private static Author hollyMolly() {
+        return new Author().toBuilder()
+                .id(13L)
+                .firstName("Holly")
+                .lastName("Molly")
+                .createdAt(LocalDateTime.parse("2011-07-17T00:00:00"))
+                .updatedAt(LocalDateTime.parse("2011-08-21T00:00:00"))
+                .build();
+    }
 }

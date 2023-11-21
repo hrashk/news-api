@@ -44,7 +44,7 @@ public abstract class ControllerTest {
                 .thenAnswer(args -> {
                     Author a = args.getArgument(0);
                     return a.toBuilder()
-                            .id(a.getId() == null ? 7L : a.getId())
+                            .id(a.getId() == null ? 3L : a.getId())
                             .build();
                 });
     }

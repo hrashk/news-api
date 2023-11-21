@@ -6,7 +6,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Collection;
 import java.util.List;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
@@ -14,16 +13,16 @@ public abstract class AuthorMapper {
     @Autowired
     protected AuthorService service;
 
-    abstract AuthorResponse toResponse(Author author);
-    abstract List<AuthorResponse> toResponseList(Collection<Author> authors);
+    abstract AuthorResponse map(Author author);
+    abstract List<AuthorResponse> map(Iterable<Author> authors);
 
-    abstract Author toAuthor(UpsertAuthorRequest authorRequest);
+    abstract Author map(UpsertAuthorRequest authorRequest);
 
-    public AuthorListResponse toResponse(List<Author> authors) {
-        return new AuthorListResponse(toResponseList(authors));
+    public AuthorListResponse wrap(Iterable<Author> authors) {
+        return new AuthorListResponse(map(authors));
     }
 
-    public Author fromId(Long id) {
+    public Author map(Long id) {
         return service.findById(id);
     }
 }
