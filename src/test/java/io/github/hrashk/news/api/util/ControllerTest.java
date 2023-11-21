@@ -11,12 +11,17 @@ import io.github.hrashk.news.api.news.NewsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
+/**
+ * Loading all controllers to catch any routing conflicts
+ */
+@WebMvcTest
 @Import(ControllerTestConfig.class)
-public abstract class ControllerTestDependencies {
+public abstract class ControllerTest {
     @Autowired
     protected MockMvc mvc;
     @MockBean

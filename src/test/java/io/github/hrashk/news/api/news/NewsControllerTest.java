@@ -2,14 +2,12 @@ package io.github.hrashk.news.api.news;
 
 import io.github.hrashk.news.api.authors.AuthorNotFoundException;
 import io.github.hrashk.news.api.categories.CategoryNotFoundException;
-import io.github.hrashk.news.api.news.web.NewsController;
 import io.github.hrashk.news.api.util.AssertionHelpers;
-import io.github.hrashk.news.api.util.ControllerTestDependencies;
+import io.github.hrashk.news.api.util.ControllerTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -20,9 +18,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(NewsController.class)
 @Import({NewsSamples.class, NewsJsonSamples.class})
-class NewsControllerTest extends ControllerTestDependencies {
+class NewsControllerTest extends ControllerTest {
     @Autowired
     private NewsJsonSamples json;
     @Autowired
