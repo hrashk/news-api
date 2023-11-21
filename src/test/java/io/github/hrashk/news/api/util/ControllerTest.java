@@ -36,16 +36,36 @@ public abstract class ControllerTest {
     protected CommentService commentService;
 
     @BeforeEach
-    public void defaultServiceConfiguration() {
+    public void stubAuthorService() {
         Mockito.when(authorService.findById(Mockito.anyLong()))
                 .thenAnswer(args -> new Author().toBuilder().id(args.getArgument(0)).build());
+    }
+
+    @BeforeEach
+    public void stubCategoryService() {
         Mockito.when(categoryService.findById(Mockito.anyLong()))
-                .thenAnswer(args -> Category.builder().id(args.getArgument(0)).build());
+                .thenAnswer(args -> new Category().toBuilder().id(args.getArgument(0)).build());
+    }
+
+    @BeforeEach
+    public void stubNewsService() {
         Mockito.when(newsService.findById(Mockito.anyLong()))
                 .thenAnswer(args -> new News().toBuilder().id(args.getArgument(0)).build());
 
+        Mockito.when(newsService.addOrReplace(Mockito.any(News.class)))
+                .thenAnswer(args -> {
+                    News n = args.getArgument(0);
+                    return n.toBuilder()
+                            .id(n.getId() == null ? 7L : n.getId())
+                            .build();
+                });
+    }
+
+    @BeforeEach
+    public void stubCommentService() {
         Mockito.when(commentService.findById(Mockito.anyLong()))
-                .thenAnswer(args -> Comment.builder().id(args.getArgument(0)).build());
+                .thenAnswer(args -> new Comment().toBuilder().id(args.getArgument(0)).build());
+
         Mockito.when(commentService.addOrReplace(Mockito.any(Comment.class)))
                 .thenAnswer(args -> {
                     Comment c = args.getArgument(0);
