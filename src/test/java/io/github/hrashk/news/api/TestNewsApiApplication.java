@@ -1,6 +1,6 @@
 package io.github.hrashk.news.api;
 
-import io.github.hrashk.news.api.seeder.DataSeeder;
+import io.github.hrashk.news.api.util.DataSeeder;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.test.context.TestConfiguration;

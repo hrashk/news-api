@@ -10,7 +10,7 @@ import io.github.hrashk.news.api.news.web.NewsListResponse;
 import io.github.hrashk.news.api.news.web.NewsResponse;
 import io.github.hrashk.news.api.news.web.NewsWithCountResponse;
 import io.github.hrashk.news.api.news.web.UpsertNewsRequest;
-import io.github.hrashk.news.api.seeder.DataSeeder;
+import io.github.hrashk.news.api.util.DataSeeder;
 import io.github.hrashk.news.api.util.PostgreSQLInitializer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

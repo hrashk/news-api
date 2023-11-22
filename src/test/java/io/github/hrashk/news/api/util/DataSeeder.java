@@ -1,4 +1,4 @@
-package io.github.hrashk.news.api.seeder;
+package io.github.hrashk.news.api.util;
 
 import io.github.hrashk.news.api.authors.Author;
 import io.github.hrashk.news.api.authors.AuthorRepository;
