@@ -65,7 +65,7 @@ class AuthorControllerTest extends ControllerTest {
     void findByValidId() throws Exception {
         when(authorService.findById(Mockito.anyLong())).thenReturn(samples.jackDoe());
 
-        mvc.perform(get(authorsUrl(3L)))
+        mvc.perform(get(authorsUrl(21L)))
                 .andExpectAll(
                         status().isOk(),
                         content().json(json.upsertResponse(), true)
@@ -100,7 +100,7 @@ class AuthorControllerTest extends ControllerTest {
 
     @Test
     void updateAuthor() throws Exception {
-        mvc.perform(put(authorsUrl(3L))
+        mvc.perform(put(authorsUrl(21L))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.upsertRequest()))
                 .andExpectAll(
@@ -109,7 +109,7 @@ class AuthorControllerTest extends ControllerTest {
                 );
 
         Mockito.verify(authorService).addOrReplace(Mockito.assertArg(a ->
-                assertThat(a).hasFieldOrPropertyWithValue("id", 3L)
+                assertThat(a).hasFieldOrPropertyWithValue("id", 21L)
         ));
     }
 
@@ -132,11 +132,11 @@ class AuthorControllerTest extends ControllerTest {
 
     @Test
     void deleteByValidId() throws Exception {
-        mvc.perform(delete(authorsUrl(3L)))
+        mvc.perform(delete(authorsUrl(21L)))
                 .andExpect(status().isNoContent());
 
         Mockito.verify(authorService).delete(Mockito.assertArg(a ->
-                assertThat(a).hasFieldOrPropertyWithValue("id", 3L)
+                assertThat(a).hasFieldOrPropertyWithValue("id", 21L)
         ));
     }
 

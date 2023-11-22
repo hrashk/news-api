@@ -1,17 +1,17 @@
 {
   "news": [
     {
-      "id": 7,
-      "authorId": 3,
-      "categoryId": 7,
+      "id": 1,
+      "authorId": 21,
+      "categoryId": 8,
       "headline": "Great news",
       "content": "Lorem ipsum dolor",
       "commentsCount": 2
     },
     {
-      "id": 22,
-      "authorId": 5,
-      "categoryId": 22,
+      "id": 2,
+      "authorId": 34,
+      "categoryId": 13,
       "headline": "Sad news",
       "content": "Dolor sit amet",
       "commentsCount": 0

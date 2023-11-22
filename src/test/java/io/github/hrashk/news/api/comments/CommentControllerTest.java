@@ -99,7 +99,7 @@ class CommentControllerTest extends ControllerTest {
 
     @Test
     void updateComment() throws Exception {
-        mvc.perform(put(commentsUrl(7L))
+        mvc.perform(put(commentsUrl(3L))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonSamples.upsertRequest()))
                 .andExpectAll(
@@ -108,7 +108,7 @@ class CommentControllerTest extends ControllerTest {
                 );
 
         Mockito.verify(commentService).addOrReplace(Mockito.assertArg(c ->
-                assertThat(c).hasFieldOrPropertyWithValue("id",7L)
+                assertThat(c).hasFieldOrPropertyWithValue("id",3L)
         ));
     }
 
@@ -117,7 +117,7 @@ class CommentControllerTest extends ControllerTest {
         Mockito.when(commentService.findById(Mockito.anyLong()))
                 .thenThrow(CommentNotFoundException.class);
 
-        mvc.perform(put(commentsUrl(7L))
+        mvc.perform(put(commentsUrl(3L))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonSamples.upsertRequest()))
                 .andExpectAll(
@@ -135,7 +135,7 @@ class CommentControllerTest extends ControllerTest {
         Mockito.when(authorService.findById(Mockito.anyLong()))
                 .thenThrow(new AuthorNotFoundException(1L));
 
-        mvc.perform(put(commentsUrl(7L))
+        mvc.perform(put(commentsUrl(3L))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonSamples.upsertRequest()))
                 .andExpectAll(
@@ -149,7 +149,7 @@ class CommentControllerTest extends ControllerTest {
         Mockito.when(newsService.findById(Mockito.anyLong()))
                 .thenThrow(new NewsNotFoundException(1L));
 
-        mvc.perform(put(commentsUrl(7L))
+        mvc.perform(put(commentsUrl(3L))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonSamples.upsertRequest()))
                 .andExpectAll(
@@ -160,13 +160,13 @@ class CommentControllerTest extends ControllerTest {
 
     @Test
     void deleteComment() throws Exception {
-        mvc.perform(delete(commentsUrl(7L)))
+        mvc.perform(delete(commentsUrl(3L)))
                 .andExpectAll(
                         status().isNoContent()
                 );
 
         Mockito.verify(commentService).delete(Mockito.assertArg(c ->
-                assertThat(c).hasFieldOrPropertyWithValue("id",7L)
+                assertThat(c).hasFieldOrPropertyWithValue("id",3L)
         ));
     }
 
@@ -175,7 +175,7 @@ class CommentControllerTest extends ControllerTest {
         Mockito.when(commentService.findById(Mockito.anyLong()))
                 .thenThrow(new CommentNotFoundException(1L));
 
-        mvc.perform(delete(commentsUrl(7L)))
+        mvc.perform(delete(commentsUrl(3L)))
                 .andExpectAll(
                         status().isNotFound(),
                         jsonPath("message").value(containsString("Comment"))

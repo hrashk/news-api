@@ -1,20 +1,20 @@
 {
-  "id": 7,
-  "authorId": 3,
-  "categoryId": 7,
+  "id": 1,
+  "authorId": 21,
+  "categoryId": 8,
   "headline": "Great news",
   "content": "Lorem ipsum dolor",
   "comments": [
     {
-      "id": 7,
-      "newsId": 7,
-      "authorId": 3,
+      "id": 3,
+      "newsId": 1,
+      "authorId": 34,
       "text": "Smiley comment"
     },
     {
-      "id": 22,
-      "newsId": 7,
-      "authorId": 3,
+      "id": 5,
+      "newsId": 1,
+      "authorId": 55,
       "text": "Simrky comment"
     }
   ]

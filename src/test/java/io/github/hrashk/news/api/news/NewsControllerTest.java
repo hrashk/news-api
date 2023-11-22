@@ -67,7 +67,7 @@ class NewsControllerTest extends ControllerTest {
         Mockito.when(newsService.findById(Mockito.anyLong()))
                 .thenReturn(samples.greatNews());
 
-        mvc.perform(get(newsUrl(7L)))
+        mvc.perform(get(newsUrl(1L)))
                 .andExpectAll(
                         status().isOk(),
                         content().json(json.updateResponse(), true)
@@ -120,7 +120,7 @@ class NewsControllerTest extends ControllerTest {
         Mockito.when(categoryService.findById(Mockito.anyLong()))
                 .thenThrow(new CategoryNotFoundException(1L));
 
-        mvc.perform(put(newsUrl(7L))
+        mvc.perform(put(newsUrl(1L))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.updateRequest()))
                 .andExpectAll(
@@ -134,7 +134,7 @@ class NewsControllerTest extends ControllerTest {
         Mockito.when(newsService.addOrReplace(Mockito.any(News.class)))
                 .thenReturn(samples.greatNews());
 
-        mvc.perform(put(newsUrl(7L))
+        mvc.perform(put(newsUrl(1L))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.updateRequest()))
                 .andExpectAll(
@@ -143,7 +143,7 @@ class NewsControllerTest extends ControllerTest {
                 );
 
         Mockito.verify(newsService).addOrReplace(Mockito.assertArg(n ->
-                assertThat(n).hasFieldOrPropertyWithValue("id",7L)
+                assertThat(n).hasFieldOrPropertyWithValue("id",1L)
         ));
     }
 
@@ -170,7 +170,7 @@ class NewsControllerTest extends ControllerTest {
         Mockito.when(authorService.findById(Mockito.anyLong()))
                 .thenThrow(new AuthorNotFoundException(1L));
 
-        mvc.perform(put(newsUrl(7L))
+        mvc.perform(put(newsUrl(1L))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.updateRequest()))
                 .andExpectAll(
@@ -184,7 +184,7 @@ class NewsControllerTest extends ControllerTest {
         Mockito.when(categoryService.findById(Mockito.anyLong()))
                 .thenThrow(new CategoryNotFoundException(1L));
 
-        mvc.perform(put(newsUrl(7L))
+        mvc.perform(put(newsUrl(1L))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.updateRequest()))
                 .andExpectAll(
@@ -195,13 +195,13 @@ class NewsControllerTest extends ControllerTest {
 
     @Test
     void deleteByValidId() throws Exception {
-        mvc.perform(delete(newsUrl(7L)))
+        mvc.perform(delete(newsUrl(1L)))
                 .andExpectAll(
                         status().isNoContent()
                 );
 
         Mockito.verify(newsService).delete(Mockito.assertArg(n ->
-                assertThat(n).hasFieldOrPropertyWithValue("id", 7L)));
+                assertThat(n).hasFieldOrPropertyWithValue("id", 1L)));
     }
 
     @Test

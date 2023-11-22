@@ -55,7 +55,7 @@ class CategoryControllerTest extends ControllerTest {
     void findByValidId() throws Exception {
         when(categoryService.findById(Mockito.anyLong())).thenReturn(samples.sciFi());
 
-        mvc.perform(get(categoriesUrl(7L)))
+        mvc.perform(get(categoriesUrl(8L)))
                 .andExpectAll(
                         status().isOk(),
                         content().json(json.upsertResponse(), true)
@@ -91,7 +91,7 @@ class CategoryControllerTest extends ControllerTest {
 
     @Test
     void updateCategory() throws Exception {
-        mvc.perform(put(categoriesUrl(7L))
+        mvc.perform(put(categoriesUrl(8L))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.upsertRequest()))
                 .andExpectAll(
@@ -100,7 +100,7 @@ class CategoryControllerTest extends ControllerTest {
                 );
 
         Mockito.verify(categoryService).addOrReplace(Mockito.assertArg(c ->
-                assertThat(c).hasFieldOrPropertyWithValue("id", 7L)
+                assertThat(c).hasFieldOrPropertyWithValue("id", 8L)
         ));
     }
 

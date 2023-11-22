@@ -44,7 +44,7 @@ public abstract class ControllerTest {
                 .thenAnswer(args -> {
                     Author a = args.getArgument(0);
                     return a.toBuilder()
-                            .id(a.getId() == null ? 3L : a.getId())
+                            .id(a.getId() == null ? 21L : a.getId())
                             .build();
                 });
     }
@@ -58,7 +58,7 @@ public abstract class ControllerTest {
                 .thenAnswer(args -> {
                     Category c = args.getArgument(0);
                     return c.toBuilder()
-                            .id(c.getId() == null ? 7L : c.getId())
+                            .id(c.getId() == null ? 8L : c.getId())
                             .build();
                 });
     }
@@ -72,7 +72,7 @@ public abstract class ControllerTest {
                 .thenAnswer(args -> {
                     News n = args.getArgument(0);
                     return n.toBuilder()
-                            .id(n.getId() == null ? 7L : n.getId())
+                            .id(n.getId() == null ? 1L : n.getId())
                             .build();
                 });
     }
@@ -86,7 +86,7 @@ public abstract class ControllerTest {
                 .thenAnswer(args -> {
                     Comment c = args.getArgument(0);
                     return c.toBuilder()
-                            .id(c.getId() == null ? 7L : c.getId())
+                            .id(c.getId() == null ? 3L : c.getId())
                             .build();
                 });
     }

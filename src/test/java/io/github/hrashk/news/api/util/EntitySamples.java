@@ -19,7 +19,7 @@ public class EntitySamples {
 
     public News greatNews() {
         News news = new News().toBuilder()
-                .id(7L)
+                .id(1L)
                 .category(sciFi())
                 .headline("Great news")
                 .content("Lorem ipsum dolor")
@@ -27,19 +27,15 @@ public class EntitySamples {
                 .updatedAt(LocalDateTime.parse("2011-10-13T00:00:00"))
                 .build();
 
-        List<Comment> comments = twoComments();
-        Author author = new Author().toBuilder().id(3L).build();
-
-        comments.forEach(news::addComment);
-        comments.forEach(author::addComment);
-        author.addNews(news);
+        twoComments(news);
+        jackDoe().addNews(news);
 
         return news;
     }
 
     public News sadNews() {
         News news = new News().toBuilder()
-                .id(22L)
+                .id(2L)
                 .category(romance())
                 .headline("Sad news")
                 .content("Dolor sit amet")
@@ -47,33 +43,42 @@ public class EntitySamples {
                 .updatedAt(LocalDateTime.parse("2011-08-21T00:00:00"))
                 .build();
 
-        Author author = new Author().toBuilder().id(5L).build();
-        author.addNews(news);
+        hollyMolly().addNews(news);
 
         return news;
     }
 
 
-    public List<Comment> twoComments() {
-        return List.of(smiley(), smirky());
+    public List<Comment> twoComments(News news) {
+        return List.of(smiley(news), smirky(news));
     }
 
-    public Comment smiley() {
-        return Comment.builder()
-                .id(7L)
+    public Comment smiley(News news) {
+        Comment comment = Comment.builder()
+                .id(3L)
                 .text("Smiley comment")
                 .createdAt(LocalDateTime.parse("2011-10-13T00:00:00"))
                 .updatedAt(LocalDateTime.parse("2011-10-13T00:00:00"))
                 .build();
+
+        hollyMolly().addComment(comment);
+        news.addComment(comment);
+
+        return comment;
     }
 
-    public Comment smirky() {
-        return Comment.builder()
-                .id(22L)
+    public Comment smirky(News news) {
+        Comment comment = Comment.builder()
+                .id(5L)
                 .text("Simrky comment")
                 .createdAt(LocalDateTime.parse("2011-07-17T00:00:00"))
                 .updatedAt(LocalDateTime.parse("2011-08-21T00:00:00"))
                 .build();
+
+        janeSmith().addComment(comment);
+        news.addComment(comment);
+
+        return comment;
     }
 
     public List<Category> twoCategories() {
@@ -82,7 +87,7 @@ public class EntitySamples {
 
     public Category sciFi() {
         return new Category().toBuilder()
-                .id(7L)
+                .id(8L)
                 .name("Science Fiction")
                 .createdAt(LocalDateTime.parse("2011-10-13T00:00:00"))
                 .updatedAt(LocalDateTime.parse("2011-10-13T00:00:00"))
@@ -91,7 +96,7 @@ public class EntitySamples {
 
     public Category romance() {
         return new Category().toBuilder()
-                .id(22L)
+                .id(13L)
                 .name("Romance")
                 .createdAt(LocalDateTime.parse("2011-07-17T00:00:00"))
                 .updatedAt(LocalDateTime.parse("2011-08-21T00:00:00"))
@@ -104,7 +109,7 @@ public class EntitySamples {
 
     public Author jackDoe() {
         return new Author().toBuilder()
-                .id(3L)
+                .id(21L)
                 .firstName("Jack")
                 .lastName("Doe")
                 .createdAt(LocalDateTime.parse("2011-07-17T00:00:00"))
@@ -112,11 +117,21 @@ public class EntitySamples {
                 .build();
     }
 
-    private static Author hollyMolly() {
+    public Author hollyMolly() {
         return new Author().toBuilder()
-                .id(13L)
+                .id(34L)
                 .firstName("Holly")
                 .lastName("Molly")
+                .createdAt(LocalDateTime.parse("2011-07-17T00:00:00"))
+                .updatedAt(LocalDateTime.parse("2011-08-21T00:00:00"))
+                .build();
+    }
+
+    public Author janeSmith() {
+        return new Author().toBuilder()
+                .id(55L)
+                .firstName("Jane")
+                .lastName("Smith")
                 .createdAt(LocalDateTime.parse("2011-07-17T00:00:00"))
                 .updatedAt(LocalDateTime.parse("2011-08-21T00:00:00"))
                 .build();
