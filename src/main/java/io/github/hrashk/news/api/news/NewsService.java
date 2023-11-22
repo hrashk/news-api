@@ -6,13 +6,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static io.github.hrashk.news.api.news.NewsSpecifications.hasAuthor;
+import static io.github.hrashk.news.api.news.NewsSpecifications.hasCategory;
+
 @Service
 @RequiredArgsConstructor
 public class NewsService {
     private final NewsRepository repository;
 
-    public List<News> findAll(Pageable pageable) {
-        return repository.findAll(pageable).getContent();
+    public List<News> findAll(Pageable pageable, Long authorId, Long categoryId) {
+        return repository.findAll(hasCategory(categoryId).and(hasAuthor(authorId)), pageable).getContent();
     }
 
     public News findById(Long id) {

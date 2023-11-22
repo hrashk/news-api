@@ -6,6 +6,7 @@ import io.github.hrashk.news.api.categories.web.CategoryListResponse;
 import io.github.hrashk.news.api.categories.web.CategoryResponse;
 import io.github.hrashk.news.api.comments.web.CommentResponse;
 import io.github.hrashk.news.api.exceptions.ErrorInfo;
+import io.github.hrashk.news.api.news.News;
 import io.github.hrashk.news.api.news.web.NewsListResponse;
 import io.github.hrashk.news.api.news.web.NewsResponse;
 import io.github.hrashk.news.api.news.web.NewsWithCountResponse;
@@ -109,6 +110,26 @@ class NewsApiApplicationTests {
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED),
                 () -> assertThat(response.getBody()).hasNoNullFieldsOrPropertiesExcept("comments")
+        );
+    }
+
+    @Test
+    void findNewsByAuthorAndCategory() {
+        News firstNews = seeder.news().get(0);
+        Long authorId = firstNews.getAuthor().getId();
+        Long categoryId = firstNews.getCategory().getId();
+
+        ResponseEntity<NewsListResponse> entity = rest.getForEntity(
+                "/api/v1/news?authorId={aid}&categoryId={cid}", NewsListResponse.class,
+                authorId,
+                categoryId);
+
+        List<NewsWithCountResponse> news = Objects.requireNonNull(entity.getBody()).news();
+        assertAll(
+                () -> assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(news).isNotEmpty(),
+                () -> assertThat(news).allSatisfy(n -> assertThat(n).hasFieldOrPropertyWithValue("authorId", authorId)),
+                () -> assertThat(news).allSatisfy(n -> assertThat(n).hasFieldOrPropertyWithValue("categoryId", categoryId))
         );
     }
 

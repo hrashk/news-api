@@ -32,7 +32,7 @@ class NewsControllerTest extends ControllerTest {
 
     @Test
     void firstPageOfNews() throws Exception {
-        when(newsService.findAll(Mockito.any(Pageable.class))).thenReturn(samples.twoNews());
+        when(newsService.findAll(Mockito.any(Pageable.class), Mockito.any(), Mockito.any())).thenReturn(samples.twoNews());
 
         mvc.perform(get(newsUrl()))
                 .andExpectAll(
@@ -43,12 +43,12 @@ class NewsControllerTest extends ControllerTest {
         Mockito.verify(newsService).findAll(Mockito.assertArg(p -> Assertions.assertAll(
                 () -> assertThat(p.getPageNumber()).isEqualTo(0),
                 () -> assertThat(p.getPageSize()).isEqualTo(10)
-        )));
+        )), Mockito.any(), Mockito.any());
     }
 
     @Test
     void secondPageOfNews() throws Exception {
-        when(newsService.findAll(Mockito.any(Pageable.class))).thenReturn(samples.twoNews());
+        when(newsService.findAll(Mockito.any(Pageable.class), Mockito.any(), Mockito.any())).thenReturn(samples.twoNews());
 
         mvc.perform(get(newsUrl()).param("page", "1").param("size", "7"))
                 .andExpectAll(
@@ -59,7 +59,7 @@ class NewsControllerTest extends ControllerTest {
         Mockito.verify(newsService).findAll(Mockito.assertArg(p -> Assertions.assertAll(
                 () -> assertThat(p.getPageNumber()).isEqualTo(1),
                 () -> assertThat(p.getPageSize()).isEqualTo(7)
-        )));
+        )), Mockito.any(), Mockito.any());
     }
 
     @Test
