@@ -1,12 +1,14 @@
 package io.github.hrashk.news.api.categories;
 
 import io.github.hrashk.news.api.util.ControllerTest;
+import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -121,8 +123,8 @@ class CategoryControllerTest extends ControllerTest {
     }
 
     @Test
-    void deleteByValidId() throws Exception {
-        mvc.perform(delete(categoriesUrl(7L)))
+    void delete() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.delete(categoriesUrl(7L)))
                 .andExpectAll(
                         status().isNoContent()
                 );
@@ -133,11 +135,22 @@ class CategoryControllerTest extends ControllerTest {
     }
 
     @Test
-    void deleteByInvalidId() throws Exception {
+    void deleteWithNews() throws Exception {
+        Mockito.doThrow(new ValidationException("asdf")).when(categoryService).delete(Mockito.any(Category.class));
+
+        mvc.perform(MockMvcRequestBuilders.delete(categoriesUrl(7L)))
+                .andExpectAll(
+                        status().isBadRequest(),
+                        jsonPath("message").isNotEmpty()
+                );
+    }
+
+    @Test
+    void deleteMissingCategory() throws Exception {
         when(categoryService.findById(Mockito.anyLong()))
                 .thenThrow(new CategoryNotFoundException(7L));
 
-        mvc.perform(delete(categoriesUrl(7L)))
+        mvc.perform(MockMvcRequestBuilders.delete(categoriesUrl(7L)))
                 .andExpectAll(
                         status().isNotFound(),
                         jsonPath("message").value(containsString("Category"))
