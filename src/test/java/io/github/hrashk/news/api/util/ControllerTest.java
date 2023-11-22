@@ -20,7 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
  * Loading all controllers to catch any routing conflicts
  */
 @WebMvcTest
-@Import({ControllerTestConfig.class, EntitySamples.class})
+@Import({MapperBeans.class, EntitySamples.class})
 public abstract class ControllerTest {
     @Autowired
     protected MockMvc mvc;

@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
 @TestConfiguration
-public class ControllerTestConfig {
+public class MapperBeans {
     @Bean
     NewsMapper newsMapper() {
         return Mappers.getMapper(NewsMapper.class);
