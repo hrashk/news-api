@@ -26,7 +26,7 @@ public class NewsController {
     public ResponseEntity<NewsListResponse> getAllNews(@ParameterObject @PageableDefault Pageable pageable) {
         List<News> news = service.findAll(pageable);
 
-        return ResponseEntity.ok(mapper.toNewsListResponse(news));
+        return ResponseEntity.ok(mapper.wrap(news));
     }
 
     @GetMapping("/{id}")

@@ -41,7 +41,7 @@ public abstract class NewsMapper {
 
     public abstract List<NewsWithCountResponse> toNewsList(Collection<News> news);
 
-    public NewsListResponse toNewsListResponse(Collection<News> news) {
+    public NewsListResponse wrap(Collection<News> news) {
         return new NewsListResponse(toNewsList(news));
     }
 
