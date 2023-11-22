@@ -1,34 +1,19 @@
 package io.github.hrashk.news.api.categories;
 
-import io.github.hrashk.news.api.util.ContainerJpaTest;
-import io.github.hrashk.news.api.util.DataSeeder;
+import io.github.hrashk.news.api.util.ServiceTest;
 import jakarta.validation.ValidationException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@ContainerJpaTest
-@Import({CategoryService.class, DataSeeder.class})
-class CategoryServiceTest {
+@Import(CategoryService.class)
+class CategoryServiceTest extends ServiceTest {
     @Autowired
     private CategoryService service;
-    @Autowired
-    private DataSeeder seeder;
-
-    private List<Category> savedCategories;
-
-    @BeforeEach
-    public void seedCategories() {
-        seeder.seed(5);
-        savedCategories = seeder.categories();
-    }
 
     @Test
     void firstPage() {
@@ -42,7 +27,7 @@ class CategoryServiceTest {
 
     @Test
     void findByValidId() {
-        Category news = savedCategories.get(0);
+        Category news = seeder.categories().get(0);
         Long validId = news.getId();
 
         assertThat(service.findById(validId)).isEqualTo(news);

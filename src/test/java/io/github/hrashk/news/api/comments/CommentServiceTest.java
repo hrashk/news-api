@@ -1,34 +1,17 @@
 package io.github.hrashk.news.api.comments;
 
-import io.github.hrashk.news.api.util.ContainerJpaTest;
-import io.github.hrashk.news.api.util.DataSeeder;
-import org.junit.jupiter.api.BeforeEach;
+import io.github.hrashk.news.api.util.ServiceTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@ContainerJpaTest
-@Import({CommentService.class, DataSeeder.class})
-class CommentServiceTest {
-
+@Import(CommentService.class)
+class CommentServiceTest extends ServiceTest {
     @Autowired
     private CommentService service;
-
-    @Autowired
-    private DataSeeder seeder;
-
-    private List<Comment> savedComments;
-
-    @BeforeEach
-    public void seedComments() {
-        seeder.seed(5);
-        savedComments = seeder.comments();
-    }
 
     @Test
     void findAll() {
@@ -37,7 +20,7 @@ class CommentServiceTest {
 
     @Test
     void findByValidId() {
-        Comment comment = savedComments.get(0);
+        Comment comment = seeder.comments().get(0);
         Long validId = comment.getId();
 
         assertThat(service.findById(validId)).isEqualTo(comment);
@@ -68,9 +51,9 @@ class CommentServiceTest {
 
     @Test
     void removeById() {
-        Long id = savedComments.get(0).getId();
+        Long id = seeder.comments().get(0).getId();
 
-        service.delete(savedComments.get(0));
+        service.delete(seeder.comments().get(0));
 
         assertThatThrownBy(() -> service.findById(id))
                 .isInstanceOf(CommentNotFoundException.class);

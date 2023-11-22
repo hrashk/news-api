@@ -1,22 +1,14 @@
 package io.github.hrashk.news.api.util;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@ContainerJpaTest
-@Import(DataSeeder.class)
-class DataSeederTest {
-    @Autowired
-    private DataSeeder seeder;
-
+class DataSeederTest extends ServiceTest {
     @Test
     void sampleDataIsLoaded() {
         int size = 10;
-        seeder.seed(size);
         seeder.flush();
 
         assertAll(

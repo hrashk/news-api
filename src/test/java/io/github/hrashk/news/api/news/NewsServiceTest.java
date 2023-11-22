@@ -1,34 +1,18 @@
 package io.github.hrashk.news.api.news;
 
-import io.github.hrashk.news.api.util.ContainerJpaTest;
-import io.github.hrashk.news.api.util.DataSeeder;
-import org.junit.jupiter.api.BeforeEach;
+import io.github.hrashk.news.api.util.ServiceTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@ContainerJpaTest
-@Import({NewsService.class, DataSeeder.class})
-class NewsServiceTest {
+@Import(NewsService.class)
+class NewsServiceTest extends ServiceTest {
     @Autowired
     private NewsService service;
-
-    @Autowired
-    private DataSeeder seeder;
-
-    private List<News> savedNews;
-
-    @BeforeEach
-    public void seedNews() {
-        seeder.seed(5);
-        savedNews = seeder.news();
-    }
 
     @Test
     void firstPage() {
@@ -42,7 +26,7 @@ class NewsServiceTest {
 
     @Test
     void findByValidId() {
-        News news = savedNews.get(0);
+        News news = seeder.news().get(0);
         Long validId = news.getId();
 
         assertThat(service.findById(validId)).isEqualTo(news);
@@ -74,7 +58,7 @@ class NewsServiceTest {
 
     @Test
     void deleteWithComments() {
-        News news = savedNews.stream()
+        News news = seeder.news().stream()
                 .filter(n -> !n.getComments().isEmpty())
                 .findAny().get();
         Long id = news.getId();

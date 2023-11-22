@@ -1,33 +1,18 @@
 package io.github.hrashk.news.api.authors;
 
-import io.github.hrashk.news.api.util.ContainerJpaTest;
-import io.github.hrashk.news.api.util.DataSeeder;
-import org.junit.jupiter.api.BeforeEach;
+import io.github.hrashk.news.api.util.ServiceTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@ContainerJpaTest
-@Import({AuthorService.class, DataSeeder.class})
-class AuthorServiceTest {
+@Import(AuthorService.class)
+class AuthorServiceTest extends ServiceTest {
     @Autowired
     private AuthorService service;
-    @Autowired
-    private DataSeeder seeder;
-
-    private List<Author> savedEntities;
-
-    @BeforeEach
-    void seedAuthors() {
-        seeder.seed(5);
-        savedEntities = seeder.authors();
-    }
 
     @Test
     void firstPage() {
@@ -58,7 +43,7 @@ class AuthorServiceTest {
 
     @Test
     void findByValidId() {
-        Author expected = savedEntities.get(0);
+        Author expected = seeder.authors().get(0);
 
         Author actual = service.findById(expected.getId());
 
