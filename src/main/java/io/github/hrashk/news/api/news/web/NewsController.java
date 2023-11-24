@@ -4,6 +4,7 @@ import io.github.hrashk.news.api.news.News;
 import io.github.hrashk.news.api.news.NewsNotFoundException;
 import io.github.hrashk.news.api.news.NewsService;
 import io.github.hrashk.news.api.util.BeanCopyUtils;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
@@ -40,7 +41,7 @@ public class NewsController {
     }
 
     @PostMapping
-    public ResponseEntity<NewsResponse> addNews(@RequestBody UpsertNewsRequest authorRequest) {
+    public ResponseEntity<NewsResponse> addNews(@RequestBody @Valid UpsertNewsRequest authorRequest) {
         News news = mapper.map(authorRequest);
         News saved = service.addOrReplace(news);
 
@@ -49,7 +50,7 @@ public class NewsController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<NewsResponse> updateNews(@PathVariable Long id, @RequestBody UpsertNewsRequest request) {
+    public ResponseEntity<NewsResponse> updateNews(@PathVariable Long id, @RequestBody @Valid UpsertNewsRequest request) {
         try {
             News current = mapper.mapToNews(id);
             News requested = mapper.map(request);

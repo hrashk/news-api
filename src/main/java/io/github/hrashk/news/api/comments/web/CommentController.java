@@ -5,6 +5,7 @@ import io.github.hrashk.news.api.comments.CommentNotFoundException;
 import io.github.hrashk.news.api.comments.CommentService;
 import io.github.hrashk.news.api.news.web.NewsMapper;
 import io.github.hrashk.news.api.util.BeanCopyUtils;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,7 +27,7 @@ public class CommentController {
     }
 
     @PostMapping
-    public ResponseEntity<CommentResponse> addComment(@RequestBody UpsertCommentRequest request) {
+    public ResponseEntity<CommentResponse> addComment(@RequestBody @Valid UpsertCommentRequest request) {
         Comment comment = mapper.map(request);
         Comment saved = service.addOrReplace(comment);
 
@@ -35,7 +36,7 @@ public class CommentController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CommentResponse> updateComment(@PathVariable Long id, @RequestBody UpsertCommentRequest request) {
+    public ResponseEntity<CommentResponse> updateComment(@PathVariable Long id, @RequestBody @Valid UpsertCommentRequest request) {
         try {
             Comment comment = mapper.mapToComment(id);
             Comment requested = mapper.map(request);

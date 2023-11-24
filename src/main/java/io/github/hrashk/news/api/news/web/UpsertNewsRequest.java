@@ -1,4 +1,11 @@
 package io.github.hrashk.news.api.news.web;
 
-public record UpsertNewsRequest(Long authorId, Long categoryId, String headline, String content) {
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+public record UpsertNewsRequest(
+        @NotNull Long authorId,
+        @NotNull Long categoryId,
+        @NotBlank String headline,
+        @NotBlank String content) {
 }

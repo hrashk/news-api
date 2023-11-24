@@ -4,6 +4,7 @@ import io.github.hrashk.news.api.categories.Category;
 import io.github.hrashk.news.api.categories.CategoryNotFoundException;
 import io.github.hrashk.news.api.categories.CategoryService;
 import io.github.hrashk.news.api.util.BeanCopyUtils;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
@@ -37,7 +38,7 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<CategoryResponse> addCategory(@RequestBody UpsertCategoryRequest categoryRequest) {
+    public ResponseEntity<CategoryResponse> addCategory(@RequestBody @Valid UpsertCategoryRequest categoryRequest) {
         Category requested = mapper.map(categoryRequest);
         Category saved = service.addOrReplace(requested);
 
@@ -46,7 +47,7 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id, @RequestBody UpsertCategoryRequest categoryRequest) {
+    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id, @RequestBody @Valid UpsertCategoryRequest categoryRequest) {
         try {
             Category category = mapper.map(id);
             Category requested = mapper.map(categoryRequest);

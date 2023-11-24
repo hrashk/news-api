@@ -1,4 +1,6 @@
 package io.github.hrashk.news.api.categories.web;
 
-public record UpsertCategoryRequest(String name) {
+import jakarta.validation.constraints.NotBlank;
+
+public record UpsertCategoryRequest(@NotBlank String name) {
 }

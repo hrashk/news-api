@@ -127,7 +127,7 @@ class NewsApiApplicationTests {
         var authors = fetchAuthors();
         var categories = fetchCategories();
 
-        UpsertNewsRequest request = new UpsertNewsRequest(authors.get(3).id(), categories.get(4).id(), "", "");
+        UpsertNewsRequest request = new UpsertNewsRequest(authors.get(3).id(), categories.get(4).id(), "h", "c");
         ResponseEntity<NewsResponse> response = rest.postForEntity("/api/v1/news", request, NewsResponse.class);
 
         assertAll(
@@ -163,11 +163,26 @@ class NewsApiApplicationTests {
         var headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        UpsertNewsRequest request = new UpsertNewsRequest(news.authorId(), news.categoryId(), "", "");
+        UpsertNewsRequest request = new UpsertNewsRequest(news.authorId(), news.categoryId(), "h", "c");
         ResponseEntity<NewsResponse> response = rest.exchange("/api/v1/news/{id}?userId={userId}",
                 HttpMethod.PUT, new HttpEntity<>(request, headers), NewsResponse.class, news.id(), news.authorId());
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    void updateNewsWithoutCategory() {
+        var news = fetchNews().get(1);
+
+        var headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        UpsertNewsRequest request = new UpsertNewsRequest(news.authorId(), null, "", "");
+        ResponseEntity<ErrorInfo> response = rest.exchange("/api/v1/news/{id}?userId={userId}",
+                HttpMethod.PUT, new HttpEntity<>(request, headers), ErrorInfo.class, news.id(), news.authorId());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody().message()).contains("categoryId");
     }
 
     @ParameterizedTest
@@ -178,7 +193,7 @@ class NewsApiApplicationTests {
         var headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        UpsertNewsRequest request = new UpsertNewsRequest(news.authorId(), news.categoryId(), "", "");
+        UpsertNewsRequest request = new UpsertNewsRequest(news.authorId(), news.categoryId(), "h", "c");
         ResponseEntity<NewsResponse> response = rest.exchange(url, HttpMethod.PUT, new HttpEntity<>(request, headers), NewsResponse.class, news.id());
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
@@ -191,7 +206,7 @@ class NewsApiApplicationTests {
         var headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        var request = new UpsertCommentRequest(comment.newsId(), comment.authorId(), "");
+        var request = new UpsertCommentRequest(comment.newsId(), comment.authorId(), "c");
         ResponseEntity<CommentResponse> response = rest.exchange("/api/v1/comments/{id}?userId={userId}",
                 HttpMethod.PUT, new HttpEntity<>(request, headers), CommentResponse.class, comment.id(), comment.authorId());
 
@@ -206,7 +221,7 @@ class NewsApiApplicationTests {
         var headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        var request = new UpsertCommentRequest(comment.newsId(), comment.authorId(), "");
+        var request = new UpsertCommentRequest(comment.newsId(), comment.authorId(), "c");
         ResponseEntity<CommentResponse> response = rest.exchange(url, HttpMethod.PUT,
                 new HttpEntity<>(request, headers), CommentResponse.class, comment.id());
 

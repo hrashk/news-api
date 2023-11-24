@@ -4,6 +4,7 @@ import io.github.hrashk.news.api.authors.Author;
 import io.github.hrashk.news.api.authors.AuthorNotFoundException;
 import io.github.hrashk.news.api.authors.AuthorService;
 import io.github.hrashk.news.api.util.BeanCopyUtils;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +32,7 @@ public class AuthorController {
     }
 
     @PostMapping
-    public ResponseEntity<AuthorResponse> addAuthor(@RequestBody UpsertAuthorRequest authorRequest) {
+    public ResponseEntity<AuthorResponse> addAuthor(@RequestBody @Valid UpsertAuthorRequest authorRequest) {
         Author author = mapper.map(authorRequest);
         Author saved = service.addOrReplace(author);
 
@@ -47,7 +48,7 @@ public class AuthorController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AuthorResponse> updateAuthor(@PathVariable Long id, @RequestBody UpsertAuthorRequest authorRequest) {
+    public ResponseEntity<AuthorResponse> updateAuthor(@PathVariable Long id, @RequestBody @Valid UpsertAuthorRequest authorRequest) {
         try {
             Author current = mapper.map(id);
             Author requested = mapper.map(authorRequest);
