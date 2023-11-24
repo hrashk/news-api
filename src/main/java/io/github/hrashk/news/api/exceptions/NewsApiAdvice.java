@@ -23,4 +23,11 @@ public class NewsApiAdvice {
     ErrorInfo handleValidationIssues(HttpServletRequest req, Exception ex) {
         return new ErrorInfo(ex.getMessage());
     }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(InvalidUserException.class)
+    @ResponseBody
+    ErrorInfo handleUserIssues(HttpServletRequest req, Exception ex) {
+        return new ErrorInfo(ex.getMessage());
+    }
 }

@@ -15,15 +15,14 @@ import io.github.hrashk.news.api.util.DataSeeder;
 import io.github.hrashk.news.api.util.PostgreSQLInitializer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.List;
@@ -49,13 +48,36 @@ class NewsApiApplicationTests {
 
     @Test
     void deleteNewsWithComments() {
-        deleteNews(findNewsWithComments());
+        NewsWithCountResponse news = findNewsWithComments();
+        assertThat(news.id()).isNotNull();
+
+        ResponseEntity<Void> response = rest.exchange("/api/v1/news/{id}?userId={userId}",
+                HttpMethod.DELETE, HttpEntity.EMPTY, Void.class, news.id(), news.authorId());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+        ResponseEntity<ErrorInfo> errorResponse = rest.getForEntity("/api/v1/news/{id}", ErrorInfo.class, news.id());
+        assertThat(errorResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
-    private Long findNewsWithComments() {
+    @ParameterizedTest
+    @CsvSource({"/api/v1/news/{id}", "/api/v1/news/{id}?userId=111222333"})
+    void deleteNewsWithInvalidUser(String url) {
+        Long id = findNewsWithComments().id();
+        assertThat(id).isNotNull();
+
+        ResponseEntity<Void> response = rest.exchange(url, HttpMethod.DELETE, HttpEntity.EMPTY, Void.class, id);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    void deleteWithInvalidId() {
+        ResponseEntity<Void> response = rest.exchange("/api/v1/news/{id}?userId=12358", HttpMethod.DELETE, HttpEntity.EMPTY, Void.class, "gogi");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    private NewsWithCountResponse findNewsWithComments() {
         return fetchNews().stream()
                 .filter(n -> n.commentsCount() > 0)
-                .map(NewsWithCountResponse::id)
                 .findFirst().orElseThrow();
     }
 
@@ -65,7 +87,7 @@ class NewsApiApplicationTests {
     }
 
     private Long findAuthorWithComments() {
-        Long newsId = findNewsWithComments();
+        Long newsId = findNewsWithComments().id();
 
         List<CommentResponse> comments = fetchComments(newsId);
 
@@ -133,6 +155,20 @@ class NewsApiApplicationTests {
         );
     }
 
+    @ParameterizedTest
+    @CsvSource({"/api/v1/news/{id}", "/api/v1/news/{id}?userId=111222333"})
+    void updateNewsWithInvalidUser(String url) {
+        var news = fetchNews().get(1);
+
+        var headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        UpsertNewsRequest request = new UpsertNewsRequest(news.authorId(), news.categoryId(), "", "");
+        ResponseEntity<NewsResponse> response = rest.exchange(url, HttpMethod.PUT, new HttpEntity<>(request, headers), NewsResponse.class, news.id());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
     private List<AuthorResponse> fetchAuthors() {
         ResponseEntity<AuthorListResponse> response = rest.getForEntity("/api/v1/authors", AuthorListResponse.class);
 
@@ -181,10 +217,6 @@ class NewsApiApplicationTests {
 
         ResponseEntity<ErrorInfo> errorResponse = rest.getForEntity("/api/v1/{name}/{id}", ErrorInfo.class, name, id);
         assertThat(errorResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-    }
-
-    private void deleteNews(Long id) {
-        deleteEntity("news", id);
     }
 
     private void deleteAuthor(Long id) {

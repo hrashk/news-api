@@ -1,5 +1,6 @@
 package io.github.hrashk.news.api.news;
 
+import io.github.hrashk.news.api.aspects.SameAuthor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,10 +23,12 @@ public class NewsService {
         return repository.findById(id).orElseThrow(() -> new NewsNotFoundException(id));
     }
 
+    @SameAuthor
     public News addOrReplace(News news) {
         return repository.save(news);
     }
 
+    @SameAuthor
     public void delete(News news) {
         repository.delete(news);
     }
