@@ -41,7 +41,9 @@ java -jar target/news-api-0.0.1-SNAPSHOT.jar
 
 The rest api services manages authors, news, their categories, and comments.
 The following URL shows the Swagger / Open API documentation of the available end points. Here you may try out
-individual requests.
+individual requests. When updating and deleting news and comments you must also specify the userId as the request
+parameter in the URL. It must equal the author id of the respective entity, otherwise you will get 403 Forbidden
+response. This logic is implemented with Spring AOP.
 
 http://localhost:8080/swagger-ui/index.html
 
