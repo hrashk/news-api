@@ -25,7 +25,8 @@ public class NewsService {
 
     @SameAuthor
     public News addOrReplace(News news) {
-        return repository.save(news);
+        News saved = repository.save(news);
+        return findById(saved.getId());
     }
 
     @SameAuthor

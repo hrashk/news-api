@@ -8,4 +8,5 @@ spring:
     banner-mode: off
   jpa:
     generate-ddl: true
+    open-in-view: false
 
