@@ -1,7 +1,7 @@
 package io.github.hrashk.news.api.aspects;
 
+import io.github.hrashk.news.api.comments.CommentService;
 import io.github.hrashk.news.api.exceptions.InvalidUserException;
-import io.github.hrashk.news.api.news.News;
 import io.github.hrashk.news.api.news.NewsService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -12,15 +12,25 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerMapping;
 
 import java.util.Map;
+import java.util.function.Function;
 
 @Aspect
 @Component
 @RequiredArgsConstructor
-public class AuthorAspect {
+public class UserValidation {
     private final HttpServletRequest request;
 
     @Before("@annotation(SameAuthor) && target(service)")
-    public void checkNewsAuthor(JoinPoint jp, NewsService service) {
+    public void checkNews(JoinPoint jp, NewsService service) {
+        checkUser(id -> service.findById(id).getAuthor().getId());
+    }
+
+    @Before("@annotation(SameAuthor) && target(service)")
+    public void checkComment(JoinPoint jp, CommentService service) {
+        checkUser(id -> service.findById(id).getAuthor().getId());
+    }
+
+    private void checkUser(Function<Long, Long> authorIdLookup) {
         Long id = getIdFromPath();
 
         if (id == null) // skip the add operation
@@ -28,8 +38,7 @@ public class AuthorAspect {
 
         Long userId = getUserIdParam();
 
-        News news = service.findById(id);
-        Long authorId = news.getAuthor().getId();
+        Long authorId = authorIdLookup.apply(id);
 
         if (!userId.equals(authorId))
             throw new InvalidUserException("Only the author of the news can alter it");
@@ -50,10 +59,5 @@ public class AuthorAspect {
         } catch (NumberFormatException ex) {
             throw new InvalidUserException("A valid userId must be specified", ex);
         }
-    }
-
-    @Before("@annotation(SameAuthor) && within(*..CommentService) && args(id,..)")
-    public void checkCommentAuthor(JoinPoint jp, Long id) {
-        System.out.printf("checking the author of comment %d in method %s%n", id, jp.getSignature().getName());
     }
 }

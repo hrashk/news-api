@@ -1,5 +1,6 @@
 package io.github.hrashk.news.api.comments;
 
+import io.github.hrashk.news.api.aspects.SameAuthor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +19,12 @@ public class CommentService {
         return repository.findById(id).orElseThrow(() -> new CommentNotFoundException(id));
     }
 
+    @SameAuthor
     public Comment addOrReplace(Comment comment) {
         return repository.save(comment);
     }
 
+    @SameAuthor
     public void delete(Comment comment) {
         repository.delete(comment);
     }

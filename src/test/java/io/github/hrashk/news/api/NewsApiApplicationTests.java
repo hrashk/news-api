@@ -220,7 +220,7 @@ class NewsApiApplicationTests {
         ResponseEntity<Void> response = rest.exchange("/api/v1/comments/{id}?userId={userId}",
                 HttpMethod.DELETE, HttpEntity.EMPTY, Void.class, comment.id(), comment.authorId());
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }
 
     @ParameterizedTest
