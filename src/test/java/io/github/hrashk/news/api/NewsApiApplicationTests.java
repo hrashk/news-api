@@ -5,6 +5,7 @@ import io.github.hrashk.news.api.authors.web.AuthorResponse;
 import io.github.hrashk.news.api.categories.web.CategoryListResponse;
 import io.github.hrashk.news.api.categories.web.CategoryResponse;
 import io.github.hrashk.news.api.comments.web.CommentResponse;
+import io.github.hrashk.news.api.comments.web.UpsertCommentRequest;
 import io.github.hrashk.news.api.exceptions.ErrorInfo;
 import io.github.hrashk.news.api.news.News;
 import io.github.hrashk.news.api.news.web.NewsListResponse;
@@ -155,9 +156,23 @@ class NewsApiApplicationTests {
         );
     }
 
+    @Test
+    void updateNews() {
+        var news = fetchNews().get(1);
+
+        var headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        UpsertNewsRequest request = new UpsertNewsRequest(news.authorId(), news.categoryId(), "", "");
+        ResponseEntity<NewsResponse> response = rest.exchange("/api/v1/news/{id}?userId={userId}",
+                HttpMethod.PUT, new HttpEntity<>(request, headers), NewsResponse.class, news.id(), news.authorId());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
     @ParameterizedTest
     @CsvSource({"/api/v1/news/{id}", "/api/v1/news/{id}?userId=111222333"})
-    void updateNewsWithInvalidUser(String url) {
+    void updateNews(String url) {
         var news = fetchNews().get(1);
 
         var headers = new HttpHeaders();
@@ -165,6 +180,55 @@ class NewsApiApplicationTests {
 
         UpsertNewsRequest request = new UpsertNewsRequest(news.authorId(), news.categoryId(), "", "");
         ResponseEntity<NewsResponse> response = rest.exchange(url, HttpMethod.PUT, new HttpEntity<>(request, headers), NewsResponse.class, news.id());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    void updateComment() {
+        var comment = fetchComments(findNewsWithComments().id()).get(0);
+
+        var headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        var request = new UpsertCommentRequest(comment.newsId(), comment.authorId(), "");
+        ResponseEntity<CommentResponse> response = rest.exchange("/api/v1/comments/{id}?userId={userId}",
+                HttpMethod.PUT, new HttpEntity<>(request, headers), CommentResponse.class, comment.id(), comment.authorId());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"/api/v1/comments/{id}", "/api/v1/comments/{id}?userId=111222333"})
+    void updateComment(String url) {
+        var comment = fetchComments(findNewsWithComments().id()).get(0);
+
+        var headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        var request = new UpsertCommentRequest(comment.newsId(), comment.authorId(), "");
+        ResponseEntity<CommentResponse> response = rest.exchange(url, HttpMethod.PUT,
+                new HttpEntity<>(request, headers), CommentResponse.class, comment.id());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    void deleteComment() {
+        var comment = fetchComments(findNewsWithComments().id()).get(0);
+
+        ResponseEntity<Void> response = rest.exchange("/api/v1/comments/{id}?userId={userId}",
+                HttpMethod.DELETE, HttpEntity.EMPTY, Void.class, comment.id(), comment.authorId());
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"/api/v1/comments/{id}", "/api/v1/comments/{id}?userId=111222333"})
+    void deleteComment(String url) {
+        var comment = fetchComments(findNewsWithComments().id()).get(0);
+
+        ResponseEntity<Void> response = rest.exchange(url, HttpMethod.DELETE, HttpEntity.EMPTY, Void.class, comment.id());
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
