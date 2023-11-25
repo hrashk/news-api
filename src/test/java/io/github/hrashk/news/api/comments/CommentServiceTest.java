@@ -40,6 +40,16 @@ class CommentServiceTest extends ServiceTest {
     }
 
     @Test
+    void update() {
+        var c = seeder.comments().get(1);
+        c.setText("asdf");
+
+        service.updateById(c.getId(), c);
+
+        assertThat(service.findById(c.getId())).hasFieldOrPropertyWithValue("text", "asdf");
+    }
+
+    @Test
     void removeById() {
         Long id = seeder.comments().get(0).getId();
 

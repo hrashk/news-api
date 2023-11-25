@@ -32,7 +32,7 @@ class AuthorServiceTest extends ServiceTest {
     }
 
     @Test
-    void replace() {
+    void update() {
         Author author = seeder.authors().get(1);
         author.setFirstName("asdf");
 

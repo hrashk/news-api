@@ -47,7 +47,7 @@ class CategoryServiceTest extends ServiceTest {
     }
 
     @Test
-    void replace() {
+    void update() {
         var category = seeder.categories().get(1);
         category.setName("asdf");
 
