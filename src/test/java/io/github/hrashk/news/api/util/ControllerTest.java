@@ -54,13 +54,13 @@ public abstract class ControllerTest {
         Mockito.when(categoryService.findById(Mockito.anyLong()))
                 .thenAnswer(args -> new Category().toBuilder().id(args.getArgument(0)).build());
 
-        Mockito.when(categoryService.addOrReplace(Mockito.any(Category.class)))
-                .thenAnswer(args -> {
-                    Category c = args.getArgument(0);
-                    return c.toBuilder()
-                            .id(c.getId() == null ? 8L : c.getId())
-                            .build();
-                });
+//        Mockito.when(categoryService.addOrReplace(Mockito.any(Category.class)))
+//                .thenAnswer(args -> {
+//                    Category c = args.getArgument(0);
+//                    return c.toBuilder()
+//                            .id(c.getId() == null ? 8L : c.getId())
+//                            .build();
+//                });
     }
 
     @BeforeEach

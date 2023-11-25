@@ -40,28 +40,27 @@ class CategoryServiceTest extends ServiceTest {
     }
 
     @Test
-    void saveWithNullId() {
-        Category saved = service.addOrReplace(seeder.aRandomCategory(-1L));
+    void add() {
+        Long id = service.add(seeder.aRandomCategory(-1L));
 
-        assertThat(saved.getId()).as("Category id").isNotNull();
+        assertThat(id).as("Category id").isNotNull();
     }
 
     @Test
-    void saveWithNonNullId() {
-        var n = seeder.aRandomCategory(-1L);
-        n.setId(-1L);
+    void replace() {
+        var category = seeder.categories().get(1);
+        category.setName("asdf");
 
-        Category saved = service.addOrReplace(n);
+        service.replaceById(category.getId(), category);
 
-        assertThat(saved.getId()).as("Category id").isGreaterThan(0L);
+        assertThat(service.findById(category.getId())).hasFieldOrPropertyWithValue("name", "asdf");
     }
 
     @Test
     void delete() {
-        Category categoryWithoutNews = service.addOrReplace(seeder.aRandomCategory(-1L));
-        Long id = categoryWithoutNews.getId();
+        Long id = service.add(seeder.aRandomCategory(-1L));
 
-        service.delete(categoryWithoutNews);
+        service.deleteById(id);
 
         assertThatThrownBy(() -> service.findById(id))
                 .isInstanceOf(CategoryNotFoundException.class);
@@ -71,7 +70,7 @@ class CategoryServiceTest extends ServiceTest {
     void deletingWithNewsFails() {
         Category categoryWithNews = seeder.news().get(0).getCategory();
 
-        assertThatThrownBy(() -> service.delete(categoryWithNews))
+        assertThatThrownBy(() -> service.deleteById(categoryWithNews.getId()))
                 .isInstanceOf(ValidationException.class);
     }
 }
