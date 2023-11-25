@@ -2,7 +2,7 @@ package io.github.hrashk.news.api;
 
 import io.github.hrashk.news.api.exceptions.EntityNotFoundException;
 
-public interface EntityService<T, ID> {
+public interface CrudService<T, ID> {
     T findById(ID id) throws EntityNotFoundException;
 
     void replaceById(ID id, T entity) throws EntityNotFoundException;

@@ -1,6 +1,6 @@
 package io.github.hrashk.news.api.news;
 
-import io.github.hrashk.news.api.EntityService;
+import io.github.hrashk.news.api.CrudService;
 import io.github.hrashk.news.api.aspects.SameAuthor;
 import io.github.hrashk.news.api.util.BeanCopyUtils;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import static io.github.hrashk.news.api.news.NewsSpecifications.hasCategory;
 
 @Service
 @RequiredArgsConstructor
-public class NewsService implements EntityService<News, Long> {
+public class NewsService implements CrudService<News, Long> {
     private final NewsRepository repository;
 
     public List<News> findAll(Pageable pageable, Long authorId, Long categoryId) {

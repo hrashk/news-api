@@ -1,6 +1,6 @@
 package io.github.hrashk.news.api.comments;
 
-import io.github.hrashk.news.api.EntityService;
+import io.github.hrashk.news.api.CrudService;
 import io.github.hrashk.news.api.aspects.SameAuthor;
 import io.github.hrashk.news.api.util.BeanCopyUtils;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CommentService implements EntityService<Comment, Long> {
+public class CommentService implements CrudService<Comment, Long> {
     private final CommentRepository repository;
 
     public List<Comment> findAll() {
