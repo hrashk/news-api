@@ -70,21 +70,12 @@ class NewsServiceTest extends ServiceTest {
     }
 
     @Test
-    void saveWithNullId() {
+    void add() {
         var n = seeder.aRandomNews(-1L);
 
-        News saved = service.addOrReplace(n);
+        Long id = service.add(n);
 
-        assertThat(saved.getId()).as("News id").isNotNull();
-    }
-
-    @Test
-    void saveWithNonNullId() {
-        var n = seeder.aRandomNews(-1L);
-
-        News saved = service.addOrReplace(n);
-
-        assertThat(saved.getId()).as("News id").isGreaterThan(0L);
+        assertThat(id).as("News id").isGreaterThan(0L);
     }
 
     @Test
@@ -94,7 +85,7 @@ class NewsServiceTest extends ServiceTest {
                 .findAny().get();
         Long id = news.getId();
 
-        service.delete(news);
+        service.deleteById(id);
 
         assertThatThrownBy(() -> service.findById(id))
                 .isInstanceOf(NewsNotFoundException.class);

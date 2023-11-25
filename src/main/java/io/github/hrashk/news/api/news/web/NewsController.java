@@ -3,7 +3,6 @@ package io.github.hrashk.news.api.news.web;
 import io.github.hrashk.news.api.news.News;
 import io.github.hrashk.news.api.news.NewsNotFoundException;
 import io.github.hrashk.news.api.news.NewsService;
-import io.github.hrashk.news.api.util.BeanCopyUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -35,30 +34,28 @@ public class NewsController {
 
     @GetMapping("/{id}")
     public ResponseEntity<NewsResponse> getNewsById(@PathVariable Long id) {
-        News news = mapper.mapToNews(id);
+        NewsResponse response = mapper.map(service.findById(id));
 
-        return ResponseEntity.ok(mapper.map(news));
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
     public ResponseEntity<NewsResponse> addNews(@RequestBody @Valid UpsertNewsRequest authorRequest) {
-        News news = mapper.map(authorRequest);
-        News saved = service.addOrReplace(news);
+        Long id = service.add(mapper.map(authorRequest));
 
-        NewsResponse response = mapper.map(saved);
+        NewsResponse response = mapper.map(service.findById(id));
+
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<NewsResponse> updateNews(@PathVariable Long id, @RequestBody @Valid UpsertNewsRequest request) {
         try {
-            News current = mapper.mapToNews(id);
-            News requested = mapper.map(request);
-            BeanCopyUtils.copyProperties(requested, current);
+            service.replaceById(id, mapper.map(request));
 
-            News saved = service.addOrReplace(current);
+            NewsResponse response = mapper.map(service.findById(id));
 
-            return ResponseEntity.ok(mapper.map(saved));
+            return ResponseEntity.ok(response);
         } catch (NewsNotFoundException ex) {
             return addNews(request);
         }
@@ -66,9 +63,7 @@ public class NewsController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNews(@PathVariable Long id) {
-        News news = mapper.mapToNews(id);
-
-        service.delete(news);
+        service.deleteById(id);
 
         return ResponseEntity.noContent().build();
     }

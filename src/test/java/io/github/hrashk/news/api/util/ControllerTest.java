@@ -68,13 +68,13 @@ public abstract class ControllerTest {
         Mockito.when(newsService.findById(Mockito.anyLong()))
                 .thenAnswer(args -> new News().toBuilder().id(args.getArgument(0)).build());
 
-        Mockito.when(newsService.addOrReplace(Mockito.any(News.class)))
-                .thenAnswer(args -> {
-                    News n = args.getArgument(0);
-                    return n.toBuilder()
-                            .id(n.getId() == null ? 1L : n.getId())
-                            .build();
-                });
+//        Mockito.when(newsService.addOrReplace(Mockito.any(News.class)))
+//                .thenAnswer(args -> {
+//                    News n = args.getArgument(0);
+//                    return n.toBuilder()
+//                            .id(n.getId() == null ? 1L : n.getId())
+//                            .build();
+//                });
     }
 
     @BeforeEach
