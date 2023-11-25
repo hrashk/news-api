@@ -23,7 +23,7 @@ public class AuthorService implements CrudService<Author, Long> {
     }
 
     @Override
-    public void replaceById(Long id, Author entity) throws AuthorNotFoundException {
+    public void updateById(Long id, Author entity) throws AuthorNotFoundException {
         var current = findById(id);
         BeanCopyUtils.copyProperties(entity, current);
 

@@ -26,7 +26,7 @@ public class CategoryService implements CrudService<Category, Long> {
     }
 
     @Override
-    public void replaceById(Long id, Category entity) throws CategoryNotFoundException {
+    public void updateById(Long id, Category entity) throws CategoryNotFoundException {
         var current = findById(id);
         BeanCopyUtils.copyProperties(entity, current);
 

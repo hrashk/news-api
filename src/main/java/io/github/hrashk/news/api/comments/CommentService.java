@@ -24,7 +24,7 @@ public class CommentService implements CrudService<Comment, Long> {
 
     @SameAuthor
     @Override
-    public void replaceById(Long id, Comment entity) throws CommentNotFoundException {
+    public void updateById(Long id, Comment entity) throws CommentNotFoundException {
         var current = findById(id);
         BeanCopyUtils.copyProperties(entity, current);
 

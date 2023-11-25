@@ -48,7 +48,7 @@ public class CategoryController {
     @PutMapping("/{id}")
     public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id, @RequestBody @Valid UpsertCategoryRequest categoryRequest) {
         try {
-            service.replaceById(id, mapper.map(categoryRequest));
+            service.updateById(id, mapper.map(categoryRequest));
 
             CategoryResponse response = mapper.map(service.findById(id));
 

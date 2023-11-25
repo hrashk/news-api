@@ -28,7 +28,7 @@ public class NewsService implements CrudService<News, Long> {
 
     @SameAuthor
     @Override
-    public void replaceById(Long id, News entity) throws NewsNotFoundException {
+    public void updateById(Long id, News entity) throws NewsNotFoundException {
         News current = findById(id);
         BeanCopyUtils.copyProperties(entity, current);
 

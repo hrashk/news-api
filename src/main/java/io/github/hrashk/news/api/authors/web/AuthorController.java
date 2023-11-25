@@ -49,7 +49,7 @@ public class AuthorController {
     @PutMapping("/{id}")
     public ResponseEntity<AuthorResponse> updateAuthor(@PathVariable Long id, @RequestBody @Valid UpsertAuthorRequest authorRequest) {
         try {
-            service.replaceById(id, mapper.map(authorRequest));
+            service.updateById(id, mapper.map(authorRequest));
 
             AuthorResponse response = mapper.map(service.findById(id));
 

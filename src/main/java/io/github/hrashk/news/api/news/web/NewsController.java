@@ -51,7 +51,7 @@ public class NewsController {
     @PutMapping("/{id}")
     public ResponseEntity<NewsResponse> updateNews(@PathVariable Long id, @RequestBody @Valid UpsertNewsRequest request) {
         try {
-            service.replaceById(id, mapper.map(request));
+            service.updateById(id, mapper.map(request));
 
             NewsResponse response = mapper.map(service.findById(id));
 

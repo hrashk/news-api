@@ -36,7 +36,7 @@ class AuthorServiceTest extends ServiceTest {
         Author author = seeder.authors().get(1);
         author.setFirstName("asdf");
 
-        service.replaceById(author.getId(), author);
+        service.updateById(author.getId(), author);
 
         assertThat(service.findById(author.getId())).hasFieldOrPropertyWithValue("firstName", "asdf");
     }
