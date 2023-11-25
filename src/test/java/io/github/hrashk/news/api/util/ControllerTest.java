@@ -40,13 +40,13 @@ public abstract class ControllerTest {
         Mockito.when(authorService.findById(Mockito.anyLong()))
                 .thenAnswer(args -> new Author().toBuilder().id(args.getArgument(0)).build());
 
-        Mockito.when(authorService.addOrReplace(Mockito.any(Author.class)))
-                .thenAnswer(args -> {
-                    Author a = args.getArgument(0);
-                    return a.toBuilder()
-                            .id(a.getId() == null ? 21L : a.getId())
-                            .build();
-                });
+//        Mockito.when(authorService.addOrReplace(Mockito.any(Author.class)))
+//                .thenAnswer(args -> {
+//                    Author a = args.getArgument(0);
+//                    return a.toBuilder()
+//                            .id(a.getId() == null ? 21L : a.getId())
+//                            .build();
+//                });
     }
 
     @BeforeEach

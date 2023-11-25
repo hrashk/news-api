@@ -25,20 +25,20 @@ class AuthorServiceTest extends ServiceTest {
     }
 
     @Test
-    void saveWithNullId() {
-        Author saved = service.addOrReplace(seeder.aRandomAuthor(-1L));
+    void add() {
+        Long id = service.add(seeder.aRandomAuthor(-1L));
 
-        assertThat(saved.getId()).as("Author id").isNotNull();
+        assertThat(id).as("Author id").isNotNull();
     }
 
     @Test
-    void saveWithNonNullId() {
-        var a = seeder.aRandomAuthor(-1L);
-        a.setId(-1L);
+    void replace() {
+        Author author = seeder.authors().get(1);
+        author.setFirstName("asdf");
 
-        Author saved = service.addOrReplace(a);
+        service.replaceById(author.getId(), author);
 
-        assertThat(saved.getId()).as("Author id").isGreaterThan(0);
+        assertThat(service.findById(author.getId())).hasFieldOrPropertyWithValue("firstName", "asdf");
     }
 
     @Test
@@ -61,7 +61,7 @@ class AuthorServiceTest extends ServiceTest {
         Author author = seeder.news().get(0).getAuthor();
         Long id = author.getId();
 
-        service.delete(author);
+        service.deleteById(id);
 
         assertThatThrownBy(() -> service.findById(id))
                 .isInstanceOf(AuthorNotFoundException.class);
@@ -72,7 +72,7 @@ class AuthorServiceTest extends ServiceTest {
         Author author = seeder.comments().get(0).getAuthor();
         Long id = author.getId();
 
-        service.delete(author);
+        service.deleteById(id);
 
         assertThatThrownBy(() -> service.findById(id))
                 .isInstanceOf(AuthorNotFoundException.class);

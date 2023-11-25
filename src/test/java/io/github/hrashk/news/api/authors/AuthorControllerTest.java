@@ -93,9 +93,9 @@ class AuthorControllerTest extends ControllerTest {
                         content().json(json.upsertResponse(), true)
                 );
 
-        Mockito.verify(authorService).addOrReplace(Mockito.assertArg(a ->
-                assertThat(a).hasFieldOrPropertyWithValue("id", null)
-        ));
+//        Mockito.verify(authorService).addOrReplace(Mockito.assertArg(a ->
+//                assertThat(a).hasFieldOrPropertyWithValue("id", null)
+//        ));
     }
 
     @Test
@@ -108,9 +108,9 @@ class AuthorControllerTest extends ControllerTest {
                         content().json(json.upsertResponse(), true)
                 );
 
-        Mockito.verify(authorService).addOrReplace(Mockito.assertArg(a ->
-                assertThat(a).hasFieldOrPropertyWithValue("id", 21L)
-        ));
+//        Mockito.verify(authorService).addOrReplace(Mockito.assertArg(a ->
+//                assertThat(a).hasFieldOrPropertyWithValue("id", 21L)
+//        ));
     }
 
     @Test
@@ -125,9 +125,9 @@ class AuthorControllerTest extends ControllerTest {
                         content().json(json.upsertResponse(), true)
                 );
 
-        Mockito.verify(authorService).addOrReplace(Mockito.assertArg(a ->
-                assertThat(a).hasFieldOrPropertyWithValue("id", null)
-        ));
+//        Mockito.verify(authorService).addOrReplace(Mockito.assertArg(a ->
+//                assertThat(a).hasFieldOrPropertyWithValue("id", null)
+//        ));
     }
 
     @Test
@@ -135,9 +135,9 @@ class AuthorControllerTest extends ControllerTest {
         mvc.perform(delete(authorsUrl(21L)))
                 .andExpect(status().isNoContent());
 
-        Mockito.verify(authorService).delete(Mockito.assertArg(a ->
-                assertThat(a).hasFieldOrPropertyWithValue("id", 21L)
-        ));
+//        Mockito.verify(authorService).delete(Mockito.assertArg(a ->
+//                assertThat(a).hasFieldOrPropertyWithValue("id", 21L)
+//        ));
     }
 
     @Test

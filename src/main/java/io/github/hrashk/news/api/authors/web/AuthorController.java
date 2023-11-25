@@ -3,7 +3,6 @@ package io.github.hrashk.news.api.authors.web;
 import io.github.hrashk.news.api.authors.Author;
 import io.github.hrashk.news.api.authors.AuthorNotFoundException;
 import io.github.hrashk.news.api.authors.AuthorService;
-import io.github.hrashk.news.api.util.BeanCopyUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -31,15 +30,6 @@ public class AuthorController {
         return ResponseEntity.ok(mapper.wrap(authors));
     }
 
-    @PostMapping
-    public ResponseEntity<AuthorResponse> addAuthor(@RequestBody @Valid UpsertAuthorRequest authorRequest) {
-        Author author = mapper.map(authorRequest);
-        Author saved = service.addOrReplace(author);
-
-        AuthorResponse response = mapper.map(saved);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<AuthorResponse> getAuthorById(@PathVariable Long id) {
         Author a = mapper.map(id);
@@ -47,16 +37,23 @@ public class AuthorController {
         return ResponseEntity.ok(mapper.map(a));
     }
 
+    @PostMapping
+    public ResponseEntity<AuthorResponse> addAuthor(@RequestBody @Valid UpsertAuthorRequest authorRequest) {
+        Long id = service.add(mapper.map(authorRequest));
+
+        AuthorResponse response = mapper.map(service.findById(id));
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<AuthorResponse> updateAuthor(@PathVariable Long id, @RequestBody @Valid UpsertAuthorRequest authorRequest) {
         try {
-            Author current = mapper.map(id);
-            Author requested = mapper.map(authorRequest);
-            BeanCopyUtils.copyProperties(requested, current);
+            service.replaceById(id, mapper.map(authorRequest));
 
-            Author saved = service.addOrReplace(current);
+            AuthorResponse response = mapper.map(service.findById(id));
 
-            return ResponseEntity.ok(mapper.map(saved));
+            return ResponseEntity.ok(response);
         } catch (AuthorNotFoundException ex) {
             return addAuthor(authorRequest);
         }
@@ -64,9 +61,7 @@ public class AuthorController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAuthor(@PathVariable Long id) {
-        Author author = mapper.map(id);
-
-        service.delete(author);
+        service.deleteById(id);
 
         return ResponseEntity.noContent().build();
     }
