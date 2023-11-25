@@ -1,4 +1,4 @@
-package io.github.hrashk.news.api.exceptions;
+package io.github.hrashk.news.api.aspects;
 
 public class InvalidUserException extends RuntimeException {
     public InvalidUserException(String message) {

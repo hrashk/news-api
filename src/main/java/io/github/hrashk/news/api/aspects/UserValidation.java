@@ -1,7 +1,6 @@
 package io.github.hrashk.news.api.aspects;
 
 import io.github.hrashk.news.api.comments.CommentService;
-import io.github.hrashk.news.api.exceptions.InvalidUserException;
 import io.github.hrashk.news.api.news.NewsService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
