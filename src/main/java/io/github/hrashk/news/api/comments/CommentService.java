@@ -1,6 +1,8 @@
 package io.github.hrashk.news.api.comments;
 
+import io.github.hrashk.news.api.EntityService;
 import io.github.hrashk.news.api.aspects.SameAuthor;
+import io.github.hrashk.news.api.util.BeanCopyUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -8,24 +10,39 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CommentService {
+public class CommentService implements EntityService<Comment, Long> {
     private final CommentRepository repository;
 
     public List<Comment> findAll() {
         return repository.findAll();
     }
 
-    public Comment findById(Long id) {
+    @Override
+    public Comment findById(Long id) throws CommentNotFoundException {
         return repository.findById(id).orElseThrow(() -> new CommentNotFoundException(id));
     }
 
     @SameAuthor
-    public Comment addOrReplace(Comment comment) {
-        return repository.save(comment);
+    @Override
+    public void replaceById(Long id, Comment entity) throws CommentNotFoundException {
+        var current = findById(id);
+        BeanCopyUtils.copyProperties(entity, current);
+
+        repository.save(current);
+    }
+
+    @Override
+    public Long add(Comment entity) {
+        var saved = repository.save(entity);
+
+        return saved.getId();
     }
 
     @SameAuthor
-    public void delete(Comment comment) {
+    @Override
+    public void deleteById(Long id) throws CommentNotFoundException {
+        var comment = findById(id);
+
         repository.delete(comment);
     }
 }

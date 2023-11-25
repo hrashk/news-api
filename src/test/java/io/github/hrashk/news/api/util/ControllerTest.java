@@ -82,12 +82,12 @@ public abstract class ControllerTest {
         Mockito.when(commentService.findById(Mockito.anyLong()))
                 .thenAnswer(args -> new Comment().toBuilder().id(args.getArgument(0)).build());
 
-        Mockito.when(commentService.addOrReplace(Mockito.any(Comment.class)))
-                .thenAnswer(args -> {
-                    Comment c = args.getArgument(0);
-                    return c.toBuilder()
-                            .id(c.getId() == null ? 3L : c.getId())
-                            .build();
-                });
+//        Mockito.when(commentService.addOrReplace(Mockito.any(Comment.class)))
+//                .thenAnswer(args -> {
+//                    Comment c = args.getArgument(0);
+//                    return c.toBuilder()
+//                            .id(c.getId() == null ? 3L : c.getId())
+//                            .build();
+//                });
     }
 }

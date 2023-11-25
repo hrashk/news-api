@@ -4,7 +4,6 @@ import io.github.hrashk.news.api.comments.Comment;
 import io.github.hrashk.news.api.comments.CommentNotFoundException;
 import io.github.hrashk.news.api.comments.CommentService;
 import io.github.hrashk.news.api.news.web.NewsMapper;
-import io.github.hrashk.news.api.util.BeanCopyUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,23 +27,21 @@ public class CommentController {
 
     @PostMapping
     public ResponseEntity<CommentResponse> addComment(@RequestBody @Valid UpsertCommentRequest request) {
-        Comment comment = mapper.map(request);
-        Comment saved = service.addOrReplace(comment);
+        Long id = service.add(mapper.map(request));
 
-        CommentResponse response = mapper.map(saved);
+        CommentResponse response = mapper.map(service.findById(id));
+
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<CommentResponse> updateComment(@PathVariable Long id, @RequestBody @Valid UpsertCommentRequest request) {
         try {
-            Comment comment = mapper.mapToComment(id);
-            Comment requested = mapper.map(request);
-            BeanCopyUtils.copyProperties(requested, comment);
+            service.replaceById(id, mapper.map(request));
 
-            Comment saved = service.addOrReplace(comment);
+            CommentResponse response = mapper.map(service.findById(id));
 
-            return ResponseEntity.ok(mapper.map(saved));
+            return ResponseEntity.ok(response);
         } catch (CommentNotFoundException ex) {
             return addComment(request);
         }
@@ -52,9 +49,7 @@ public class CommentController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long id) {
-        Comment comment = mapper.mapToComment(id);
-
-        service.delete(comment);
+        service.deleteById(id);
 
         return ResponseEntity.noContent().build();
     }

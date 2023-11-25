@@ -33,27 +33,17 @@ class CommentServiceTest extends ServiceTest {
     }
 
     @Test
-    void saveWithNullId() {
-        Comment saved = service.addOrReplace(seeder.aRandomComment(-1L));
+    void add() {
+        Long id = service.add(seeder.aRandomComment(-1L));
 
-        assertThat(saved.getId()).as("Comment id").isNotNull();
-    }
-
-    @Test
-    void saveWithNonNullId() {
-        var comment = seeder.aRandomComment(-1L);
-        comment.setId(-1L);
-
-        Comment saved = service.addOrReplace(comment);
-
-        assertThat(saved.getId()).as("Comment id").isGreaterThan(0);
+        assertThat(id).as("Comment id").isNotNull();
     }
 
     @Test
     void removeById() {
         Long id = seeder.comments().get(0).getId();
 
-        service.delete(seeder.comments().get(0));
+        service.deleteById(id);
 
         assertThatThrownBy(() -> service.findById(id))
                 .isInstanceOf(CommentNotFoundException.class);
