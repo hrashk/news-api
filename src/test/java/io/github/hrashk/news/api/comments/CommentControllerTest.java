@@ -1,7 +1,6 @@
 package io.github.hrashk.news.api.comments;
 
-import io.github.hrashk.news.api.authors.AuthorNotFoundException;
-import io.github.hrashk.news.api.news.NewsNotFoundException;
+import io.github.hrashk.news.api.exceptions.EntityNotFoundException;
 import io.github.hrashk.news.api.util.ControllerTest;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -43,8 +42,8 @@ class CommentControllerTest extends ControllerTest {
 
     @Test
     void getMissingComment() throws Exception {
-        Mockito.when(commentService.findById(Mockito.anyLong()))
-                .thenThrow(new CommentNotFoundException(1L));
+//        Mockito.when(commentService.findById(Mockito.anyLong()))
+//                .thenThrow(new CommentNotFoundException(1L));
 
         mvc.perform(get(commentsUrl(3L)))
                 .andExpectAll(
@@ -71,7 +70,7 @@ class CommentControllerTest extends ControllerTest {
     @Test
     void addCommentWithInvalidAuthor() throws Exception {
         Mockito.when(authorService.findById(Mockito.anyLong()))
-                .thenThrow(new AuthorNotFoundException(1L));
+                .thenThrow(new EntityNotFoundException("Author", 1L));
 
         mvc.perform(post(commentsUrl())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -85,7 +84,7 @@ class CommentControllerTest extends ControllerTest {
     @Test
     void addCommentWithInvalidNews() throws Exception {
         Mockito.when(newsService.findById(Mockito.anyLong()))
-                .thenThrow(new NewsNotFoundException(1L));
+                .thenThrow(new EntityNotFoundException("News", 1L));
 
         mvc.perform(post(commentsUrl())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -113,8 +112,8 @@ class CommentControllerTest extends ControllerTest {
 
     @Test
     void updateMissingComment() throws Exception {
-        Mockito.when(commentService.findById(Mockito.anyLong()))
-                .thenThrow(CommentNotFoundException.class);
+//        Mockito.when(commentService.findById(Mockito.anyLong()))
+//                .thenThrow(CommentNotFoundException.class);
 
         mvc.perform(put(commentsUrl(3L))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -132,7 +131,7 @@ class CommentControllerTest extends ControllerTest {
     @Test
     void updateCommentWithInvalidAuthor() throws Exception {
         Mockito.when(authorService.findById(Mockito.anyLong()))
-                .thenThrow(new AuthorNotFoundException(1L));
+                .thenThrow(new EntityNotFoundException("Author", 1L));
 
         mvc.perform(put(commentsUrl(3L))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -146,7 +145,7 @@ class CommentControllerTest extends ControllerTest {
     @Test
     void updateCommentWithInvalidNews() throws Exception {
         Mockito.when(newsService.findById(Mockito.anyLong()))
-                .thenThrow(new NewsNotFoundException(1L));
+                .thenThrow(new EntityNotFoundException("News", 1L));
 
         mvc.perform(put(commentsUrl(3L))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -171,8 +170,8 @@ class CommentControllerTest extends ControllerTest {
 
     @Test
     void deleteMissingComment() throws Exception {
-        Mockito.when(commentService.findById(Mockito.anyLong()))
-                .thenThrow(new CommentNotFoundException(1L));
+//        Mockito.when(commentService.findById(Mockito.anyLong()))
+//                .thenThrow(new CommentNotFoundException(1L));
 
         mvc.perform(delete(commentsUrl(3L)))
                 .andExpectAll(

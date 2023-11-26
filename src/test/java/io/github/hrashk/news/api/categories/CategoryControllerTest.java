@@ -62,8 +62,8 @@ class CategoryControllerTest extends ControllerTest {
 
     @Test
     void findByInvalidId() throws Exception {
-        when(categoryService.findById(Mockito.anyLong()))
-                .thenThrow(new CategoryNotFoundException(1L));
+//        when(categoryService.findById(Mockito.anyLong()))
+//                .thenThrow(new CategoryNotFoundException(1L));
 
         mvc.perform(get(categoriesUrl(7L)))
                 .andExpectAll(
@@ -104,8 +104,8 @@ class CategoryControllerTest extends ControllerTest {
 
     @Test
     void updateWithInvalidIdCreatesNewEntity() throws Exception {
-        when(categoryService.findById(Mockito.anyLong()))
-                .thenThrow(new CategoryNotFoundException(1L));
+//        when(categoryService.findById(Mockito.anyLong()))
+//                .thenThrow(new CategoryNotFoundException(1L));
 
         mvc.perform(put(categoriesUrl(7L))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -145,8 +145,8 @@ class CategoryControllerTest extends ControllerTest {
 
     @Test
     void deleteMissingCategory() throws Exception {
-        when(categoryService.findById(Mockito.anyLong()))
-                .thenThrow(new CategoryNotFoundException(7L));
+//        when(categoryService.findById(Mockito.anyLong()))
+//                .thenThrow(new CategoryNotFoundException(7L));
 
         mvc.perform(MockMvcRequestBuilders.delete(categoriesUrl(7L)))
                 .andExpectAll(

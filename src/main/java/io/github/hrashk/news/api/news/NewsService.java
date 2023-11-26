@@ -1,9 +1,8 @@
 package io.github.hrashk.news.api.news;
 
-import io.github.hrashk.news.api.CrudService;
 import io.github.hrashk.news.api.aspects.SameAuthor;
-import io.github.hrashk.news.api.util.BeanCopyUtils;
-import lombok.RequiredArgsConstructor;
+import io.github.hrashk.news.api.common.BaseService;
+import io.github.hrashk.news.api.exceptions.EntityNotFoundException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -13,40 +12,28 @@ import static io.github.hrashk.news.api.news.NewsSpecifications.hasAuthor;
 import static io.github.hrashk.news.api.news.NewsSpecifications.hasCategory;
 
 @Service
-@RequiredArgsConstructor
-public class NewsService implements CrudService<News, Long> {
-    private final NewsRepository repository;
+public class NewsService extends BaseService<News, NewsRepository> {
+    protected NewsService(NewsRepository repository) {
+        super(repository, "News");
+    }
 
     public List<News> findAll(Pageable pageable, Long authorId, Long categoryId) {
         return repository.findAll(hasCategory(categoryId).and(hasAuthor(authorId)), pageable).getContent();
     }
 
+    @SameAuthor
     @Override
-    public News findById(Long id) throws NewsNotFoundException {
-        return repository.findById(id).orElseThrow(() -> new NewsNotFoundException(id));
+    public Long updateOrAdd(Long id, News entity) {
+        return super.updateOrAdd(id, entity);
     }
 
     @SameAuthor
     @Override
-    public void updateById(Long id, News entity) throws NewsNotFoundException {
-        News current = findById(id);
-        BeanCopyUtils.copyProperties(entity, current);
-
-        repository.save(current);
+    public void deleteById(Long id) throws EntityNotFoundException {
+        super.deleteById(id);
     }
 
-    @Override
-    public Long add(News entity) {
-        News saved = repository.save(entity);
-
-        return saved.getId();
-    }
-
-    @SameAuthor
-    @Override
-    public void deleteById(Long id) throws NewsNotFoundException {
-        News news = findById(id);
-
-        repository.delete(news);
+    public boolean existsByCategoryId(Long id) {
+        return repository.existsByCategoryId(id);
     }
 }

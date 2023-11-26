@@ -1,5 +1,6 @@
 package io.github.hrashk.news.api.authors;
 
+import io.github.hrashk.news.api.exceptions.EntityNotFoundException;
 import io.github.hrashk.news.api.util.ServiceTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,7 @@ class AuthorServiceTest extends ServiceTest {
         Author author = seeder.authors().get(1);
         author.setFirstName("asdf");
 
-        service.updateById(author.getId(), author);
+        service.updateOrAdd(author.getId(), author);
 
         assertThat(service.findById(author.getId())).hasFieldOrPropertyWithValue("firstName", "asdf");
     }
@@ -53,7 +54,7 @@ class AuthorServiceTest extends ServiceTest {
     @Test
     void findByInvalidId() {
         assertThatThrownBy(() -> service.findById(-1L))
-                .isInstanceOf(AuthorNotFoundException.class);
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
@@ -64,7 +65,7 @@ class AuthorServiceTest extends ServiceTest {
         service.deleteById(id);
 
         assertThatThrownBy(() -> service.findById(id))
-                .isInstanceOf(AuthorNotFoundException.class);
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
@@ -75,6 +76,6 @@ class AuthorServiceTest extends ServiceTest {
         service.deleteById(id);
 
         assertThatThrownBy(() -> service.findById(id))
-                .isInstanceOf(AuthorNotFoundException.class);
+                .isInstanceOf(EntityNotFoundException.class);
     }
 }

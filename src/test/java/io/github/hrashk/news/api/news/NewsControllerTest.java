@@ -1,7 +1,5 @@
 package io.github.hrashk.news.api.news;
 
-import io.github.hrashk.news.api.authors.AuthorNotFoundException;
-import io.github.hrashk.news.api.categories.CategoryNotFoundException;
 import io.github.hrashk.news.api.util.ControllerTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -76,8 +74,8 @@ class NewsControllerTest extends ControllerTest {
 
     @Test
     void findingByInvalidIdFails() throws Exception {
-        Mockito.when(newsService.findById(Mockito.anyLong()))
-                .thenThrow(new NewsNotFoundException(1L));
+//        Mockito.when(newsService.findById(Mockito.anyLong()))
+//                .thenThrow(new NewsNotFoundException(1L));
 
         mvc.perform(get(newsUrl(-1L)))
                 .andExpectAll(
@@ -103,8 +101,8 @@ class NewsControllerTest extends ControllerTest {
 
     @Test
     void addingWithInvalidAuthorIdFails() throws Exception {
-        Mockito.when(authorService.findById(Mockito.anyLong()))
-                .thenThrow(new AuthorNotFoundException(1L));
+//        Mockito.when(authorService.findById(Mockito.anyLong()))
+//                .thenThrow(new AuthorNotFoundException(1L));
 
         mvc.perform(post(newsUrl())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -117,8 +115,8 @@ class NewsControllerTest extends ControllerTest {
 
     @Test
     void addingWithInvalidCategoryIdFails() throws Exception {
-        Mockito.when(categoryService.findById(Mockito.anyLong()))
-                .thenThrow(new CategoryNotFoundException(1L));
+//        Mockito.when(categoryService.findById(Mockito.anyLong()))
+//                .thenThrow(new CategoryNotFoundException(1L));
 
         mvc.perform(put(newsUrl(1L))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -149,8 +147,8 @@ class NewsControllerTest extends ControllerTest {
 
     @Test
     void updateMissingNews() throws Exception {
-        Mockito.when(newsService.findById(Mockito.anyLong()))
-                .thenThrow(new NewsNotFoundException(1L));
+//        Mockito.when(newsService.findById(Mockito.anyLong()))
+//                .thenThrow(new NewsNotFoundException(1L));
 
         mvc.perform(put(newsUrl(-1L))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -167,8 +165,8 @@ class NewsControllerTest extends ControllerTest {
 
     @Test
     void updatingWithInvalidAuthorIdFails() throws Exception {
-        Mockito.when(authorService.findById(Mockito.anyLong()))
-                .thenThrow(new AuthorNotFoundException(1L));
+//        Mockito.when(authorService.findById(Mockito.anyLong()))
+//                .thenThrow(new AuthorNotFoundException(1L));
 
         mvc.perform(put(newsUrl(1L))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -181,8 +179,8 @@ class NewsControllerTest extends ControllerTest {
 
     @Test
     void updatingWithInvalidCategoryIdFails() throws Exception {
-        Mockito.when(categoryService.findById(Mockito.anyLong()))
-                .thenThrow(new CategoryNotFoundException(1L));
+//        Mockito.when(categoryService.findById(Mockito.anyLong()))
+//                .thenThrow(new CategoryNotFoundException(1L));
 
         mvc.perform(put(newsUrl(1L))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -206,7 +204,7 @@ class NewsControllerTest extends ControllerTest {
 
     @Test
     void deletingByInvalidIdFails() throws Exception {
-        Mockito.when(newsService.findById(Mockito.anyLong())).thenThrow(NewsNotFoundException.class);
+//        Mockito.when(newsService.findById(Mockito.anyLong())).thenThrow(NewsNotFoundException.class);
 
         mvc.perform(delete(newsUrl(-1L)))
                 .andExpectAll(

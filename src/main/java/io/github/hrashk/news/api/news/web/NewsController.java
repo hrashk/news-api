@@ -1,7 +1,6 @@
 package io.github.hrashk.news.api.news.web;
 
 import io.github.hrashk.news.api.news.News;
-import io.github.hrashk.news.api.news.NewsNotFoundException;
 import io.github.hrashk.news.api.news.NewsService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping(value = "/api/v1/news", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -50,15 +50,14 @@ public class NewsController {
 
     @PutMapping("/{id}")
     public ResponseEntity<NewsResponse> updateNews(@PathVariable Long id, @RequestBody @Valid UpsertNewsRequest request) {
-        try {
-            service.updateById(id, mapper.map(request));
+        Long newId = service.updateOrAdd(id, mapper.map(request));
 
-            NewsResponse response = mapper.map(service.findById(id));
+        NewsResponse response = mapper.map(service.findById(newId));
 
+        if (Objects.equals(newId, id))
             return ResponseEntity.ok(response);
-        } catch (NewsNotFoundException ex) {
-            return addNews(request);
-        }
+        else
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/{id}")

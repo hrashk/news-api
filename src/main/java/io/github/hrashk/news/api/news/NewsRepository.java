@@ -12,6 +12,7 @@ import java.util.Optional;
 
 public interface NewsRepository extends JpaRepository<News, Long>, JpaSpecificationExecutor<News> {
     boolean existsByCategory(Category category);
+    boolean existsByCategoryId(Long id);
 
     @Override
     @EntityGraph(attributePaths = "comments")

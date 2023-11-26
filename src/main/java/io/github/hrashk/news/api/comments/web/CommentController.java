@@ -1,7 +1,6 @@
 package io.github.hrashk.news.api.comments.web;
 
 import io.github.hrashk.news.api.comments.Comment;
-import io.github.hrashk.news.api.comments.CommentNotFoundException;
 import io.github.hrashk.news.api.comments.CommentService;
 import io.github.hrashk.news.api.news.web.NewsMapper;
 import jakarta.validation.Valid;
@@ -10,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Objects;
 
 @RestController
 @RequestMapping(value = "/api/v1/comments", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -36,15 +37,14 @@ public class CommentController {
 
     @PutMapping("/{id}")
     public ResponseEntity<CommentResponse> updateComment(@PathVariable Long id, @RequestBody @Valid UpsertCommentRequest request) {
-        try {
-            service.updateById(id, mapper.map(request));
+        Long newId = service.updateOrAdd(id, mapper.map(request));
 
-            CommentResponse response = mapper.map(service.findById(id));
+        CommentResponse response = mapper.map(service.findById(newId));
 
+        if (Objects.equals(newId, id))
             return ResponseEntity.ok(response);
-        } catch (CommentNotFoundException ex) {
-            return addComment(request);
-        }
+        else
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/{id}")

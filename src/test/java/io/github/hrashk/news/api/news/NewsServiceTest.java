@@ -1,5 +1,6 @@
 package io.github.hrashk.news.api.news;
 
+import io.github.hrashk.news.api.exceptions.EntityNotFoundException;
 import io.github.hrashk.news.api.util.ServiceTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +67,7 @@ class NewsServiceTest extends ServiceTest {
     @Test
     void findByInvalidId() {
         assertThatThrownBy(() -> service.findById(-1L))
-                .isInstanceOf(NewsNotFoundException.class);
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
@@ -83,7 +84,7 @@ class NewsServiceTest extends ServiceTest {
         var n = seeder.news().get(1);
         n.setHeadline("asdf");
 
-        service.updateById(n.getId(), n);
+        service.updateOrAdd(n.getId(), n);
 
         assertThat(service.findById(n.getId())).hasFieldOrPropertyWithValue("headline", "asdf");
     }
@@ -98,6 +99,6 @@ class NewsServiceTest extends ServiceTest {
         service.deleteById(id);
 
         assertThatThrownBy(() -> service.findById(id))
-                .isInstanceOf(NewsNotFoundException.class);
+                .isInstanceOf(EntityNotFoundException.class);
     }
 }

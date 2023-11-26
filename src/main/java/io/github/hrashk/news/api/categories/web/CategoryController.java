@@ -1,7 +1,6 @@
 package io.github.hrashk.news.api.categories.web;
 
 import io.github.hrashk.news.api.categories.Category;
-import io.github.hrashk.news.api.categories.CategoryNotFoundException;
 import io.github.hrashk.news.api.categories.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping(value = "/api/v1/categories", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -46,16 +46,15 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id, @RequestBody @Valid UpsertCategoryRequest categoryRequest) {
-        try {
-            service.updateById(id, mapper.map(categoryRequest));
+    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id, @RequestBody @Valid UpsertCategoryRequest request) {
+        Long newId = service.updateOrAdd(id, mapper.map(request));
 
-            CategoryResponse response = mapper.map(service.findById(id));
+        CategoryResponse response = mapper.map(service.findById(newId));
 
+        if (Objects.equals(newId, id))
             return ResponseEntity.ok(response);
-        } catch (CategoryNotFoundException ex) {
-            return addCategory(categoryRequest);
-        }
+        else
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/{id}")

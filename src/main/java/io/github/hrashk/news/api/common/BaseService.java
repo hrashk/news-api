@@ -1,0 +1,43 @@
+package io.github.hrashk.news.api.common;
+
+import io.github.hrashk.news.api.exceptions.EntityNotFoundException;
+import io.github.hrashk.news.api.util.BeanCopyUtils;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public abstract class BaseService<E extends BaseEntity, R extends JpaRepository<E, Long>> implements CrudService<E, Long> {
+    protected final R repository;
+    protected final String entityName;
+
+    protected BaseService(R repository, String entityName) {
+        this.repository = repository;
+        this.entityName = entityName;
+    }
+
+    @Override
+    public E findById(Long id) throws EntityNotFoundException {
+        return repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(entityName, id));
+    }
+
+    @Override
+    public Long updateOrAdd(Long id, E entity) {
+        try {
+            var current = findById(id);
+            BeanCopyUtils.copyProperties(entity, current);
+
+            return repository.save(current).getId();
+        } catch (EntityNotFoundException ex) {
+            return add(entity);
+        }
+    }
+
+    @Override
+    public Long add(E entity) {
+        return repository.save(entity).getId();
+    }
+
+    @Override
+    public void deleteById(Long id) throws EntityNotFoundException {
+        repository.delete(findById(id));
+    }
+}

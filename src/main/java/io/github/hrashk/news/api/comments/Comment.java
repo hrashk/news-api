@@ -1,6 +1,7 @@
 package io.github.hrashk.news.api.comments;
 
 import io.github.hrashk.news.api.authors.Author;
+import io.github.hrashk.news.api.common.BaseEntity;
 import io.github.hrashk.news.api.news.News;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -20,7 +21,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
-public class Comment {
+public class Comment implements BaseEntity {
     @Id
     @GeneratedValue
     private Long id;

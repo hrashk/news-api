@@ -1,5 +1,6 @@
 package io.github.hrashk.news.api.categories;
 
+import io.github.hrashk.news.api.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +19,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
-public class Category {
+public class Category implements BaseEntity {
     @Id
     @GeneratedValue
     private Long id;

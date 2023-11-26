@@ -1,5 +1,7 @@
 package io.github.hrashk.news.api.categories;
 
+import io.github.hrashk.news.api.exceptions.EntityNotFoundException;
+import io.github.hrashk.news.api.news.NewsService;
 import io.github.hrashk.news.api.util.ServiceTest;
 import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.Test;
@@ -10,7 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@Import(CategoryService.class)
+@Import({CategoryService.class, NewsService.class})
 class CategoryServiceTest extends ServiceTest {
     @Autowired
     private CategoryService service;
@@ -36,7 +38,7 @@ class CategoryServiceTest extends ServiceTest {
     @Test
     void findByInvalidId() {
         assertThatThrownBy(() -> service.findById(-1L))
-                .isInstanceOf(CategoryNotFoundException.class);
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
@@ -51,7 +53,7 @@ class CategoryServiceTest extends ServiceTest {
         var category = seeder.categories().get(1);
         category.setName("asdf");
 
-        service.updateById(category.getId(), category);
+        service.updateOrAdd(category.getId(), category);
 
         assertThat(service.findById(category.getId())).hasFieldOrPropertyWithValue("name", "asdf");
     }
@@ -63,7 +65,7 @@ class CategoryServiceTest extends ServiceTest {
         service.deleteById(id);
 
         assertThatThrownBy(() -> service.findById(id))
-                .isInstanceOf(CategoryNotFoundException.class);
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test

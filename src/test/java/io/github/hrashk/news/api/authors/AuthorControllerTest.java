@@ -11,7 +11,6 @@ import org.springframework.http.MediaType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -74,7 +73,7 @@ class AuthorControllerTest extends ControllerTest {
 
     @Test
     void findByInvalidId() throws Exception {
-        when(authorService.findById(Mockito.anyLong())).thenThrow(new AuthorNotFoundException(1L));
+//        when(authorService.findById(Mockito.anyLong())).thenThrow(new AuthorNotFoundException(1L));
 
         mvc.perform(get(authorsUrl(-1L)))
                 .andExpectAll(
@@ -115,7 +114,7 @@ class AuthorControllerTest extends ControllerTest {
 
     @Test
     void updatingWithInvalidIdCreatesNewEntity() throws Exception {
-        when(authorService.findById(anyLong())).thenThrow(new AuthorNotFoundException(1L));
+//        when(authorService.findById(anyLong())).thenThrow(new AuthorNotFoundException(1L));
 
         mvc.perform(put(authorsUrl(-1L))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -142,7 +141,7 @@ class AuthorControllerTest extends ControllerTest {
 
     @Test
     void deletingByInvalidIdFails() throws Exception {
-        when(authorService.findById(Mockito.anyLong())).thenThrow(new AuthorNotFoundException(1L));
+//        when(authorService.findById(Mockito.anyLong())).thenThrow(new AuthorNotFoundException(1L));
 
         mvc.perform(delete(authorsUrl(-1L)))
                 .andExpectAll(

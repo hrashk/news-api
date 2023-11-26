@@ -3,6 +3,7 @@ package io.github.hrashk.news.api.news;
 import io.github.hrashk.news.api.authors.Author;
 import io.github.hrashk.news.api.categories.Category;
 import io.github.hrashk.news.api.comments.Comment;
+import io.github.hrashk.news.api.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -20,7 +21,7 @@ import java.util.Collection;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
-public class News {
+public class News implements BaseEntity {
     @Id
     @GeneratedValue
     private Long id;

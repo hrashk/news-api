@@ -1,5 +1,6 @@
 package io.github.hrashk.news.api.comments;
 
+import io.github.hrashk.news.api.exceptions.EntityNotFoundException;
 import io.github.hrashk.news.api.util.ServiceTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ class CommentServiceTest extends ServiceTest {
     @Test
     void findByInvalidId() {
         assertThatThrownBy(() -> service.findById(-1L))
-                .isInstanceOf(CommentNotFoundException.class);
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
@@ -44,7 +45,7 @@ class CommentServiceTest extends ServiceTest {
         var c = seeder.comments().get(1);
         c.setText("asdf");
 
-        service.updateById(c.getId(), c);
+        service.updateOrAdd(c.getId(), c);
 
         assertThat(service.findById(c.getId())).hasFieldOrPropertyWithValue("text", "asdf");
     }
@@ -56,6 +57,6 @@ class CommentServiceTest extends ServiceTest {
         service.deleteById(id);
 
         assertThatThrownBy(() -> service.findById(id))
-                .isInstanceOf(CommentNotFoundException.class);
+                .isInstanceOf(EntityNotFoundException.class);
     }
 }

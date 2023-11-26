@@ -1,6 +1,7 @@
 package io.github.hrashk.news.api.authors;
 
 import io.github.hrashk.news.api.comments.Comment;
+import io.github.hrashk.news.api.common.BaseEntity;
 import io.github.hrashk.news.api.news.News;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,7 +20,7 @@ import java.util.Collection;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
-public class Author {
+public class Author implements BaseEntity {
     @Id
     @GeneratedValue
     private Long id;

@@ -1,7 +1,6 @@
 package io.github.hrashk.news.api.authors.web;
 
 import io.github.hrashk.news.api.authors.Author;
-import io.github.hrashk.news.api.authors.AuthorNotFoundException;
 import io.github.hrashk.news.api.authors.AuthorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping(value = "/api/v1/authors", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -48,15 +48,14 @@ public class AuthorController {
 
     @PutMapping("/{id}")
     public ResponseEntity<AuthorResponse> updateAuthor(@PathVariable Long id, @RequestBody @Valid UpsertAuthorRequest authorRequest) {
-        try {
-            service.updateById(id, mapper.map(authorRequest));
+        Long newId = service.updateOrAdd(id, mapper.map(authorRequest));
 
-            AuthorResponse response = mapper.map(service.findById(id));
+        AuthorResponse response = mapper.map(service.findById(newId));
 
+        if (Objects.equals(newId, id))
             return ResponseEntity.ok(response);
-        } catch (AuthorNotFoundException ex) {
-            return addAuthor(authorRequest);
-        }
+        else
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/{id}")
