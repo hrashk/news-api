@@ -28,6 +28,7 @@ class AuthorServiceTest extends ServiceTest {
     @Test
     void add() {
         Long id = service.add(seeder.aRandomAuthor(-1L));
+        seeder.flush();
 
         assertThat(id).as("Author id").isNotNull();
     }
@@ -38,6 +39,7 @@ class AuthorServiceTest extends ServiceTest {
         author.setFirstName("asdf");
 
         service.updateOrAdd(author.getId(), author);
+        seeder.flush();
 
         assertThat(service.findById(author.getId())).hasFieldOrPropertyWithValue("firstName", "asdf");
     }
@@ -63,6 +65,7 @@ class AuthorServiceTest extends ServiceTest {
         Long id = author.getId();
 
         service.deleteById(id);
+        seeder.flush();
 
         assertThatThrownBy(() -> service.findById(id))
                 .isInstanceOf(EntityNotFoundException.class);
@@ -74,6 +77,7 @@ class AuthorServiceTest extends ServiceTest {
         Long id = author.getId();
 
         service.deleteById(id);
+        seeder.flush();
 
         assertThatThrownBy(() -> service.findById(id))
                 .isInstanceOf(EntityNotFoundException.class);

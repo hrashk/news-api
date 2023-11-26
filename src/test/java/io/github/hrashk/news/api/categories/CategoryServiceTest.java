@@ -44,6 +44,7 @@ class CategoryServiceTest extends ServiceTest {
     @Test
     void add() {
         Long id = service.add(seeder.aRandomCategory(-1L));
+        seeder.flush();
 
         assertThat(id).as("Category id").isNotNull();
     }
@@ -54,6 +55,7 @@ class CategoryServiceTest extends ServiceTest {
         category.setName("asdf");
 
         service.updateOrAdd(category.getId(), category);
+        seeder.flush();
 
         assertThat(service.findById(category.getId())).hasFieldOrPropertyWithValue("name", "asdf");
     }
@@ -63,6 +65,7 @@ class CategoryServiceTest extends ServiceTest {
         Long id = service.add(seeder.aRandomCategory(-1L));
 
         service.deleteById(id);
+        seeder.flush();
 
         assertThatThrownBy(() -> service.findById(id))
                 .isInstanceOf(EntityNotFoundException.class);

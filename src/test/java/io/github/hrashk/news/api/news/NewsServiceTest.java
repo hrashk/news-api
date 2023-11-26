@@ -75,6 +75,7 @@ class NewsServiceTest extends ServiceTest {
         var n = seeder.aRandomNews(-1L);
 
         Long id = service.add(n);
+        seeder.flush();
 
         assertThat(id).as("News id").isGreaterThan(0L);
     }
@@ -85,6 +86,7 @@ class NewsServiceTest extends ServiceTest {
         n.setHeadline("asdf");
 
         service.updateOrAdd(n.getId(), n);
+        seeder.flush();
 
         assertThat(service.findById(n.getId())).hasFieldOrPropertyWithValue("headline", "asdf");
     }
@@ -97,6 +99,7 @@ class NewsServiceTest extends ServiceTest {
         Long id = news.getId();
 
         service.deleteById(id);
+        seeder.flush();
 
         assertThatThrownBy(() -> service.findById(id))
                 .isInstanceOf(EntityNotFoundException.class);

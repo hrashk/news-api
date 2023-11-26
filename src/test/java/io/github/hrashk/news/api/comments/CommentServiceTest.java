@@ -36,6 +36,7 @@ class CommentServiceTest extends ServiceTest {
     @Test
     void add() {
         Long id = service.add(seeder.aRandomComment(-1L));
+        seeder.flush();
 
         assertThat(id).as("Comment id").isNotNull();
     }
@@ -46,6 +47,7 @@ class CommentServiceTest extends ServiceTest {
         c.setText("asdf");
 
         service.updateOrAdd(c.getId(), c);
+        seeder.flush();
 
         assertThat(service.findById(c.getId())).hasFieldOrPropertyWithValue("text", "asdf");
     }
@@ -55,6 +57,7 @@ class CommentServiceTest extends ServiceTest {
         Long id = seeder.comments().get(0).getId();
 
         service.deleteById(id);
+        seeder.flush();
 
         assertThatThrownBy(() -> service.findById(id))
                 .isInstanceOf(EntityNotFoundException.class);
