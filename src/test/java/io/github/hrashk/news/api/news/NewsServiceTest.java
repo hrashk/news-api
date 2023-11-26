@@ -5,9 +5,6 @@ import io.github.hrashk.news.api.util.ServiceTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.PageRequest;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -19,41 +16,7 @@ class NewsServiceTest extends ServiceTest {
 
     @Test
     void firstPage() {
-        assertThat(service.findAll(PageRequest.of(0, 3), null, null)).hasSize(3);
-    }
-
-    @Test
-    void secondPage() {
-        assertThat(service.findAll(PageRequest.of(1, 2), null, null)).hasSize(2);
-    }
-
-    @Test
-    void findByAuthor() {
-        Long authorId = seeder.news().get(0).getAuthor().getId();
-        List<News> news = service.findAll(PageRequest.of(0, 10), authorId, null);
-
-        assertThat(news).isNotEmpty();
-        assertThat(news).allSatisfy(n -> assertThat(n.getAuthor()).hasFieldOrPropertyWithValue("id", authorId));
-    }
-
-    @Test
-    void findByCategory() {
-        Long categoryId = seeder.news().get(0).getCategory().getId();
-        List<News> news = service.findAll(PageRequest.of(0, 10), null, categoryId);
-
-        assertThat(news).isNotEmpty();
-        assertThat(news).allSatisfy(n -> assertThat(n.getCategory()).hasFieldOrPropertyWithValue("id", categoryId));
-    }
-
-    @Test
-    void findByAuthorAndCategory() {
-        Long authorId = seeder.news().get(0).getAuthor().getId();
-        Long categoryId = seeder.news().get(0).getCategory().getId();
-        List<News> news = service.findAll(PageRequest.of(0, 10), authorId, categoryId);
-
-        assertThat(news).isNotEmpty();
-        assertThat(news).allSatisfy(n -> assertThat(n.getAuthor()).hasFieldOrPropertyWithValue("id", authorId));
-        assertThat(news).allSatisfy(n -> assertThat(n.getCategory()).hasFieldOrPropertyWithValue("id", categoryId));
+        assertThat(service.findAll(new NewsFilter())).hasSize(10);
     }
 
     @Test

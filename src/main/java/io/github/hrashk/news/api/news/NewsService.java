@@ -3,13 +3,9 @@ package io.github.hrashk.news.api.news;
 import io.github.hrashk.news.api.aspects.SameAuthor;
 import io.github.hrashk.news.api.common.BaseService;
 import io.github.hrashk.news.api.exceptions.EntityNotFoundException;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
-import static io.github.hrashk.news.api.news.NewsSpecifications.hasAuthor;
-import static io.github.hrashk.news.api.news.NewsSpecifications.hasCategory;
 
 @Service
 public class NewsService extends BaseService<News, NewsRepository> {
@@ -17,8 +13,8 @@ public class NewsService extends BaseService<News, NewsRepository> {
         super(repository, "News");
     }
 
-    public List<News> findAll(Pageable pageable, Long authorId, Long categoryId) {
-        return repository.findAll(hasCategory(categoryId).and(hasAuthor(authorId)), pageable).getContent();
+    public List<News> findAll(NewsFilter filter) {
+        return repository.findAll(NewsSpecifications.fromFilter(filter), filter.pageable()).getContent();
     }
 
     @SameAuthor

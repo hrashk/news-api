@@ -10,4 +10,9 @@ public final class NewsSpecifications {
     public static Specification<News> hasAuthor(Long id) {
         return (root, query, builder) -> id == null ? null : builder.equal(root.join("author").get("id"), id);
     }
+
+    public static Specification<News> fromFilter(NewsFilter filter) {
+        return Specification.where(hasAuthor(filter.getAuthorId()))
+                .and(hasCategory(filter.getCategoryId()));
+    }
 }
