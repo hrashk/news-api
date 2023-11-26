@@ -1,6 +1,5 @@
 package io.github.hrashk.news.api.exceptions;
 
-import io.github.hrashk.news.api.aspects.InvalidUserException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ValidationException;
 import org.springframework.http.HttpStatus;

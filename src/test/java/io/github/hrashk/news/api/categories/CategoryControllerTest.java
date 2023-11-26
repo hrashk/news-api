@@ -1,157 +1,152 @@
 package io.github.hrashk.news.api.categories;
 
+import io.github.hrashk.news.api.categories.web.CategoryListResponse;
+import io.github.hrashk.news.api.categories.web.CategoryResponse;
+import io.github.hrashk.news.api.categories.web.UpsertCategoryRequest;
+import io.github.hrashk.news.api.exceptions.ErrorInfo;
 import io.github.hrashk.news.api.util.ControllerTest;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
-@Import(CategoryJsonSamples.class)
 class CategoryControllerTest extends ControllerTest {
-    @Autowired
-    private CategoryJsonSamples json;
 
-    public String categoriesUrl() {
-        return "/api/v1/categories";
-    }
+    private static final String CATEGORIES_URL = "/api/v1/categories";
+    private static final String CATEGORIES_ID_URL = CATEGORIES_URL + "/{id}";
 
-    public String categoriesUrl(Long id) {
-        return categoriesUrl() + "/" + id;
+    @Test
+    void firstPage() {
+        ResponseEntity<CategoryListResponse> response = rest.getForEntity(CATEGORIES_URL, CategoryListResponse.class);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody().categories()).hasSize(10),
+                () -> assertThat(response.getBody().categories()).allSatisfy(c -> assertThat(c).hasNoNullFieldsOrProperties())
+        );
     }
 
     @Test
-    void getFirstPageOfCategories() throws Exception {
-        when(categoryService.findAll(Mockito.any(Pageable.class))).thenReturn(samples.twoCategories());
+    void secondPage() {
+        ResponseEntity<CategoryListResponse> response = rest.getForEntity(CATEGORIES_URL + "?page=1&size=3", CategoryListResponse.class);
 
-        mvc.perform(get(categoriesUrl()))
-                .andExpectAll(
-                        status().isOk(),
-                        content().json(json.findAllResponse(), true)
-                );
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody().categories()).hasSize(3),
+                () -> assertThat(response.getBody().categories()).allSatisfy(c -> assertThat(c).hasNoNullFieldsOrProperties())
+        );
     }
 
     @Test
-    void getSecondPageOfCategories() throws Exception {
-        when(categoryService.findAll(Mockito.any(Pageable.class))).thenReturn(samples.twoCategories());
+    void findById() {
+        Long categoryId = seeder.categories().get(0).getId();
 
-        mvc.perform(get(categoriesUrl()).param("page", "1").param("size", "7"))
-                .andExpectAll(
-                        status().isOk(),
-                        content().json(json.findAllResponse(), true)
-                );
+        ResponseEntity<CategoryResponse> response = rest.getForEntity(CATEGORIES_ID_URL, CategoryResponse.class, categoryId);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties(),
+                () -> assertThat(response.getBody().id()).isEqualTo(categoryId)
+        );
     }
 
     @Test
-    void findByValidId() throws Exception {
-        when(categoryService.findById(Mockito.anyLong())).thenReturn(samples.sciFi());
+    void findMissing() {
+        Long categoryId = INVALID_ID;
 
-        mvc.perform(get(categoriesUrl(8L)))
-                .andExpectAll(
-                        status().isOk(),
-                        content().json(json.upsertResponse(), true)
-                );
+        ResponseEntity<ErrorInfo> response = rest.getForEntity(CATEGORIES_ID_URL, ErrorInfo.class, categoryId);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
+                () -> assertThat(response.getBody().message()).contains("Category")
+        );
     }
 
     @Test
-    void findByInvalidId() throws Exception {
-//        when(categoryService.findById(Mockito.anyLong()))
-//                .thenThrow(new CategoryNotFoundException(1L));
+    void addThenDelete() {
+        var request = new UpsertCategoryRequest("lorem");
 
-        mvc.perform(get(categoriesUrl(7L)))
-                .andExpectAll(
-                        status().isNotFound(),
-                        jsonPath("message").value(containsString("Category"))
-                );
+        ResponseEntity<CategoryResponse> response = rest.postForEntity(CATEGORIES_URL, request, CategoryResponse.class);
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED),
+                () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties(),
+                () -> assertThat(response.getBody().name()).isEqualTo("lorem")
+        );
+
+        Long id = response.getBody().id();
+        ResponseEntity<Void> deleteResponse = delete(CATEGORIES_ID_URL, id);
+        assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+        ResponseEntity<ErrorInfo> findResponse = rest.getForEntity(CATEGORIES_ID_URL, ErrorInfo.class, id);
+        assertAll(
+                () -> assertThat(findResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
+                () -> assertThat(findResponse.getBody().message()).contains("Category")
+        );
     }
 
     @Test
-    void addCategory() throws Exception {
-        mvc.perform(post(categoriesUrl())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json.upsertRequest()))
-                .andExpectAll(
-                        status().isCreated(),
-                        content().json(json.upsertResponse(), true)
-                );
+    void addBroken() {
+        var request = new UpsertCategoryRequest("  ");
 
-//        Mockito.verify(categoryService).addOrReplace(Mockito.assertArg(c ->
-//                assertThat(c).hasFieldOrPropertyWithValue("id", null)
-//        ));
+        ResponseEntity<ErrorInfo> response = rest.postForEntity(CATEGORIES_URL, request, ErrorInfo.class);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST),
+                () -> assertThat(response.getBody().message()).contains("name")
+        );
     }
 
     @Test
-    void updateCategory() throws Exception {
-        mvc.perform(put(categoriesUrl(8L))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json.upsertRequest()))
-                .andExpectAll(
-                        status().isOk(),
-                        content().json(json.upsertResponse(), true)
-                );
+    void update() {
+        Long categoryId = seeder.categories().get(0).getId();
+        var request = new UpsertCategoryRequest("lorem");
 
-//        Mockito.verify(categoryService).addOrReplace(Mockito.assertArg(c ->
-//                assertThat(c).hasFieldOrPropertyWithValue("id", 8L)
-//        ));
+        ResponseEntity<CategoryResponse> response = put(CATEGORIES_ID_URL, request, CategoryResponse.class, categoryId);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties(),
+                () -> assertThat(response.getBody().name()).isEqualTo("lorem")
+        );
     }
 
     @Test
-    void updateWithInvalidIdCreatesNewEntity() throws Exception {
-//        when(categoryService.findById(Mockito.anyLong()))
-//                .thenThrow(new CategoryNotFoundException(1L));
+    void updateMissing() {
+        Long categoryId = INVALID_ID;
+        var request = new UpsertCategoryRequest("lorem");
 
-        mvc.perform(put(categoriesUrl(7L))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json.upsertRequest()))
-                .andExpectAll(
-                        status().isCreated(),
-                        content().json(json.upsertResponse(), true)
-                );
+        ResponseEntity<CategoryResponse> response = put(CATEGORIES_ID_URL, request, CategoryResponse.class, categoryId);
 
-//        Mockito.verify(categoryService).addOrReplace(Mockito.assertArg(c ->
-//                assertThat(c).hasFieldOrPropertyWithValue("id", null)
-//        ));
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED),
+                () -> assertThat(response.getBody().name()).isEqualTo("lorem"),
+                () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties()
+        );
     }
 
     @Test
-    void delete() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.delete(categoriesUrl(7L)))
-                .andExpectAll(
-                        status().isNoContent()
-                );
+    void deleteWithNews() {
+        Long categoryId = seeder.news().get(0).getCategory().getId();
 
-//        Mockito.verify(categoryService).delete(Mockito.assertArg(c ->
-//                assertThat(c).hasFieldOrPropertyWithValue("id", 7L)
-//        ));
+        ResponseEntity<ErrorInfo> response = delete(CATEGORIES_ID_URL, ErrorInfo.class, categoryId);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST),
+                () -> assertThat(response.getBody().message()).contains("Cannot")
+        );
     }
 
     @Test
-    void deleteWithNews() throws Exception {
-//        Mockito.doThrow(new ValidationException("asdf")).when(categoryService).delete(Mockito.any(Category.class));
+    void deleteMissing() {
+        Long categoryId = INVALID_ID;
 
-        mvc.perform(MockMvcRequestBuilders.delete(categoriesUrl(7L)))
-                .andExpectAll(
-                        status().isBadRequest(),
-                        jsonPath("message").isNotEmpty()
-                );
-    }
+        ResponseEntity<ErrorInfo> response = delete(CATEGORIES_ID_URL, ErrorInfo.class, categoryId);
 
-    @Test
-    void deleteMissingCategory() throws Exception {
-//        when(categoryService.findById(Mockito.anyLong()))
-//                .thenThrow(new CategoryNotFoundException(7L));
-
-        mvc.perform(MockMvcRequestBuilders.delete(categoriesUrl(7L)))
-                .andExpectAll(
-                        status().isNotFound(),
-                        jsonPath("message").value(containsString("Category"))
-                );
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
+                () -> assertThat(response.getBody().message()).contains("Category")
+        );
     }
 }

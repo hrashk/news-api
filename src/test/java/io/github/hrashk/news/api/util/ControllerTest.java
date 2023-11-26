@@ -1,93 +1,42 @@
 package io.github.hrashk.news.api.util;
 
-import io.github.hrashk.news.api.authors.Author;
-import io.github.hrashk.news.api.authors.AuthorService;
-import io.github.hrashk.news.api.categories.Category;
-import io.github.hrashk.news.api.categories.CategoryService;
-import io.github.hrashk.news.api.comments.Comment;
-import io.github.hrashk.news.api.comments.CommentService;
-import io.github.hrashk.news.api.news.News;
-import io.github.hrashk.news.api.news.NewsService;
 import org.junit.jupiter.api.BeforeEach;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.http.*;
+import org.springframework.test.context.ContextConfiguration;
 
-/**
- * Loading all controllers to catch any routing conflicts
- */
-@WebMvcTest
-@Import({MapperBeans.class, EntitySamples.class})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ContextConfiguration(initializers = PostgreSQLInitializer.class)
+@Import(DataSeeder.class)
 public abstract class ControllerTest {
+    protected static final Long INVALID_ID = 111222333L;
     @Autowired
-    protected MockMvc mvc;
+    protected TestRestTemplate rest;
     @Autowired
-    protected EntitySamples samples;
-    @MockBean
-    protected NewsService newsService;
-    @MockBean
-    protected AuthorService authorService;
-    @MockBean
-    protected CategoryService categoryService;
-    @MockBean
-    protected CommentService commentService;
+    protected DataSeeder seeder;
 
     @BeforeEach
-    public void stubAuthorService() {
-        Mockito.when(authorService.findById(Mockito.anyLong()))
-                .thenAnswer(args -> new Author().toBuilder().id(args.getArgument(0)).build());
-
-//        Mockito.when(authorService.addOrReplace(Mockito.any(Author.class)))
-//                .thenAnswer(args -> {
-//                    Author a = args.getArgument(0);
-//                    return a.toBuilder()
-//                            .id(a.getId() == null ? 21L : a.getId())
-//                            .build();
-//                });
+    void injectSampleData() {
+        seeder.seed(10);
     }
 
-    @BeforeEach
-    public void stubCategoryService() {
-        Mockito.when(categoryService.findById(Mockito.anyLong()))
-                .thenAnswer(args -> new Category().toBuilder().id(args.getArgument(0)).build());
+    public <T> ResponseEntity<T> put(String url, Object request, Class<T> responseType, Object... urlVariables) {
+        var headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
-//        Mockito.when(categoryService.addOrReplace(Mockito.any(Category.class)))
-//                .thenAnswer(args -> {
-//                    Category c = args.getArgument(0);
-//                    return c.toBuilder()
-//                            .id(c.getId() == null ? 8L : c.getId())
-//                            .build();
-//                });
+        return rest.exchange(url, HttpMethod.PUT, new HttpEntity<>(request, headers), responseType, urlVariables);
     }
 
-    @BeforeEach
-    public void stubNewsService() {
-        Mockito.when(newsService.findById(Mockito.anyLong()))
-                .thenAnswer(args -> new News().toBuilder().id(args.getArgument(0)).build());
-
-//        Mockito.when(newsService.addOrReplace(Mockito.any(News.class)))
-//                .thenAnswer(args -> {
-//                    News n = args.getArgument(0);
-//                    return n.toBuilder()
-//                            .id(n.getId() == null ? 1L : n.getId())
-//                            .build();
-//                });
+    public <T> ResponseEntity<T> delete(String url, Class<T> responseType, Object... urlVariables) {
+        return rest.exchange(url, HttpMethod.DELETE, HttpEntity.EMPTY, responseType, urlVariables);
     }
 
-    @BeforeEach
-    public void stubCommentService() {
-        Mockito.when(commentService.findById(Mockito.anyLong()))
-                .thenAnswer(args -> new Comment().toBuilder().id(args.getArgument(0)).build());
-
-//        Mockito.when(commentService.addOrReplace(Mockito.any(Comment.class)))
-//                .thenAnswer(args -> {
-//                    Comment c = args.getArgument(0);
-//                    return c.toBuilder()
-//                            .id(c.getId() == null ? 3L : c.getId())
-//                            .build();
-//                });
+    public ResponseEntity<Void> delete(String url, Object... urlVariables) {
+        return delete(url, Void.class, urlVariables);
     }
 }
