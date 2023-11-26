@@ -2,6 +2,7 @@ package io.github.hrashk.news.api.common;
 
 import io.github.hrashk.news.api.exceptions.EntityNotFoundException;
 import io.github.hrashk.news.api.util.BeanCopyUtils;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public abstract class BaseService<E extends BaseEntity, R extends JpaRepository<E, Long>> implements CrudService<E, Long> {
@@ -20,6 +21,7 @@ public abstract class BaseService<E extends BaseEntity, R extends JpaRepository<
     }
 
     @Override
+    @Transactional
     public Long updateOrAdd(Long id, E entity) {
         try {
             var current = findById(id);
@@ -32,11 +34,13 @@ public abstract class BaseService<E extends BaseEntity, R extends JpaRepository<
     }
 
     @Override
+    @Transactional
     public Long add(E entity) {
         return repository.save(entity).getId();
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) throws EntityNotFoundException {
         repository.delete(findById(id));
     }
