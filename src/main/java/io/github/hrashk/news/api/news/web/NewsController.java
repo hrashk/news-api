@@ -3,6 +3,9 @@ package io.github.hrashk.news.api.news.web;
 import io.github.hrashk.news.api.news.News;
 import io.github.hrashk.news.api.news.NewsFilter;
 import io.github.hrashk.news.api.news.NewsService;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -44,6 +47,8 @@ public class NewsController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Parameter(in = ParameterIn.QUERY, name = "userId", schema = @Schema(type = "integer"), required = true,
+            description = "the operation is forbidden unless coincides with the authorId of the news")
     @PutMapping("/{id}")
     public ResponseEntity<NewsResponse> updateNews(@PathVariable Long id, @RequestBody @Valid UpsertNewsRequest request) {
         Long newId = service.updateOrAdd(id, mapper.map(request));
@@ -56,6 +61,8 @@ public class NewsController {
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Parameter(in = ParameterIn.QUERY, name = "userId", schema = @Schema(type = "integer"), required = true,
+            description = "the operation is forbidden unless coincides with the authorId of the news")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNews(@PathVariable Long id) {
         service.deleteById(id);
