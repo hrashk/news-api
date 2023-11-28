@@ -1,216 +1,272 @@
 package io.github.hrashk.news.api.news;
 
-import io.github.hrashk.news.api.authors.AuthorNotFoundException;
-import io.github.hrashk.news.api.categories.CategoryNotFoundException;
+import io.github.hrashk.news.api.comments.Comment;
+import io.github.hrashk.news.api.exceptions.ErrorInfo;
+import io.github.hrashk.news.api.news.web.NewsListResponse;
+import io.github.hrashk.news.api.news.web.NewsResponse;
+import io.github.hrashk.news.api.news.web.UpsertNewsRequest;
 import io.github.hrashk.news.api.util.ControllerTest;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.MediaType;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
-@Import({NewsJsonSamples.class})
 class NewsControllerTest extends ControllerTest {
-    @Autowired
-    private NewsJsonSamples json;
-    
-    public String newsUrl() {
-        return "/api/v1/news";
-    }
-    
-    public String newsUrl(Long id) {
-        return newsUrl() + "/" + id;
+    private static final String NEWS_URL = "/api/v1/news";
+    private static final String NEWS_ID_URL = NEWS_URL + "/{id}";
+    private static final String NEWS_WITH_USER_URL = NEWS_ID_URL + "?userId={userId}";
+
+    @Test
+    void firstPage() {
+        ResponseEntity<NewsListResponse> response = rest.getForEntity(NEWS_URL, NewsListResponse.class);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody().news()).hasSize(10),
+                () -> assertThat(response.getBody().news()).allSatisfy(n -> assertThat(n).hasNoNullFieldsOrProperties())
+        );
     }
 
     @Test
-    void firstPageOfNews() throws Exception {
-        when(newsService.findAll(Mockito.any(Pageable.class), Mockito.any(), Mockito.any())).thenReturn(samples.twoNews());
+    void secondPage() {
+        ResponseEntity<NewsListResponse> response = rest.getForEntity(NEWS_URL + "?page=1&size=3", NewsListResponse.class);
 
-        mvc.perform(get(newsUrl()))
-                .andExpectAll(
-                        status().isOk(),
-                        content().json(json.findAllResponse(), true)
-                );
-
-        Mockito.verify(newsService).findAll(Mockito.assertArg(p -> Assertions.assertAll(
-                () -> assertThat(p.getPageNumber()).isEqualTo(0),
-                () -> assertThat(p.getPageSize()).isEqualTo(10)
-        )), Mockito.any(), Mockito.any());
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody().news()).hasSize(3),
+                () -> assertThat(response.getBody().news()).allSatisfy(n -> assertThat(n).hasNoNullFieldsOrProperties())
+        );
     }
 
     @Test
-    void secondPageOfNews() throws Exception {
-        when(newsService.findAll(Mockito.any(Pageable.class), Mockito.any(), Mockito.any())).thenReturn(samples.twoNews());
+    void findByAuthorAndCategory() {
+        News news = seeder.news().get(0);
+        Long authorId = news.getAuthor().getId();
+        Long categoryId = news.getCategory().getId();
 
-        mvc.perform(get(newsUrl()).param("page", "1").param("size", "7"))
-                .andExpectAll(
-                        status().isOk(),
-                        content().json(json.findAllResponse(), true)
-                );
+        ResponseEntity<NewsListResponse> entity = rest.getForEntity(NEWS_URL + "?authorId={aid}&categoryId={cid}",
+                NewsListResponse.class, authorId, categoryId);
 
-        Mockito.verify(newsService).findAll(Mockito.assertArg(p -> Assertions.assertAll(
-                () -> assertThat(p.getPageNumber()).isEqualTo(1),
-                () -> assertThat(p.getPageSize()).isEqualTo(7)
-        )), Mockito.any(), Mockito.any());
+        assertAll(
+                () -> assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(entity.getBody().news()).isNotEmpty(),
+                () -> assertThat(entity.getBody().news()).allSatisfy(n -> assertAll(
+                        () -> assertThat(n).hasFieldOrPropertyWithValue("authorId", authorId),
+                        () -> assertThat(n).hasFieldOrPropertyWithValue("categoryId", categoryId))
+                )
+        );
     }
 
     @Test
-    void findByValidId() throws Exception {
-        Mockito.when(newsService.findById(Mockito.anyLong()))
-                .thenReturn(samples.greatNews());
+    void findByAuthor() {
+        Long authorId = seeder.news().get(0).getAuthor().getId();
 
-        mvc.perform(get(newsUrl(1L)))
-                .andExpectAll(
-                        status().isOk(),
-                        content().json(json.updateResponse(), true)
-                );
+        ResponseEntity<NewsListResponse> entity = rest.getForEntity(NEWS_URL + "?authorId={aid}",
+                NewsListResponse.class, authorId);
+
+        assertAll(
+                () -> assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(entity.getBody().news()).isNotEmpty(),
+                () -> assertThat(entity.getBody().news()).allSatisfy(n ->
+                        assertThat(n).hasFieldOrPropertyWithValue("authorId", authorId))
+        );
     }
 
     @Test
-    void findingByInvalidIdFails() throws Exception {
-        Mockito.when(newsService.findById(Mockito.anyLong()))
-                .thenThrow(new NewsNotFoundException(1L));
+    void findByCategory() {
+        Long categoryId = seeder.news().get(0).getCategory().getId();
 
-        mvc.perform(get(newsUrl(-1L)))
-                .andExpectAll(
-                        status().isNotFound(),
-                        jsonPath("message").value(containsString("News"))
-                );
+        ResponseEntity<NewsListResponse> entity = rest.getForEntity(NEWS_URL + "?categoryId={cid}",
+                NewsListResponse.class, categoryId);
+
+        assertAll(
+                () -> assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(entity.getBody().news()).isNotEmpty(),
+                () -> assertThat(entity.getBody().news()).allSatisfy(n ->
+                        assertThat(n).hasFieldOrPropertyWithValue("categoryId", categoryId))
+        );
     }
 
     @Test
-    void addNews() throws Exception {
-        mvc.perform(post(newsUrl())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json.insertRequest()))
-                .andExpectAll(
-                        status().isCreated(),
-                        content().json(json.insertResponse(), true)
-                );
+    void findById() {
+        Comment comment = seeder.comments().get(0);
+        Long newsId = comment.getNews().getId();
 
-        Mockito.verify(newsService).addOrReplace(Mockito.assertArg(n ->
-                assertThat(n).hasFieldOrPropertyWithValue("id",null)
-        ));
+        ResponseEntity<NewsResponse> response = rest.getForEntity(NEWS_ID_URL, NewsResponse.class, newsId);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties(),
+                () -> assertThat(response.getBody().id()).isEqualTo(newsId),
+                () -> assertThat(response.getBody().comments()).anySatisfy(c ->
+                        assertThat(c.id()).isEqualTo(comment.getId()))
+        );
     }
 
     @Test
-    void addingWithInvalidAuthorIdFails() throws Exception {
-        Mockito.when(authorService.findById(Mockito.anyLong()))
-                .thenThrow(new AuthorNotFoundException(1L));
+    void findMissing() {
+        Long newsId = INVALID_ID;
 
-        mvc.perform(post(newsUrl())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json.updateRequest()))
-                .andExpectAll(
-                        status().isNotFound(),
-                        jsonPath("message").value(containsString("Author"))
-                );
+        ResponseEntity<ErrorInfo> response = rest.getForEntity(NEWS_ID_URL, ErrorInfo.class, newsId);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
+                () -> assertThat(response.getBody().message()).contains("News")
+        );
     }
 
     @Test
-    void addingWithInvalidCategoryIdFails() throws Exception {
-        Mockito.when(categoryService.findById(Mockito.anyLong()))
-                .thenThrow(new CategoryNotFoundException(1L));
+    void add() {
+        Long authorId = seeder.authors().get(3).getId();
+        Long categoryId = seeder.categories().get(4).getId();
+        UpsertNewsRequest request = new UpsertNewsRequest(authorId, categoryId, "h", "c");
 
-        mvc.perform(put(newsUrl(1L))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json.updateRequest()))
-                .andExpectAll(
-                        status().isNotFound(),
-                        jsonPath("message").value(containsString("Category"))
-                );
+        ResponseEntity<NewsResponse> response = rest.postForEntity(NEWS_URL, request, NewsResponse.class);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED),
+                () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties(),
+                () -> assertThat(response.getBody().headline()).isEqualTo("h"),
+                () -> assertThat(response.getBody().content()).isEqualTo("c")
+        );
     }
 
     @Test
-    void updateNews() throws Exception {
-        Mockito.when(newsService.addOrReplace(Mockito.any(News.class)))
-                .thenReturn(samples.greatNews());
+    void addWithInvalidAuthorId() {
+        Long authorId = INVALID_ID;
+        Long categoryId = seeder.categories().get(4).getId();
+        UpsertNewsRequest request = new UpsertNewsRequest(authorId, categoryId, "h", "c");
 
-        mvc.perform(put(newsUrl(1L))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json.updateRequest()))
-                .andExpectAll(
-                        status().isOk(),
-                        content().json(json.updateResponse(), true)
-                );
+        ResponseEntity<ErrorInfo> response = rest.postForEntity(NEWS_URL, request, ErrorInfo.class);
 
-        Mockito.verify(newsService).addOrReplace(Mockito.assertArg(n ->
-                assertThat(n).hasFieldOrPropertyWithValue("id",1L)
-        ));
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
+                () -> assertThat(response.getBody().message()).contains("Author")
+        );
     }
 
     @Test
-    void updateMissingNews() throws Exception {
-        Mockito.when(newsService.findById(Mockito.anyLong()))
-                .thenThrow(new NewsNotFoundException(1L));
+    void addiWithInvalidCategoryId() {
+        Long authorId = seeder.authors().get(3).getId();
+        Long categoryId = INVALID_ID;
+        UpsertNewsRequest request = new UpsertNewsRequest(authorId, categoryId, "h", "c");
 
-        mvc.perform(put(newsUrl(-1L))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json.insertRequest()))
-                .andExpectAll(
-                        status().isCreated(),
-                        content().json(json.insertResponse(), true)
-                );
+        ResponseEntity<ErrorInfo> response = rest.postForEntity(NEWS_URL, request, ErrorInfo.class);
 
-        Mockito.verify(newsService).addOrReplace(Mockito.assertArg(n ->
-                assertThat(n).hasFieldOrPropertyWithValue("id",null)
-        ));
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
+                () -> assertThat(response.getBody().message()).contains("Category")
+        );
     }
 
     @Test
-    void updatingWithInvalidAuthorIdFails() throws Exception {
-        Mockito.when(authorService.findById(Mockito.anyLong()))
-                .thenThrow(new AuthorNotFoundException(1L));
+    void addBroken() {
+        UpsertNewsRequest request = new UpsertNewsRequest(null, null, " ", null);
 
-        mvc.perform(put(newsUrl(1L))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json.updateRequest()))
-                .andExpectAll(
-                        status().isNotFound(),
-                        jsonPath("message").value(containsString("Author"))
-                );
+        ResponseEntity<ErrorInfo> response = rest.postForEntity(NEWS_URL, request, ErrorInfo.class);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST),
+                () -> assertThat(response.getBody().message()).contains("authorId", "categoryId", "headline", "content")
+        );
     }
 
     @Test
-    void updatingWithInvalidCategoryIdFails() throws Exception {
-        Mockito.when(categoryService.findById(Mockito.anyLong()))
-                .thenThrow(new CategoryNotFoundException(1L));
+    void update() {
+        var news = seeder.news().get(0);
+        Long authorId = news.getAuthor().getId();
+        Long categoryId = news.getCategory().getId();
+        UpsertNewsRequest request = new UpsertNewsRequest(authorId, categoryId, "asdf", news.getContent());
 
-        mvc.perform(put(newsUrl(1L))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json.updateRequest()))
-                .andExpectAll(
-                        status().isNotFound(),
-                        jsonPath("message").value(containsString("Category"))
-                );
+        Long newsId = news.getId();
+        Long userId = authorId;
+        ResponseEntity<NewsResponse> response = put(NEWS_WITH_USER_URL, request, NewsResponse.class, newsId, userId);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody().headline()).isEqualTo("asdf"),
+                () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties()
+        );
     }
 
     @Test
-    void deleteByValidId() throws Exception {
-        mvc.perform(delete(newsUrl(1L)))
-                .andExpectAll(
-                        status().isNoContent()
-                );
+    void updateMissing() {
+        Long authorId = seeder.authors().get(3).getId();
+        Long categoryId = seeder.categories().get(4).getId();
+        UpsertNewsRequest request = new UpsertNewsRequest(authorId, categoryId, "h", "c");
 
-        Mockito.verify(newsService).delete(Mockito.assertArg(n ->
-                assertThat(n).hasFieldOrPropertyWithValue("id", 1L)));
+        Long newsId = INVALID_ID;
+        Long userId = authorId;
+        ResponseEntity<NewsResponse> response = put(NEWS_WITH_USER_URL, request, NewsResponse.class, newsId, userId);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED),
+                () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties()
+        );
+    }
+
+    @ParameterizedTest
+    @CsvSource({NEWS_ID_URL, NEWS_WITH_USER_URL})
+    void updateWithInvalidUser(String url) {
+        var news = seeder.news().get(0);
+        Long authorId = news.getAuthor().getId();
+        Long categoryId = news.getCategory().getId();
+        UpsertNewsRequest request = new UpsertNewsRequest(authorId, categoryId, "asdf", news.getContent());
+
+        Long newsId = news.getId();
+        Long userId = INVALID_ID;
+        ResponseEntity<ErrorInfo> response = put(url, request, ErrorInfo.class, newsId, userId);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN),
+                () -> assertThat(response.getBody().message()).contains("not allowed")
+        );
     }
 
     @Test
-    void deletingByInvalidIdFails() throws Exception {
-        Mockito.when(newsService.findById(Mockito.anyLong())).thenThrow(NewsNotFoundException.class);
+    void deleteWithComments() {
+        var news = seeder.comments().get(0).getNews();
+        Long newsId = news.getId();
+        Long userId = news.getAuthor().getId();
 
-        mvc.perform(delete(newsUrl(-1L)))
-                .andExpectAll(
-                        status().isNotFound()
-                );
+        ResponseEntity<Void> response = delete(NEWS_WITH_USER_URL, newsId, userId);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+        ResponseEntity<ErrorInfo> findResponse = rest.getForEntity(NEWS_ID_URL, ErrorInfo.class, newsId);
+        assertAll(
+                () -> assertThat(findResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
+                () -> assertThat(findResponse.getBody().message()).contains("News")
+        );
+    }
+
+    @Test
+    void deleteMissing() {
+        Long newsId = INVALID_ID;
+        Long userId = seeder.authors().get(0).getId();
+
+        ResponseEntity<ErrorInfo> response = delete(NEWS_WITH_USER_URL, ErrorInfo.class, newsId, userId);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
+                () -> assertThat(response.getBody().message()).contains("News")
+        );
+    }
+
+    @ParameterizedTest
+    @CsvSource({NEWS_ID_URL, NEWS_WITH_USER_URL})
+    void deleteWithInvalidUser(String url) {
+        Long newsId = seeder.news().get(0).getId();
+        Long userId = INVALID_ID;
+
+        ResponseEntity<ErrorInfo> response = delete(url, ErrorInfo.class, newsId, userId);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN),
+                () -> assertThat(response.getBody().message()).contains("not allowed")
+        );
     }
 }

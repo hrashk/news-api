@@ -1,5 +1,6 @@
 package io.github.hrashk.news.api.comments;
 
+import io.github.hrashk.news.api.exceptions.EntityNotFoundException;
 import io.github.hrashk.news.api.util.ServiceTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,33 +30,36 @@ class CommentServiceTest extends ServiceTest {
     @Test
     void findByInvalidId() {
         assertThatThrownBy(() -> service.findById(-1L))
-                .isInstanceOf(CommentNotFoundException.class);
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
-    void saveWithNullId() {
-        Comment saved = service.addOrReplace(seeder.aRandomComment(-1L));
+    void add() {
+        Long id = service.add(seeder.aRandomComment(-1L));
+        seeder.flush();
 
-        assertThat(saved.getId()).as("Comment id").isNotNull();
+        assertThat(id).as("Comment id").isNotNull();
     }
 
     @Test
-    void saveWithNonNullId() {
-        var comment = seeder.aRandomComment(-1L);
-        comment.setId(-1L);
+    void update() {
+        var c = seeder.comments().get(1);
+        c.setText("asdf");
 
-        Comment saved = service.addOrReplace(comment);
+        service.updateOrAdd(c.getId(), c);
+        seeder.flush();
 
-        assertThat(saved.getId()).as("Comment id").isGreaterThan(0);
+        assertThat(service.findById(c.getId())).hasFieldOrPropertyWithValue("text", "asdf");
     }
 
     @Test
     void removeById() {
         Long id = seeder.comments().get(0).getId();
 
-        service.delete(seeder.comments().get(0));
+        service.deleteById(id);
+        seeder.flush();
 
         assertThatThrownBy(() -> service.findById(id))
-                .isInstanceOf(CommentNotFoundException.class);
+                .isInstanceOf(EntityNotFoundException.class);
     }
 }

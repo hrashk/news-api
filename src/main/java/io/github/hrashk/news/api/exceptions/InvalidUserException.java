@@ -1,11 +1,11 @@
 package io.github.hrashk.news.api.exceptions;
 
 public class InvalidUserException extends RuntimeException {
-    public InvalidUserException(String message) {
-        super(message);
+    public InvalidUserException() {
+        this(null);
     }
 
-    public InvalidUserException(String message, Throwable cause) {
-        super(message, cause);
+    public InvalidUserException(Throwable cause) {
+        super("You are not allowed to make this change", cause);
     }
 }

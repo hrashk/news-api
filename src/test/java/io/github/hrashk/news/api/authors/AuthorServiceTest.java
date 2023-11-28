@@ -1,5 +1,6 @@
 package io.github.hrashk.news.api.authors;
 
+import io.github.hrashk.news.api.exceptions.EntityNotFoundException;
 import io.github.hrashk.news.api.util.ServiceTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,20 +26,22 @@ class AuthorServiceTest extends ServiceTest {
     }
 
     @Test
-    void saveWithNullId() {
-        Author saved = service.addOrReplace(seeder.aRandomAuthor(-1L));
+    void add() {
+        Long id = service.add(seeder.aRandomAuthor(-1L));
+        seeder.flush();
 
-        assertThat(saved.getId()).as("Author id").isNotNull();
+        assertThat(id).as("Author id").isNotNull();
     }
 
     @Test
-    void saveWithNonNullId() {
-        var a = seeder.aRandomAuthor(-1L);
-        a.setId(-1L);
+    void update() {
+        Author author = seeder.authors().get(1);
+        author.setFirstName("asdf");
 
-        Author saved = service.addOrReplace(a);
+        service.updateOrAdd(author.getId(), author);
+        seeder.flush();
 
-        assertThat(saved.getId()).as("Author id").isGreaterThan(0);
+        assertThat(service.findById(author.getId())).hasFieldOrPropertyWithValue("firstName", "asdf");
     }
 
     @Test
@@ -53,7 +56,7 @@ class AuthorServiceTest extends ServiceTest {
     @Test
     void findByInvalidId() {
         assertThatThrownBy(() -> service.findById(-1L))
-                .isInstanceOf(AuthorNotFoundException.class);
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
@@ -61,10 +64,11 @@ class AuthorServiceTest extends ServiceTest {
         Author author = seeder.news().get(0).getAuthor();
         Long id = author.getId();
 
-        service.delete(author);
+        service.deleteById(id);
+        seeder.flush();
 
         assertThatThrownBy(() -> service.findById(id))
-                .isInstanceOf(AuthorNotFoundException.class);
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
@@ -72,9 +76,10 @@ class AuthorServiceTest extends ServiceTest {
         Author author = seeder.comments().get(0).getAuthor();
         Long id = author.getId();
 
-        service.delete(author);
+        service.deleteById(id);
+        seeder.flush();
 
         assertThatThrownBy(() -> service.findById(id))
-                .isInstanceOf(AuthorNotFoundException.class);
+                .isInstanceOf(EntityNotFoundException.class);
     }
 }

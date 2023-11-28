@@ -1,5 +1,7 @@
 package io.github.hrashk.news.api.categories;
 
+import io.github.hrashk.news.api.exceptions.EntityNotFoundException;
+import io.github.hrashk.news.api.news.NewsService;
 import io.github.hrashk.news.api.util.ServiceTest;
 import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.Test;
@@ -10,7 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@Import(CategoryService.class)
+@Import({CategoryService.class, NewsService.class})
 class CategoryServiceTest extends ServiceTest {
     @Autowired
     private CategoryService service;
@@ -36,42 +38,44 @@ class CategoryServiceTest extends ServiceTest {
     @Test
     void findByInvalidId() {
         assertThatThrownBy(() -> service.findById(-1L))
-                .isInstanceOf(CategoryNotFoundException.class);
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
-    void saveWithNullId() {
-        Category saved = service.addOrReplace(seeder.aRandomCategory(-1L));
+    void add() {
+        Long id = service.add(seeder.aRandomCategory(-1L));
+        seeder.flush();
 
-        assertThat(saved.getId()).as("Category id").isNotNull();
+        assertThat(id).as("Category id").isNotNull();
     }
 
     @Test
-    void saveWithNonNullId() {
-        var n = seeder.aRandomCategory(-1L);
-        n.setId(-1L);
+    void update() {
+        var category = seeder.categories().get(1);
+        category.setName("asdf");
 
-        Category saved = service.addOrReplace(n);
+        service.updateOrAdd(category.getId(), category);
+        seeder.flush();
 
-        assertThat(saved.getId()).as("Category id").isGreaterThan(0L);
+        assertThat(service.findById(category.getId())).hasFieldOrPropertyWithValue("name", "asdf");
     }
 
     @Test
     void delete() {
-        Category categoryWithoutNews = service.addOrReplace(seeder.aRandomCategory(-1L));
-        Long id = categoryWithoutNews.getId();
+        Long id = service.add(seeder.aRandomCategory(-1L));
 
-        service.delete(categoryWithoutNews);
+        service.deleteById(id);
+        seeder.flush();
 
         assertThatThrownBy(() -> service.findById(id))
-                .isInstanceOf(CategoryNotFoundException.class);
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
     void deletingWithNewsFails() {
         Category categoryWithNews = seeder.news().get(0).getCategory();
 
-        assertThatThrownBy(() -> service.delete(categoryWithNews))
+        assertThatThrownBy(() -> service.deleteById(categoryWithNews.getId()))
                 .isInstanceOf(ValidationException.class);
     }
 }

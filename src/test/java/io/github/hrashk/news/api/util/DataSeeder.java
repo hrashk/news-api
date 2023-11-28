@@ -45,7 +45,7 @@ public final class DataSeeder {
         comments = commentRepository.saveAll(sampleComments(count));
     }
 
-    void flush() {
+    public void flush() {
         authorsRepo.flush();
         categoryRepo.flush();
         newsRepo.flush();

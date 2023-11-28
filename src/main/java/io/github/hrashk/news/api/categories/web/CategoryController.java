@@ -1,9 +1,7 @@
 package io.github.hrashk.news.api.categories.web;
 
 import io.github.hrashk.news.api.categories.Category;
-import io.github.hrashk.news.api.categories.CategoryNotFoundException;
 import io.github.hrashk.news.api.categories.CategoryService;
-import io.github.hrashk.news.api.util.BeanCopyUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -15,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping(value = "/api/v1/categories", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -39,33 +38,28 @@ public class CategoryController {
 
     @PostMapping
     public ResponseEntity<CategoryResponse> addCategory(@RequestBody @Valid UpsertCategoryRequest categoryRequest) {
-        Category requested = mapper.map(categoryRequest);
-        Category saved = service.addOrReplace(requested);
+        Long id = service.add(mapper.map(categoryRequest));
 
-        CategoryResponse response = mapper.map(saved);
+        CategoryResponse response = mapper.map(service.findById(id));
+
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id, @RequestBody @Valid UpsertCategoryRequest categoryRequest) {
-        try {
-            Category category = mapper.map(id);
-            Category requested = mapper.map(categoryRequest);
-            BeanCopyUtils.copyProperties(requested, category);
+    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id, @RequestBody @Valid UpsertCategoryRequest request) {
+        Long newId = service.updateOrAdd(id, mapper.map(request));
 
-            Category saved = service.addOrReplace(category);
+        CategoryResponse response = mapper.map(service.findById(newId));
 
-            return ResponseEntity.ok(mapper.map(saved));
-        } catch (CategoryNotFoundException ex) {
-            return addCategory(categoryRequest);
-        }
+        if (Objects.equals(newId, id))
+            return ResponseEntity.ok(response);
+        else
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
-        Category category = mapper.map(id);
-
-        service.delete(category);
+        service.deleteById(id);
 
         return ResponseEntity.noContent().build();
     }

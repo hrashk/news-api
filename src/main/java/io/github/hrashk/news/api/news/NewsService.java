@@ -1,36 +1,35 @@
 package io.github.hrashk.news.api.news;
 
 import io.github.hrashk.news.api.aspects.SameAuthor;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
+import io.github.hrashk.news.api.common.BaseService;
+import io.github.hrashk.news.api.exceptions.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static io.github.hrashk.news.api.news.NewsSpecifications.hasAuthor;
-import static io.github.hrashk.news.api.news.NewsSpecifications.hasCategory;
-
 @Service
-@RequiredArgsConstructor
-public class NewsService {
-    private final NewsRepository repository;
-
-    public List<News> findAll(Pageable pageable, Long authorId, Long categoryId) {
-        return repository.findAll(hasCategory(categoryId).and(hasAuthor(authorId)), pageable).getContent();
+public class NewsService extends BaseService<News, NewsRepository> {
+    protected NewsService(NewsRepository repository) {
+        super(repository, "News");
     }
 
-    public News findById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new NewsNotFoundException(id));
+    public List<News> findAll(NewsFilter filter) {
+        return repository.findAll(NewsSpecifications.fromFilter(filter), filter.pageable()).getContent();
     }
 
     @SameAuthor
-    public News addOrReplace(News news) {
-        News saved = repository.save(news);
-        return findById(saved.getId());
+    @Override
+    public Long updateOrAdd(Long id, News entity) {
+        return super.updateOrAdd(id, entity);
     }
 
     @SameAuthor
-    public void delete(News news) {
-        repository.delete(news);
+    @Override
+    public void deleteById(Long id) throws EntityNotFoundException {
+        super.deleteById(id);
+    }
+
+    public boolean existsByCategoryId(Long id) {
+        return repository.existsByCategoryId(id);
     }
 }

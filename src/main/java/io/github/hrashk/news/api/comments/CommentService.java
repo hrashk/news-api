@@ -1,31 +1,31 @@
 package io.github.hrashk.news.api.comments;
 
 import io.github.hrashk.news.api.aspects.SameAuthor;
-import lombok.RequiredArgsConstructor;
+import io.github.hrashk.news.api.common.BaseService;
+import io.github.hrashk.news.api.exceptions.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
-public class CommentService {
-    private final CommentRepository repository;
+public class CommentService extends BaseService<Comment, CommentRepository> {
+    protected CommentService(CommentRepository repository) {
+        super(repository, "Comment");
+    }
 
     public List<Comment> findAll() {
         return repository.findAll();
     }
 
-    public Comment findById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new CommentNotFoundException(id));
+    @SameAuthor
+    @Override
+    public Long updateOrAdd(Long id, Comment entity) {
+        return super.updateOrAdd(id, entity);
     }
 
     @SameAuthor
-    public Comment addOrReplace(Comment comment) {
-        return repository.save(comment);
-    }
-
-    @SameAuthor
-    public void delete(Comment comment) {
-        repository.delete(comment);
+    @Override
+    public void deleteById(Long id) throws EntityNotFoundException {
+        super.deleteById(id);
     }
 }

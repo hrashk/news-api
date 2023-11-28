@@ -1,153 +1,162 @@
 package io.github.hrashk.news.api.authors;
 
+import io.github.hrashk.news.api.authors.web.AuthorListResponse;
+import io.github.hrashk.news.api.authors.web.AuthorResponse;
+import io.github.hrashk.news.api.authors.web.UpsertAuthorRequest;
+import io.github.hrashk.news.api.exceptions.ErrorInfo;
 import io.github.hrashk.news.api.util.ControllerTest;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
-@Import(AuthorJsonSamples.class)
 class AuthorControllerTest extends ControllerTest {
-    @Autowired
-    private AuthorJsonSamples json;
 
-    public String authorsUrl() {
-        return "/api/v1/authors";
-    }
+    private static final String AUTHORS_URL = "/api/v1/authors";
+    private static final String AUTHORS_ID_URL = AUTHORS_URL + "/{id}";
 
-    public String authorsUrl(Long id) {
-        return authorsUrl() + "/" + id;
+    @Test
+    void firstPage() {
+        ResponseEntity<AuthorListResponse> response = rest.getForEntity(AUTHORS_URL, AuthorListResponse.class);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody().authors()).hasSize(10),
+                () -> assertThat(response.getBody().authors()).allSatisfy(a -> assertThat(a).hasNoNullFieldsOrProperties())
+        );
     }
 
     @Test
-    void getFirstPageOfAuthors() throws Exception {
-        when(authorService.findAll(Mockito.any(Pageable.class))).thenReturn(samples.twoAuthors());
+    void secondPage() {
+        ResponseEntity<AuthorListResponse> response = rest.getForEntity(AUTHORS_URL + "?page=1&size=3", AuthorListResponse.class);
 
-        mvc.perform(get(authorsUrl()))
-                .andExpectAll(
-                        status().isOk(),
-                        content().json(json.findAllResponse(), true)
-                );
-
-        Mockito.verify(authorService).findAll(Mockito.assertArg(p -> Assertions.assertAll(
-                () -> assertThat(p.getPageNumber()).isEqualTo(0),
-                () -> assertThat(p.getPageSize()).isEqualTo(10)
-        )));
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody().authors()).hasSize(3),
+                () -> assertThat(response.getBody().authors()).allSatisfy(a -> assertThat(a).hasNoNullFieldsOrProperties())
+        );
     }
 
     @Test
-    void getSecondPageOfAuthors() throws Exception {
-        when(authorService.findAll(Mockito.any(Pageable.class))).thenReturn(samples.twoAuthors());
+    void findById() {
+        Long authorId = seeder.authors().get(0).getId();
 
-        mvc.perform(get(authorsUrl()).param("page", "1").param("size", "7"))
-                .andExpectAll(
-                        status().isOk(),
-                        content().json(json.findAllResponse(), true)
-                );
+        ResponseEntity<AuthorResponse> response = rest.getForEntity(AUTHORS_ID_URL, AuthorResponse.class, authorId);
 
-        Mockito.verify(authorService).findAll(Mockito.assertArg(p -> Assertions.assertAll(
-                () -> assertThat(p.getPageNumber()).isEqualTo(1),
-                () -> assertThat(p.getPageSize()).isEqualTo(7)
-        )));
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties(),
+                () -> assertThat(response.getBody().id()).isEqualTo(authorId)
+        );
     }
 
     @Test
-    void findByValidId() throws Exception {
-        when(authorService.findById(Mockito.anyLong())).thenReturn(samples.jackDoe());
+    void findMissing() {
+        Long authorId = INVALID_ID;
 
-        mvc.perform(get(authorsUrl(21L)))
-                .andExpectAll(
-                        status().isOk(),
-                        content().json(json.upsertResponse(), true)
-                );
+        ResponseEntity<ErrorInfo> response = rest.getForEntity(AUTHORS_ID_URL, ErrorInfo.class, authorId);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
+                () -> assertThat(response.getBody().message()).contains("Author")
+        );
     }
 
     @Test
-    void findByInvalidId() throws Exception {
-        when(authorService.findById(Mockito.anyLong())).thenThrow(new AuthorNotFoundException(1L));
+    void add() {
+        UpsertAuthorRequest request = new UpsertAuthorRequest("lorem", "ipsum");
 
-        mvc.perform(get(authorsUrl(-1L)))
-                .andExpectAll(
-                        status().isNotFound(),
-                        jsonPath("message").value(containsString("Author"))
-                );
+        ResponseEntity<AuthorResponse> response = rest.postForEntity(AUTHORS_URL, request, AuthorResponse.class);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED),
+                () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties(),
+                () -> assertThat(response.getBody().firstName()).isEqualTo("lorem"),
+                () -> assertThat(response.getBody().lastName()).isEqualTo("ipsum")
+        );
     }
 
     @Test
-    void addAuthor() throws Exception {
-        mvc.perform(post(authorsUrl())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json.upsertRequest()))
-                .andExpectAll(
-                        status().isCreated(),
-                        content().json(json.upsertResponse(), true)
-                );
+    void addBroken() {
+        UpsertAuthorRequest request = new UpsertAuthorRequest("  ", null);
 
-        Mockito.verify(authorService).addOrReplace(Mockito.assertArg(a ->
-                assertThat(a).hasFieldOrPropertyWithValue("id", null)
-        ));
+        ResponseEntity<ErrorInfo> response = rest.postForEntity(AUTHORS_URL, request, ErrorInfo.class);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST),
+                () -> assertThat(response.getBody().message()).contains("firstName", "lastName")
+        );
     }
 
     @Test
-    void updateAuthor() throws Exception {
-        mvc.perform(put(authorsUrl(21L))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json.upsertRequest()))
-                .andExpectAll(
-                        status().isOk(),
-                        content().json(json.upsertResponse(), true)
-                );
+    void update() {
+        Author author = seeder.authors().get(0);
+        Long authorId = author.getId();
+        var request = new UpsertAuthorRequest(author.getFirstName(), "lorem");
 
-        Mockito.verify(authorService).addOrReplace(Mockito.assertArg(a ->
-                assertThat(a).hasFieldOrPropertyWithValue("id", 21L)
-        ));
+        ResponseEntity<AuthorResponse> response = put(AUTHORS_ID_URL, request, AuthorResponse.class, authorId);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody().lastName()).isEqualTo("lorem"),
+                () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties()
+        );
     }
 
     @Test
-    void updatingWithInvalidIdCreatesNewEntity() throws Exception {
-        when(authorService.findById(anyLong())).thenThrow(new AuthorNotFoundException(1L));
+    void updateMissing() {
+        Long authorId = INVALID_ID;
+        UpsertAuthorRequest request = new UpsertAuthorRequest("lorem", "ipsum");
 
-        mvc.perform(put(authorsUrl(-1L))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json.upsertRequest()))
-                .andExpectAll(
-                        status().isCreated(),
-                        content().json(json.upsertResponse(), true)
-                );
+        ResponseEntity<AuthorResponse> response = put(AUTHORS_ID_URL, request, AuthorResponse.class, authorId);
 
-        Mockito.verify(authorService).addOrReplace(Mockito.assertArg(a ->
-                assertThat(a).hasFieldOrPropertyWithValue("id", null)
-        ));
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED),
+                () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties(),
+                () -> assertThat(response.getBody().firstName()).isEqualTo("lorem"),
+                () -> assertThat(response.getBody().lastName()).isEqualTo("ipsum")
+        );
     }
 
     @Test
-    void deleteByValidId() throws Exception {
-        mvc.perform(delete(authorsUrl(21L)))
-                .andExpect(status().isNoContent());
+    void deleteWithNews() {
+        Long authorId = seeder.news().get(0).getAuthor().getId();
 
-        Mockito.verify(authorService).delete(Mockito.assertArg(a ->
-                assertThat(a).hasFieldOrPropertyWithValue("id", 21L)
-        ));
+        ResponseEntity<Void> response = delete(AUTHORS_ID_URL, authorId);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+        ResponseEntity<ErrorInfo> findResponse = rest.getForEntity(AUTHORS_ID_URL, ErrorInfo.class, authorId);
+        assertAll(
+                () -> assertThat(findResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
+                () -> assertThat(findResponse.getBody().message()).contains("Author")
+        );
     }
 
     @Test
-    void deletingByInvalidIdFails() throws Exception {
-        when(authorService.findById(Mockito.anyLong())).thenThrow(new AuthorNotFoundException(1L));
+    void deleteWithAuthors() {
+        Long authorId = seeder.comments().get(0).getAuthor().getId();
 
-        mvc.perform(delete(authorsUrl(-1L)))
-                .andExpectAll(
-                        status().isNotFound(),
-                        jsonPath("message").value(containsString("Author"))
-                );
+        ResponseEntity<Void> response = delete(AUTHORS_ID_URL, authorId);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+        ResponseEntity<ErrorInfo> findResponse = rest.getForEntity(AUTHORS_ID_URL, ErrorInfo.class, authorId);
+        assertAll(
+                () -> assertThat(findResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
+                () -> assertThat(findResponse.getBody().message()).contains("Author")
+        );
+    }
+
+    @Test
+    void deleteMissing() {
+        Long authorId = INVALID_ID;
+
+        ResponseEntity<ErrorInfo> response = delete(AUTHORS_ID_URL, ErrorInfo.class, authorId);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
+                () -> assertThat(response.getBody().message()).contains("Author")
+        );
     }
 }

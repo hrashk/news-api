@@ -1,16 +1,19 @@
 package io.github.hrashk.news.api.comments.web;
 
 import io.github.hrashk.news.api.comments.Comment;
-import io.github.hrashk.news.api.comments.CommentNotFoundException;
 import io.github.hrashk.news.api.comments.CommentService;
 import io.github.hrashk.news.api.news.web.NewsMapper;
-import io.github.hrashk.news.api.util.BeanCopyUtils;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Objects;
 
 @RestController
 @RequestMapping(value = "/api/v1/comments", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -28,33 +31,32 @@ public class CommentController {
 
     @PostMapping
     public ResponseEntity<CommentResponse> addComment(@RequestBody @Valid UpsertCommentRequest request) {
-        Comment comment = mapper.map(request);
-        Comment saved = service.addOrReplace(comment);
+        Long id = service.add(mapper.map(request));
 
-        CommentResponse response = mapper.map(saved);
+        CommentResponse response = mapper.map(service.findById(id));
+
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Parameter(in = ParameterIn.QUERY, name = "userId", schema = @Schema(type = "integer"), required = true,
+            description = "the operation is forbidden unless coincides with the authorId of the comment")
     @PutMapping("/{id}")
     public ResponseEntity<CommentResponse> updateComment(@PathVariable Long id, @RequestBody @Valid UpsertCommentRequest request) {
-        try {
-            Comment comment = mapper.mapToComment(id);
-            Comment requested = mapper.map(request);
-            BeanCopyUtils.copyProperties(requested, comment);
+        Long newId = service.updateOrAdd(id, mapper.map(request));
 
-            Comment saved = service.addOrReplace(comment);
+        CommentResponse response = mapper.map(service.findById(newId));
 
-            return ResponseEntity.ok(mapper.map(saved));
-        } catch (CommentNotFoundException ex) {
-            return addComment(request);
-        }
+        if (Objects.equals(newId, id))
+            return ResponseEntity.ok(response);
+        else
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Parameter(in = ParameterIn.QUERY, name = "userId", schema = @Schema(type = "integer"), required = true,
+            description = "the operation is forbidden unless coincides with the authorId of the comment")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long id) {
-        Comment comment = mapper.mapToComment(id);
-
-        service.delete(comment);
+        service.deleteById(id);
 
         return ResponseEntity.noContent().build();
     }
