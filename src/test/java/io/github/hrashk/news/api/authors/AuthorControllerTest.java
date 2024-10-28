@@ -19,10 +19,15 @@ class AuthorControllerTest extends ControllerTest {
 
     @Test
     void firstPage() {
-        ResponseEntity<AuthorListResponse> response = rest.getForEntity(AUTHORS_URL, AuthorListResponse.class);
+        ResponseEntity<AuthorListResponse> response = rest.withBasicAuth("spring", "secret")
+                .getForEntity(AUTHORS_URL, AuthorListResponse.class);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody()).isNotNull()
+        );
+
+        assertAll(
                 () -> assertThat(response.getBody().authors()).hasSize(10),
                 () -> assertThat(response.getBody().authors()).allSatisfy(a -> assertThat(a).hasNoNullFieldsOrProperties())
         );

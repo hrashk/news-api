@@ -15,4 +15,8 @@ public class AuthorService extends BaseService<Author, AuthorRepository> {
     public List<Author> findAll(Pageable pageable) {
         return repository.findAll(pageable).getContent();
     }
+
+    public Author findByUsername(String username) {
+        return repository.findByUsername(username);
+    }
 }

@@ -3,6 +3,7 @@ package io.github.hrashk.news.api.authors;
 import io.github.hrashk.news.api.comments.Comment;
 import io.github.hrashk.news.api.common.BaseEntity;
 import io.github.hrashk.news.api.news.News;
+import io.github.hrashk.news.api.security.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -12,6 +13,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "authors")
@@ -29,6 +31,15 @@ public class Author implements BaseEntity {
     private String firstName;
     @Column(nullable = false)
     private String lastName;
+
+    private String username;
+
+    private String password;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "author", cascade = CascadeType.ALL)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private List<Role> roles;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.REMOVE)
     @ToString.Exclude
