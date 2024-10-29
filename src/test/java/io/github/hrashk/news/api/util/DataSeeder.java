@@ -45,6 +45,9 @@ public final class DataSeeder {
         authors = sampleAuthors(count);
         authors.get(0).addRole(RoleType.ROLE_ADMIN);
         authors.get(1).addRole(RoleType.ROLE_MODERATOR);
+        authors.get(2).addRole(RoleType.ROLE_USER);
+        authors.get(3).addRole(RoleType.ROLE_MODERATOR);
+        authors.get(3).addRole(RoleType.ROLE_USER);
 
         authors = authors.stream().map(this::saveAndReturnDecoded).toList();
         categories = categoryRepo.saveAll(sampleCategories(count));
@@ -92,15 +95,12 @@ public final class DataSeeder {
     }
 
     public Author aRandomAuthor(long id) {
-        Author author = new Author().toBuilder()
+        return new Author().toBuilder()
                 .firstName(faker.name().firstName())
                 .lastName(faker.name().lastName())
                 .username(faker.internet().username())
                 .password(faker.internet().password())
                 .build();
-        author.addRole(RoleType.ROLE_USER);
-
-        return author;
     }
 
     public Category aRandomCategory(long id) {

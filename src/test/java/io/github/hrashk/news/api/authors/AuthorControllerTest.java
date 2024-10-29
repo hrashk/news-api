@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -33,6 +35,38 @@ class AuthorControllerTest extends ControllerTest {
                 () -> assertThat(response.getBody().authors()).hasSize(10),
                 () -> assertThat(response.getBody().authors()).allSatisfy(a -> assertThat(a).hasNoNullFieldsOrProperties())
         );
+    }
+
+    @Test
+    void unauthorizedWhenNoCreds() {
+        ResponseEntity<AuthorListResponse> response = rest
+                .getForEntity(AUTHORS_URL, AuthorListResponse.class);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED),
+                () -> assertThat(response.getBody()).isNull()
+        );
+    }
+
+    @Test
+    void unauthorizedWhenWrongCreds() {
+        ResponseEntity<AuthorListResponse> response = rest.withBasicAuth("fake", "password")
+                .getForEntity(AUTHORS_URL, AuthorListResponse.class);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED),
+                () -> assertThat(response.getBody()).isNull()
+        );
+    }
+
+    @Test
+    void forbiddenWhenNoRole() {
+        Author author = seeder.authors().get(4);
+
+        ResponseEntity<Map> response = rest.withBasicAuth(author.getUsername(), author.getPassword())
+                .getForEntity(AUTHORS_URL, Map.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
