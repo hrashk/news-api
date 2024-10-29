@@ -19,7 +19,9 @@ class AuthorControllerTest extends ControllerTest {
 
     @Test
     void firstPage() {
-        ResponseEntity<AuthorListResponse> response = rest.withBasicAuth("spring", "secret")
+        Author author = seeder.authors().get(0);
+
+        ResponseEntity<AuthorListResponse> response = rest.withBasicAuth(author.getUsername(), author.getPassword())
                 .getForEntity(AUTHORS_URL, AuthorListResponse.class);
 
         assertAll(

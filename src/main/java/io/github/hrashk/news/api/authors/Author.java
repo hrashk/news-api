@@ -4,6 +4,7 @@ import io.github.hrashk.news.api.comments.Comment;
 import io.github.hrashk.news.api.common.BaseEntity;
 import io.github.hrashk.news.api.news.News;
 import io.github.hrashk.news.api.security.Role;
+import io.github.hrashk.news.api.security.RoleType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -13,7 +14,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 @Entity
 @Table(name = "authors")
@@ -39,7 +39,7 @@ public class Author implements BaseEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "author", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    private List<Role> roles;
+    private Collection<Role> roles = new ArrayList<>();
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.REMOVE)
     @ToString.Exclude
@@ -63,5 +63,11 @@ public class Author implements BaseEntity {
     public void addNews(News newsItem) {
         newsItem.setAuthor(this);
         news.add(newsItem);
+    }
+
+    public void addRole(RoleType type) {
+        Role role = Role.from(type);
+        role.setAuthor(this);
+        roles.add(role);
     }
 }

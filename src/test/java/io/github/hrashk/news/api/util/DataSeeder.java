@@ -2,12 +2,14 @@ package io.github.hrashk.news.api.util;
 
 import io.github.hrashk.news.api.authors.Author;
 import io.github.hrashk.news.api.authors.AuthorRepository;
+import io.github.hrashk.news.api.authors.AuthorService;
 import io.github.hrashk.news.api.categories.Category;
 import io.github.hrashk.news.api.categories.CategoryRepository;
 import io.github.hrashk.news.api.comments.Comment;
 import io.github.hrashk.news.api.comments.CommentRepository;
 import io.github.hrashk.news.api.news.News;
 import io.github.hrashk.news.api.news.NewsRepository;
+import io.github.hrashk.news.api.security.RoleType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
@@ -26,6 +28,7 @@ import java.util.stream.LongStream;
 @Accessors(fluent = true)
 public final class DataSeeder {
     private final AuthorRepository authorsRepo;
+    private final AuthorService authorService;
     private final NewsRepository newsRepo;
     private final CategoryRepository categoryRepo;
     private final CommentRepository commentRepository;
@@ -39,7 +42,11 @@ public final class DataSeeder {
     private List<Comment> comments;
 
     public void seed(int count) {
-        authors = authorsRepo.saveAll(sampleAuthors(count));
+        authors = sampleAuthors(count);
+        authors.get(0).addRole(RoleType.ROLE_ADMIN);
+        authors.get(1).addRole(RoleType.ROLE_MODERATOR);
+
+        authors = authors.stream().map(this::saveAndReturnDecoded).toList();
         categories = categoryRepo.saveAll(sampleCategories(count));
         news = newsRepo.saveAll(sampleNews(count));
         comments = commentRepository.saveAll(sampleComments(count));
@@ -50,6 +57,16 @@ public final class DataSeeder {
         categoryRepo.flush();
         newsRepo.flush();
         commentRepository.flush();
+    }
+
+    private Author saveAndReturnDecoded(Author a) {
+        String decoded = a.getPassword();
+
+        authorService.encodePassword(a);
+        a = authorsRepo.save(a);
+        a.setPassword(decoded);
+
+        return a;
     }
 
     public List<Author> sampleAuthors(int count) {
@@ -75,10 +92,15 @@ public final class DataSeeder {
     }
 
     public Author aRandomAuthor(long id) {
-        return new Author().toBuilder()
+        Author author = new Author().toBuilder()
                 .firstName(faker.name().firstName())
                 .lastName(faker.name().lastName())
+                .username(faker.internet().username())
+                .password(faker.internet().password())
                 .build();
+        author.addRole(RoleType.ROLE_USER);
+
+        return author;
     }
 
     public Category aRandomCategory(long id) {
