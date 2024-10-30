@@ -62,6 +62,22 @@ public final class DataSeeder {
         commentRepository.flush();
     }
 
+    public Author admin() {
+        return authors.get(0);
+    }
+
+    public Author moderator() {
+        return authors.get(1);
+    }
+
+    public Author plainUser() {
+        return authors.get(3);
+    }
+
+    public Author withoutRoles() {
+        return authors.get(4);
+    }
+
     private Author saveAndReturnDecoded(Author a) {
         String decoded = a.getPassword();
 
