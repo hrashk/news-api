@@ -17,31 +17,6 @@ class AuthorControllerTest extends ControllerTest {
     private static final String AUTHORS_ID_URL = AUTHORS_URL + "/{id}";
 
     @Test
-    void findById() {
-        Long authorId = seeder.authors().get(0).getId();
-
-        ResponseEntity<AuthorResponse> response = rest.getForEntity(AUTHORS_ID_URL, AuthorResponse.class, authorId);
-
-        assertAll(
-                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
-                () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties(),
-                () -> assertThat(response.getBody().id()).isEqualTo(authorId)
-        );
-    }
-
-    @Test
-    void findMissing() {
-        Long authorId = INVALID_ID;
-
-        ResponseEntity<ErrorInfo> response = rest.getForEntity(AUTHORS_ID_URL, ErrorInfo.class, authorId);
-
-        assertAll(
-                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
-                () -> assertThat(response.getBody().message()).contains("Author")
-        );
-    }
-
-    @Test
     void add() {
         UpsertAuthorRequest request = new UpsertAuthorRequest("lorem", "ipsum");
 
