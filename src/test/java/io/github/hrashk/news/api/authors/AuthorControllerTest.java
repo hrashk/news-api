@@ -21,9 +21,9 @@ class AuthorControllerTest extends ControllerTest {
 
     @Test
     void firstPage() {
-        Author author = seeder.authors().get(0);
+        Author admin = seeder.admin();
 
-        ResponseEntity<AuthorListResponse> response = rest.withBasicAuth(author.getUsername(), author.getPassword())
+        ResponseEntity<AuthorListResponse> response = rest.withBasicAuth(admin.getUsername(), admin.getPassword())
                 .getForEntity(AUTHORS_URL, AuthorListResponse.class);
 
         assertAll(
@@ -61,7 +61,27 @@ class AuthorControllerTest extends ControllerTest {
 
     @Test
     void forbiddenWhenNoRole() {
-        Author author = seeder.authors().get(4);
+        Author author = seeder.withoutRoles();
+
+        ResponseEntity<Map> response = rest.withBasicAuth(author.getUsername(), author.getPassword())
+                .getForEntity(AUTHORS_URL, Map.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    void forbiddenWhenModerator() {
+        Author author = seeder.moderator();
+
+        ResponseEntity<Map> response = rest.withBasicAuth(author.getUsername(), author.getPassword())
+                .getForEntity(AUTHORS_URL, Map.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    void forbiddenWhenPlainUser() {
+        Author author = seeder.plainUser();
 
         ResponseEntity<Map> response = rest.withBasicAuth(author.getUsername(), author.getPassword())
                 .getForEntity(AUTHORS_URL, Map.class);
@@ -71,7 +91,10 @@ class AuthorControllerTest extends ControllerTest {
 
     @Test
     void secondPage() {
-        ResponseEntity<AuthorListResponse> response = rest.getForEntity(AUTHORS_URL + "?page=1&size=3", AuthorListResponse.class);
+        Author admin = seeder.admin();
+
+        ResponseEntity<AuthorListResponse> response = rest.withBasicAuth(admin.getUsername(), admin.getPassword())
+                .getForEntity(AUTHORS_URL + "?page=1&size=3", AuthorListResponse.class);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
