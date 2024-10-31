@@ -5,9 +5,16 @@ import io.github.hrashk.news.api.authors.web.AuthorResponse;
 import io.github.hrashk.news.api.authors.web.UpsertAuthorRequest;
 import io.github.hrashk.news.api.exceptions.ErrorInfo;
 import io.github.hrashk.news.api.util.ControllerTest;
+import io.github.hrashk.news.api.util.DataSeeder;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -45,20 +52,28 @@ class AuthorControllerTest extends ControllerTest {
         );
     }
 
-    @Test
-    void update() {
-        Author a = seeder.withoutRoles();
+    @ParameterizedTest(name="{1}")
+    @MethodSource("users")
+    void update(Function<DataSeeder, Author> userProvider, String userType) {
+        Author a = seeder.plainUser();
         var request = new UpsertAuthorRequest(
-                a.getFirstName(), "lorem", "random", "password");
+                a.getFirstName(), "lorem", a.getUsername(), "password");
 
         ResponseEntity<AuthorResponse> response =
-                put(Constants.AUTHORS_ID_URL, request, seeder.admin(), AuthorResponse.class, a.getId());
+                put(Constants.AUTHORS_ID_URL, request, userProvider.apply(seeder), AuthorResponse.class, a.getId());
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
                 () -> assertThat(response.getBody().lastName()).isEqualTo("lorem"),
                 () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties()
         );
+    }
+
+    static Stream<Arguments> users() {
+        return Stream.of(
+                Arguments.of((Function<DataSeeder, Author>) DataSeeder::admin, "admin"),
+                Arguments.of((Function<DataSeeder, Author>) DataSeeder::moderator, "moderator"),
+                Arguments.of((Function<DataSeeder, Author>) DataSeeder::plainUser, "plainUser"));
     }
 
     @Test
