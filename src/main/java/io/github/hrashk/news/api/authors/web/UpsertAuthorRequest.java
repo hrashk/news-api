@@ -4,5 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 
 public record UpsertAuthorRequest(
         @NotBlank String firstName,
-        @NotBlank String lastName) {
+        @NotBlank String lastName,
+        @NotBlank String username,
+        @NotBlank String password
+) {
 }
