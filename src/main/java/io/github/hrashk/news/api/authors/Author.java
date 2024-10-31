@@ -73,12 +73,12 @@ public class Author implements BaseEntity {
         roles.add(role);
     }
 
-    public EnumSet<RoleType> getRoleSet() {
+    public EnumSet<RoleType> roleSet() {
         return roles.stream().map(Role::getAuthority)
                 .collect(Collectors.toCollection(() -> EnumSet.noneOf(RoleType.class)));
     }
 
-    public boolean isPlainUser() {
-        return getRoleSet().equals(EnumSet.of(RoleType.ROLE_USER));
+    public boolean hasOnlyUserRole() {
+        return roleSet().equals(EnumSet.of(RoleType.ROLE_USER));
     }
 }

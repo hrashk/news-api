@@ -51,7 +51,7 @@ public class UserValidator {
 
         Author author = getAuthorFromPrincipal();
 
-        if (author.isPlainUser() && !author.getId().equals(authorId))
+        if (author.hasOnlyUserRole() && !author.getId().equals(authorId))
             throw new InvalidUserException();
     }
 
