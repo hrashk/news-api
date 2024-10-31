@@ -47,12 +47,12 @@ class AuthorControllerTest extends ControllerTest {
 
     @Test
     void update() {
-        Author author = seeder.authors().get(0);
-        Long authorId = author.getId();
+        Author a = seeder.withoutRoles();
         var request = new UpsertAuthorRequest(
-                author.getFirstName(), "lorem", "random", "password");
+                a.getFirstName(), "lorem", "random", "password");
 
-        ResponseEntity<AuthorResponse> response = put(Constants.AUTHORS_ID_URL, request, seeder.admin(), AuthorResponse.class, authorId);
+        ResponseEntity<AuthorResponse> response =
+                put(Constants.AUTHORS_ID_URL, request, seeder.admin(), AuthorResponse.class, a.getId());
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
