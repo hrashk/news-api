@@ -1,5 +1,6 @@
 package io.github.hrashk.news.api.common;
 
+import io.github.hrashk.news.api.aspects.SameAuthor;
 import io.github.hrashk.news.api.exceptions.EntityNotFoundException;
 import io.github.hrashk.news.api.util.BeanCopyUtils;
 import jakarta.transaction.Transactional;
@@ -15,6 +16,7 @@ public abstract class BaseService<E extends BaseEntity, R extends JpaRepository<
     }
 
     @Override
+    @SameAuthor
     public E findById(Long id) throws EntityNotFoundException {
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(entityName, id));
@@ -22,6 +24,7 @@ public abstract class BaseService<E extends BaseEntity, R extends JpaRepository<
 
     @Override
     @Transactional
+    @SameAuthor
     public Long updateOrAdd(Long id, E entity) {
         try {
             var current = findById(id);
@@ -41,6 +44,7 @@ public abstract class BaseService<E extends BaseEntity, R extends JpaRepository<
 
     @Override
     @Transactional
+    @SameAuthor
     public void deleteById(Long id) throws EntityNotFoundException {
         repository.delete(findById(id));
     }
