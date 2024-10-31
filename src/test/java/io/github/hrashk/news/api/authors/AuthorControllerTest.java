@@ -15,9 +15,12 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 class AuthorControllerTest extends ControllerTest {
     @Test
     void add() {
-        UpsertAuthorRequest request = new UpsertAuthorRequest("lorem", "ipsum");
+        Author a = seeder.admin();
+        UpsertAuthorRequest request = new UpsertAuthorRequest(
+                "lorem", "ipsum", "random", "password");
 
-        ResponseEntity<AuthorResponse> response = rest.postForEntity(Constants.AUTHORS_URL, request, AuthorResponse.class);
+        ResponseEntity<AuthorResponse> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
+                .postForEntity(Constants.AUTHORS_URL, request, AuthorResponse.class);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED),
@@ -29,9 +32,12 @@ class AuthorControllerTest extends ControllerTest {
 
     @Test
     void addBroken() {
-        UpsertAuthorRequest request = new UpsertAuthorRequest("  ", null);
+        Author m = seeder.moderator();
+        UpsertAuthorRequest request = new UpsertAuthorRequest(
+                "  ", null, "random", "password");
 
-        ResponseEntity<ErrorInfo> response = rest.postForEntity(Constants.AUTHORS_URL, request, ErrorInfo.class);
+        ResponseEntity<ErrorInfo> response = rest.withBasicAuth(m.getUsername(), m.getPassword())
+                .postForEntity(Constants.AUTHORS_URL, request, ErrorInfo.class);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST),
@@ -43,9 +49,10 @@ class AuthorControllerTest extends ControllerTest {
     void update() {
         Author author = seeder.authors().get(0);
         Long authorId = author.getId();
-        var request = new UpsertAuthorRequest(author.getFirstName(), "lorem");
+        var request = new UpsertAuthorRequest(
+                author.getFirstName(), "lorem", "random", "password");
 
-        ResponseEntity<AuthorResponse> response = put(Constants.AUTHORS_ID_URL, request, AuthorResponse.class, authorId);
+        ResponseEntity<AuthorResponse> response = put(Constants.AUTHORS_ID_URL, request, seeder.admin(), AuthorResponse.class, authorId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
@@ -57,9 +64,10 @@ class AuthorControllerTest extends ControllerTest {
     @Test
     void updateMissing() {
         Long authorId = INVALID_ID;
-        UpsertAuthorRequest request = new UpsertAuthorRequest("lorem", "ipsum");
+        UpsertAuthorRequest request = new UpsertAuthorRequest(
+                "lorem", "ipsum", "random", "password");
 
-        ResponseEntity<AuthorResponse> response = put(Constants.AUTHORS_ID_URL, request, AuthorResponse.class, authorId);
+        ResponseEntity<AuthorResponse> response = put(Constants.AUTHORS_ID_URL, request, seeder.moderator(), AuthorResponse.class, authorId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED),

@@ -184,7 +184,7 @@ class NewsControllerTest extends ControllerTest {
 
         Long newsId = news.getId();
         Long userId = authorId;
-        ResponseEntity<NewsResponse> response = put(NEWS_WITH_USER_URL, request, NewsResponse.class, newsId, userId);
+        ResponseEntity<NewsResponse> response = put(NEWS_WITH_USER_URL, request, seeder.admin(), NewsResponse.class, newsId, userId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
@@ -201,7 +201,7 @@ class NewsControllerTest extends ControllerTest {
 
         Long newsId = INVALID_ID;
         Long userId = authorId;
-        ResponseEntity<NewsResponse> response = put(NEWS_WITH_USER_URL, request, NewsResponse.class, newsId, userId);
+        ResponseEntity<NewsResponse> response = put(NEWS_WITH_USER_URL, request, seeder.moderator(), NewsResponse.class, newsId, userId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED),
@@ -219,7 +219,7 @@ class NewsControllerTest extends ControllerTest {
 
         Long newsId = news.getId();
         Long userId = INVALID_ID;
-        ResponseEntity<ErrorInfo> response = put(url, request, ErrorInfo.class, newsId, userId);
+        ResponseEntity<ErrorInfo> response = put(url, request, seeder.moderator(), ErrorInfo.class, newsId, userId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN),

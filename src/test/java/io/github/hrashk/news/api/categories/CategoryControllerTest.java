@@ -103,7 +103,7 @@ class CategoryControllerTest extends ControllerTest {
         Long categoryId = seeder.categories().get(0).getId();
         var request = new UpsertCategoryRequest("lorem");
 
-        ResponseEntity<CategoryResponse> response = put(CATEGORIES_ID_URL, request, CategoryResponse.class, categoryId);
+        ResponseEntity<CategoryResponse> response = put(CATEGORIES_ID_URL, request, seeder.admin(), CategoryResponse.class, categoryId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
@@ -117,7 +117,7 @@ class CategoryControllerTest extends ControllerTest {
         Long categoryId = INVALID_ID;
         var request = new UpsertCategoryRequest("lorem");
 
-        ResponseEntity<CategoryResponse> response = put(CATEGORIES_ID_URL, request, CategoryResponse.class, categoryId);
+        ResponseEntity<CategoryResponse> response = put(CATEGORIES_ID_URL, request, seeder.moderator(), CategoryResponse.class, categoryId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED),

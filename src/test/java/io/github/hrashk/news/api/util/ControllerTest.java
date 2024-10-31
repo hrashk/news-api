@@ -1,5 +1,6 @@
 package io.github.hrashk.news.api.util;
 
+import io.github.hrashk.news.api.authors.Author;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -25,11 +26,12 @@ public abstract class ControllerTest {
         seeder.seed(10);
     }
 
-    public <T> ResponseEntity<T> put(String url, Object request, Class<T> responseType, Object... urlVariables) {
+    public <T> ResponseEntity<T> put(String url, Object request, Author a, Class<T> responseType, Object... urlVariables) {
         var headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        return rest.exchange(url, HttpMethod.PUT, new HttpEntity<>(request, headers), responseType, urlVariables);
+        return rest.withBasicAuth(a.getUsername(), a.getPassword())
+                .exchange(url, HttpMethod.PUT, new HttpEntity<>(request, headers), responseType, urlVariables);
     }
 
     public <T> ResponseEntity<T> delete(String url, Class<T> responseType, Object... urlVariables) {

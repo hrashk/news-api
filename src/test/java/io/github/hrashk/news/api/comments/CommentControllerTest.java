@@ -107,7 +107,7 @@ class CommentControllerTest extends ControllerTest {
         Long commentId = comment.getId();
         Long userId = authorId;
         ResponseEntity<CommentResponse> response = put(COMMENTS_WITH_USER_URL,
-                request, CommentResponse.class, commentId, userId);
+                request, seeder.moderator(), CommentResponse.class, commentId, userId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
@@ -125,7 +125,7 @@ class CommentControllerTest extends ControllerTest {
         Long commentId = INVALID_ID;
         Long userId = authorId;
         ResponseEntity<CommentResponse> response = put(COMMENTS_WITH_USER_URL,
-                request, CommentResponse.class, commentId, userId);
+                request, seeder.admin(), CommentResponse.class, commentId, userId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED),
@@ -143,7 +143,7 @@ class CommentControllerTest extends ControllerTest {
 
         Long commentId = comment.getId();
         Long userId = INVALID_ID;
-        ResponseEntity<ErrorInfo> response = put(url, request, ErrorInfo.class, commentId, userId);
+        ResponseEntity<ErrorInfo> response = put(url, request, seeder.moderator(), ErrorInfo.class, commentId, userId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN),
