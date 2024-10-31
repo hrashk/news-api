@@ -14,6 +14,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "authors")
@@ -69,5 +71,14 @@ public class Author implements BaseEntity {
         Role role = Role.from(type);
         role.setAuthor(this);
         roles.add(role);
+    }
+
+    public EnumSet<RoleType> getRoleSet() {
+        return roles.stream().map(Role::getAuthority)
+                .collect(Collectors.toCollection(() -> EnumSet.noneOf(RoleType.class)));
+    }
+
+    public boolean isPlainUser() {
+        return getRoleSet().equals(EnumSet.of(RoleType.ROLE_USER));
     }
 }

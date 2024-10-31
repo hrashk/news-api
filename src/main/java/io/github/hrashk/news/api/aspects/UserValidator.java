@@ -1,5 +1,7 @@
 package io.github.hrashk.news.api.aspects;
 
+import io.github.hrashk.news.api.authors.Author;
+import io.github.hrashk.news.api.authors.AuthorService;
 import io.github.hrashk.news.api.comments.CommentService;
 import io.github.hrashk.news.api.exceptions.EntityNotFoundException;
 import io.github.hrashk.news.api.exceptions.InvalidUserException;
@@ -20,6 +22,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class UserValidator {
     private final HttpServletRequest request;
+    private final AuthorService authorService;
 
     @Before("@annotation(SameAuthor) && target(service)")
     public void checkNews(JoinPoint jp, NewsService service) {
@@ -31,20 +34,24 @@ public class UserValidator {
         checkUser(id -> service.findById(id).getAuthor().getId());
     }
 
+    @Before("@annotation(SameAuthor) && target(service)")
+    public void checkAuthor(JoinPoint jp, AuthorService service) {
+        checkUser(id -> id);
+    }
+
     private void checkUser(Function<Long, Long> authorIdLookup) {
         Long authorId;
 
         try {
             Long entityId = getIdFromPath();
             authorId = authorIdLookup.apply(entityId);
-        }
-        catch (NumberFormatException | EntityNotFoundException ex) {
+        } catch (NumberFormatException | EntityNotFoundException ex) {
             return; // skip if no id in the url path or no entity matches the id
         }
 
-        Long userId = getUserIdParam();
+        Author author = getAuthorFromPrincipal();
 
-        if (!userId.equals(authorId))
+        if (author.isPlainUser() && !author.getId().equals(authorId))
             throw new InvalidUserException();
     }
 
@@ -54,11 +61,9 @@ public class UserValidator {
         return Long.parseLong(String.valueOf(variables.get("id")));
     }
 
-    private long getUserIdParam() {
-        try {
-            return Long.parseLong(request.getParameter("userId"));
-        } catch (NumberFormatException ex) {
-            throw new InvalidUserException(ex);
-        }
+    private Author getAuthorFromPrincipal() {
+        String username = request.getUserPrincipal().getName();
+
+        return authorService.findByUsername(username);
     }
 }

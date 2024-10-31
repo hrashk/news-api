@@ -44,9 +44,10 @@ public final class DataSeeder {
     public void seed(int count) {
         authors = sampleAuthors(count);
         authors.get(0).addRole(RoleType.ROLE_ADMIN);
+
         authors.get(1).addRole(RoleType.ROLE_MODERATOR);
         authors.get(2).addRole(RoleType.ROLE_USER);
-        authors.get(3).addRole(RoleType.ROLE_MODERATOR);
+
         authors.get(3).addRole(RoleType.ROLE_USER);
 
         authors = authors.stream().map(this::saveAndReturnDecoded).toList();
