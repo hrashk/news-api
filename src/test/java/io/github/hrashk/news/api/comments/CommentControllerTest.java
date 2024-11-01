@@ -157,7 +157,7 @@ class CommentControllerTest extends ControllerTest {
         Long commentId = comment.getId();
         Long userId = comment.getAuthor().getId();
 
-        ResponseEntity<Void> response = delete(COMMENTS_WITH_USER_URL, commentId, userId);
+        ResponseEntity<Void> response = delete(COMMENTS_WITH_USER_URL, seeder.admin(), commentId, userId);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
         ResponseEntity<ErrorInfo> findResponse = rest.getForEntity(COMMENTS_ID_URL, ErrorInfo.class, commentId);
@@ -172,7 +172,7 @@ class CommentControllerTest extends ControllerTest {
         Long commentId = INVALID_ID;
         Long userId = seeder.authors().get(0).getId();
 
-        ResponseEntity<ErrorInfo> response = delete(COMMENTS_WITH_USER_URL, ErrorInfo.class, commentId, userId);
+        ResponseEntity<ErrorInfo> response = delete(COMMENTS_WITH_USER_URL, seeder.moderator(), ErrorInfo.class, commentId, userId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
@@ -186,7 +186,7 @@ class CommentControllerTest extends ControllerTest {
         Long commentId = seeder.comments().get(0).getId();
         Long userId = INVALID_ID;
 
-        ResponseEntity<ErrorInfo> response = delete(url, ErrorInfo.class, commentId, userId);
+        ResponseEntity<ErrorInfo> response = delete(url, seeder.admin(), ErrorInfo.class, commentId, userId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN),

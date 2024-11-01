@@ -38,12 +38,13 @@ public abstract class ControllerTest {
                 .exchange(url, HttpMethod.PUT, new HttpEntity<>(request, headers), responseType, urlVariables);
     }
 
-    public <T> ResponseEntity<T> delete(String url, Class<T> responseType, Object... urlVariables) {
-        return rest.exchange(url, HttpMethod.DELETE, HttpEntity.EMPTY, responseType, urlVariables);
+    public <T> ResponseEntity<T> delete(String url, Author a, Class<T> responseType, Object... urlVariables) {
+        return rest.withBasicAuth(a.getUsername(), a.getPassword())
+                .exchange(url, HttpMethod.DELETE, HttpEntity.EMPTY, responseType, urlVariables);
     }
 
-    public ResponseEntity<Void> delete(String url, Object... urlVariables) {
-        return delete(url, Void.class, urlVariables);
+    public ResponseEntity<Void> delete(String url, Author a, Object... urlVariables) {
+        return delete(url, a, Void.class, urlVariables);
     }
 
     static Stream<Arguments> users() {

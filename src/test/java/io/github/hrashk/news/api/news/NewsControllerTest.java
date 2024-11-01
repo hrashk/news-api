@@ -233,7 +233,7 @@ class NewsControllerTest extends ControllerTest {
         Long newsId = news.getId();
         Long userId = news.getAuthor().getId();
 
-        ResponseEntity<Void> response = delete(NEWS_WITH_USER_URL, newsId, userId);
+        ResponseEntity<Void> response = delete(NEWS_WITH_USER_URL, seeder.admin(), newsId, userId);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
         ResponseEntity<ErrorInfo> findResponse = rest.getForEntity(NEWS_ID_URL, ErrorInfo.class, newsId);
@@ -248,7 +248,7 @@ class NewsControllerTest extends ControllerTest {
         Long newsId = INVALID_ID;
         Long userId = seeder.authors().get(0).getId();
 
-        ResponseEntity<ErrorInfo> response = delete(NEWS_WITH_USER_URL, ErrorInfo.class, newsId, userId);
+        ResponseEntity<ErrorInfo> response = delete(NEWS_WITH_USER_URL, seeder.moderator(), ErrorInfo.class, newsId, userId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
@@ -262,7 +262,7 @@ class NewsControllerTest extends ControllerTest {
         Long newsId = seeder.news().get(0).getId();
         Long userId = INVALID_ID;
 
-        ResponseEntity<ErrorInfo> response = delete(url, ErrorInfo.class, newsId, userId);
+        ResponseEntity<ErrorInfo> response = delete(url, seeder.admin(), ErrorInfo.class, newsId, userId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN),

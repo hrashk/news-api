@@ -87,12 +87,14 @@ class AuthorControllerTest extends ControllerTest {
 
     @Test
     void deleteWithNews() {
-        Long authorId = seeder.news().get(0).getAuthor().getId();
+        Long authorId = seeder.moderator().getId();
 
-        ResponseEntity<Void> response = delete(Constants.AUTHORS_ID_URL, authorId);
+        Author a = seeder.admin();
+        ResponseEntity<Void> response = delete(Constants.AUTHORS_ID_URL, a, authorId);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        ResponseEntity<ErrorInfo> findResponse = rest.getForEntity(Constants.AUTHORS_ID_URL, ErrorInfo.class, authorId);
+        ResponseEntity<ErrorInfo> findResponse = rest.withBasicAuth(a.getUsername(), a.getPassword())
+                .getForEntity(Constants.AUTHORS_ID_URL, ErrorInfo.class, authorId);
         assertAll(
                 () -> assertThat(findResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
                 () -> assertThat(findResponse.getBody().message()).contains("Author")
@@ -101,12 +103,14 @@ class AuthorControllerTest extends ControllerTest {
 
     @Test
     void deleteWithAuthors() {
-        Long authorId = seeder.comments().get(0).getAuthor().getId();
+        Long authorId = seeder.admin().getId();
 
-        ResponseEntity<Void> response = delete(Constants.AUTHORS_ID_URL, authorId);
+        Author m = seeder.moderator();
+        ResponseEntity<Void> response = delete(Constants.AUTHORS_ID_URL, m, authorId);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        ResponseEntity<ErrorInfo> findResponse = rest.getForEntity(Constants.AUTHORS_ID_URL, ErrorInfo.class, authorId);
+        ResponseEntity<ErrorInfo> findResponse = rest.withBasicAuth(m.getUsername(), m.getPassword())
+                .getForEntity(Constants.AUTHORS_ID_URL, ErrorInfo.class, authorId);
         assertAll(
                 () -> assertThat(findResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
                 () -> assertThat(findResponse.getBody().message()).contains("Author")
@@ -117,7 +121,7 @@ class AuthorControllerTest extends ControllerTest {
     void deleteMissing() {
         Long authorId = INVALID_ID;
 
-        ResponseEntity<ErrorInfo> response = delete(Constants.AUTHORS_ID_URL, ErrorInfo.class, authorId);
+        ResponseEntity<ErrorInfo> response = delete(Constants.AUTHORS_ID_URL, seeder.admin(), ErrorInfo.class, authorId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),

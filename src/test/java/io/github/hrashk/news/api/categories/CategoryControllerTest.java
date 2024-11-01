@@ -76,7 +76,7 @@ class CategoryControllerTest extends ControllerTest {
         );
 
         Long id = response.getBody().id();
-        ResponseEntity<Void> deleteResponse = delete(CATEGORIES_ID_URL, id);
+        ResponseEntity<Void> deleteResponse = delete(CATEGORIES_ID_URL, seeder.moderator(), id);
         assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
         ResponseEntity<ErrorInfo> findResponse = rest.getForEntity(CATEGORIES_ID_URL, ErrorInfo.class, id);
@@ -130,7 +130,7 @@ class CategoryControllerTest extends ControllerTest {
     void deleteWithNews() {
         Long categoryId = seeder.news().get(0).getCategory().getId();
 
-        ResponseEntity<ErrorInfo> response = delete(CATEGORIES_ID_URL, ErrorInfo.class, categoryId);
+        ResponseEntity<ErrorInfo> response = delete(CATEGORIES_ID_URL, seeder.admin(), ErrorInfo.class, categoryId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST),
@@ -142,7 +142,7 @@ class CategoryControllerTest extends ControllerTest {
     void deleteMissing() {
         Long categoryId = INVALID_ID;
 
-        ResponseEntity<ErrorInfo> response = delete(CATEGORIES_ID_URL, ErrorInfo.class, categoryId);
+        ResponseEntity<ErrorInfo> response = delete(CATEGORIES_ID_URL, seeder.admin(), ErrorInfo.class, categoryId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
