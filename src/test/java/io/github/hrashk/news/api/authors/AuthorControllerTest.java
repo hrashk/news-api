@@ -20,9 +20,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class AuthorControllerTest extends ControllerTest {
-    @Test
-    void add() {
-        Author a = seeder.admin();
+    @ParameterizedTest(name="{1}")
+    @MethodSource("users")
+    void add(Function<DataSeeder, Author> userProvider, String userType) {
+        Author a = userProvider.apply(seeder);
         UpsertAuthorRequest request = new UpsertAuthorRequest(
                 "lorem", "ipsum", "random", "password");
 
@@ -74,7 +75,7 @@ class AuthorControllerTest extends ControllerTest {
         return Stream.of(
                 Arguments.of((Function<DataSeeder, Author>) DataSeeder::admin, "admin"),
                 Arguments.of((Function<DataSeeder, Author>) DataSeeder::moderator, "moderator"),
-                Arguments.of((Function<DataSeeder, Author>) DataSeeder::plainUser, "plainUser"));
+                Arguments.of((Function<DataSeeder, Author>) DataSeeder::plainUser, "user"));
     }
 
     @Test
