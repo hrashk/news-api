@@ -10,10 +10,11 @@ import org.springframework.data.domain.PageRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@Import(AuthorService.class)
+@Import({AuthorService.class, TestBeans.class})
 class AuthorServiceTest extends ServiceTest {
     @Autowired
     private AuthorService service;
+
 
     @Test
     void firstPage() {
