@@ -1,4 +1,4 @@
-package io.github.hrashk.news.api.authors;
+package io.github.hrashk.news.api.util;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -7,7 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Objects;
 
 @TestConfiguration
-class TestBeans {
+public class ServiceTestBeans {
     @Bean
     PasswordEncoder dummyEncoder() {
         return new PasswordEncoder() {

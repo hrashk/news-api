@@ -2,7 +2,6 @@ package io.github.hrashk.news.api.util;
 
 import io.github.hrashk.news.api.authors.Author;
 import io.github.hrashk.news.api.authors.AuthorRepository;
-import io.github.hrashk.news.api.authors.AuthorService;
 import io.github.hrashk.news.api.categories.Category;
 import io.github.hrashk.news.api.categories.CategoryRepository;
 import io.github.hrashk.news.api.comments.Comment;
@@ -15,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import net.datafaker.Faker;
 import org.springframework.boot.test.context.TestComponent;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Random;
@@ -28,7 +28,7 @@ import java.util.stream.LongStream;
 @Accessors(fluent = true)
 public final class DataSeeder {
     private final AuthorRepository authorsRepo;
-    private final AuthorService authorService;
+    private final PasswordEncoder encoder;
     private final NewsRepository newsRepo;
     private final CategoryRepository categoryRepo;
     private final CommentRepository commentRepository;
@@ -82,7 +82,7 @@ public final class DataSeeder {
     private Author saveAndReturnDecoded(Author a) {
         String decoded = a.getPassword();
 
-        authorService.encodePassword(a);
+        a.setPassword(encoder.encode(a.getPassword()));
         a = authorsRepo.save(a);
         a.setPassword(decoded);
 
