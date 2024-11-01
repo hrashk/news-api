@@ -24,7 +24,6 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class UserValidator {
     private final HttpServletRequest request;
-    private final AuthorService authorService;
 
     @Before("@annotation(SameAuthor) && target(service)")
     public void checkNews(JoinPoint jp, NewsService service) {
