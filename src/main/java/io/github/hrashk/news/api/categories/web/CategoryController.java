@@ -10,6 +10,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,6 +38,7 @@ public class CategoryController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MODERATOR')")
     public ResponseEntity<CategoryResponse> addCategory(@RequestBody @Valid UpsertCategoryRequest categoryRequest) {
         Long id = service.add(mapper.map(categoryRequest));
 
@@ -46,6 +48,7 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MODERATOR')")
     public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id, @RequestBody @Valid UpsertCategoryRequest request) {
         Long newId = service.updateOrAdd(id, mapper.map(request));
 
@@ -58,6 +61,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MODERATOR')")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
         service.deleteById(id);
 

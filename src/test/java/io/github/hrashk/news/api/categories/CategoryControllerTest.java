@@ -15,6 +15,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -131,6 +132,18 @@ class CategoryControllerTest extends ControllerTest {
         );
     }
 
+    @Test
+    void plainUserCannotAdd() {
+        Author a = seeder.plainUser();
+
+        var request = new UpsertCategoryRequest("lorem");
+
+        ResponseEntity<?> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
+                .postForEntity(Constants.CATEGORIES_URL, request, Map.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
     @ParameterizedTest(name = "{1}")
     @MethodSource("upsertUsers")
     void update(Function<DataSeeder, Author> userProvider, String userType) {
@@ -147,6 +160,19 @@ class CategoryControllerTest extends ControllerTest {
                 () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties(),
                 () -> assertThat(response.getBody().name()).isEqualTo("lorem")
         );
+    }
+
+    @Test
+    void plainUserCannotUpdate() {
+        Author a = seeder.plainUser();
+
+        Long categoryId = seeder.categories().get(0).getId();
+        var request = new UpsertCategoryRequest("lorem");
+
+        ResponseEntity<?> response =
+                put(Constants.CATEGORIES_ID_URL, request, a, Map.class, categoryId);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
@@ -178,6 +204,18 @@ class CategoryControllerTest extends ControllerTest {
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST),
                 () -> assertThat(response.getBody().message()).contains("Cannot")
         );
+    }
+
+    @Test
+    void plainUserCannotDelete() {
+        Author a = seeder.plainUser();
+
+        Long categoryId = seeder.news().get(0).getCategory().getId();
+
+        ResponseEntity<?> response =
+                delete(Constants.CATEGORIES_ID_URL, a, Map.class, categoryId);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
