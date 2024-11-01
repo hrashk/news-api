@@ -4,6 +4,5 @@ public record AuthorResponse(
         Long id,
         String firstName,
         String lastName,
-        String username,
-        String password) {
+        String username) {
 }

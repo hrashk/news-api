@@ -57,7 +57,7 @@ class AuthorControllerTest extends ControllerTest {
     void update(Function<DataSeeder, Author> userProvider, String userType) {
         Author a = seeder.plainUser();
         var request = new UpsertAuthorRequest(
-                a.getFirstName(), "lorem", a.getUsername(), "password");
+                a.getFirstName(), "lorem", "random", "password");
 
         ResponseEntity<AuthorResponse> response =
                 put(Constants.AUTHORS_ID_URL, request, userProvider.apply(seeder), AuthorResponse.class, a.getId());
@@ -65,6 +65,7 @@ class AuthorControllerTest extends ControllerTest {
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
                 () -> assertThat(response.getBody().lastName()).isEqualTo("lorem"),
+                () -> assertThat(response.getBody().username()).isEqualTo("random"),
                 () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties()
         );
     }

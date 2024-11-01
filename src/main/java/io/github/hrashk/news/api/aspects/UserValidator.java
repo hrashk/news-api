@@ -6,11 +6,13 @@ import io.github.hrashk.news.api.comments.CommentService;
 import io.github.hrashk.news.api.exceptions.EntityNotFoundException;
 import io.github.hrashk.news.api.exceptions.InvalidUserException;
 import io.github.hrashk.news.api.news.NewsService;
+import io.github.hrashk.news.api.security.AppUserPrincipal;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerMapping;
 
@@ -62,8 +64,9 @@ public class UserValidator {
     }
 
     private Author getAuthorFromPrincipal() {
-        String username = request.getUserPrincipal().getName();
+        Authentication authn = (Authentication) request.getUserPrincipal();
+        AppUserPrincipal principal = (AppUserPrincipal) authn.getPrincipal();
 
-        return authorService.findByUsername(username);
+        return principal.getAuthor();
     }
 }
