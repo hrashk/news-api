@@ -8,13 +8,11 @@ import io.github.hrashk.news.api.util.ControllerTest;
 import io.github.hrashk.news.api.util.DataSeeder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -69,13 +67,6 @@ class AuthorControllerTest extends ControllerTest {
                 () -> assertThat(response.getBody().username()).isEqualTo("random"),
                 () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties()
         );
-    }
-
-    static Stream<Arguments> users() {
-        return Stream.of(
-                Arguments.of((Function<DataSeeder, Author>) DataSeeder::admin, "admin"),
-                Arguments.of((Function<DataSeeder, Author>) DataSeeder::moderator, "moderator"),
-                Arguments.of((Function<DataSeeder, Author>) DataSeeder::plainUser, "user"));
     }
 
     @Test
