@@ -39,7 +39,7 @@ class GetAuthorByIdTest extends ControllerTest {
         Author pu = seeder.plainUser();
         Long authorId = seeder.withoutRoles().getId();
 
-        ResponseEntity<Map> response = rest.withBasicAuth(pu.getUsername(), pu.getPassword())
+        ResponseEntity<?> response = rest.withBasicAuth(pu.getUsername(), pu.getPassword())
                 .getForEntity(Constants.AUTHORS_ID_URL, Map.class, authorId);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);

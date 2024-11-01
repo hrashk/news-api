@@ -82,7 +82,7 @@ class GetAllAuthorsTest extends ControllerTest {
     void forbiddenIfNotAdmin(Function<DataSeeder, Author> userProvider, String userType) {
         Author a = userProvider.apply(seeder);
 
-        ResponseEntity<Map> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
+        ResponseEntity<?> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
                 .getForEntity(Constants.AUTHORS_URL, Map.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
