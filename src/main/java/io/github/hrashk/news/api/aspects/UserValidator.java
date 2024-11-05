@@ -47,7 +47,7 @@ public class UserValidator {
             Long entityId = getIdFromPath();
             authorId = authorIdLookup.apply(entityId);
         } catch (NumberFormatException | EntityNotFoundException ex) {
-            return; // skip if no id in the url path or no entity matches the id
+            return; // when the web controller searches for an entity by id right after creating it
         }
 
         Author author = getAuthorFromPrincipal();
