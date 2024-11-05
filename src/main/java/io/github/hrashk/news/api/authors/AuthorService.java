@@ -1,6 +1,8 @@
 package io.github.hrashk.news.api.authors;
 
+import io.github.hrashk.news.api.aspects.SameAuthor;
 import io.github.hrashk.news.api.common.BaseService;
+import io.github.hrashk.news.api.exceptions.EntityNotFoundException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,12 @@ public class AuthorService extends BaseService<Author, AuthorRepository> {
     public AuthorService(AuthorRepository repository, PasswordEncoder passwordEncoder) {
         super(repository, "Author");
         this.passwordEncoder = passwordEncoder;
+    }
+
+    @Override
+    @SameAuthor
+    public Author findById(Long id) throws EntityNotFoundException {
+        return super.findById(id);
     }
 
     @Override

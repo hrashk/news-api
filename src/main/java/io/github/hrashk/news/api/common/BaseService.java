@@ -16,7 +16,6 @@ public abstract class BaseService<E extends BaseEntity, R extends JpaRepository<
     }
 
     @Override
-    @SameAuthor
     public E findById(Long id) throws EntityNotFoundException {
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(entityName, id));
