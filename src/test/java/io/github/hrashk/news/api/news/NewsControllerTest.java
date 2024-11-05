@@ -161,13 +161,16 @@ class NewsControllerTest extends ControllerTest {
         );
     }
 
-    @Test
-    void addWithInvalidAuthorId() {
+    @ParameterizedTest(name = "{1}")
+    @MethodSource("users")
+    void addWithInvalidAuthorId(Function<DataSeeder, Author> userProvider, String userType) {
         Long authorId = INVALID_ID;
         Long categoryId = seeder.categories().get(4).getId();
         UpsertNewsRequest request = new UpsertNewsRequest(authorId, categoryId, "h", "c");
 
-        ResponseEntity<ErrorInfo> response = rest.postForEntity(NEWS_URL, request, ErrorInfo.class);
+        Author a = userProvider.apply(seeder);
+        ResponseEntity<ErrorInfo> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
+                .postForEntity(NEWS_URL, request, ErrorInfo.class);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
@@ -175,13 +178,16 @@ class NewsControllerTest extends ControllerTest {
         );
     }
 
-    @Test
-    void addiWithInvalidCategoryId() {
+    @ParameterizedTest(name = "{1}")
+    @MethodSource("users")
+    void addiWithInvalidCategoryId(Function<DataSeeder, Author> userProvider, String userType) {
         Long authorId = seeder.authors().get(3).getId();
         Long categoryId = INVALID_ID;
         UpsertNewsRequest request = new UpsertNewsRequest(authorId, categoryId, "h", "c");
 
-        ResponseEntity<ErrorInfo> response = rest.postForEntity(NEWS_URL, request, ErrorInfo.class);
+        Author a = userProvider.apply(seeder);
+        ResponseEntity<ErrorInfo> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
+                .postForEntity(NEWS_URL, request, ErrorInfo.class);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
@@ -189,11 +195,14 @@ class NewsControllerTest extends ControllerTest {
         );
     }
 
-    @Test
-    void addBroken() {
+    @ParameterizedTest(name = "{1}")
+    @MethodSource("users")
+    void addBroken(Function<DataSeeder, Author> userProvider, String userType) {
         UpsertNewsRequest request = new UpsertNewsRequest(null, null, " ", null);
 
-        ResponseEntity<ErrorInfo> response = rest.postForEntity(NEWS_URL, request, ErrorInfo.class);
+        Author a = userProvider.apply(seeder);
+        ResponseEntity<ErrorInfo> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
+                .postForEntity(NEWS_URL, request, ErrorInfo.class);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST),
