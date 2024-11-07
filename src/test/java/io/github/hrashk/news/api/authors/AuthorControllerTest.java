@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 class AuthorControllerTest extends ControllerTest {
     @ParameterizedTest(name="{1}")
-    @MethodSource("users")
+    @MethodSource("adminAndModerator")
     void add(Function<DataSeeder, Author> userProvider, String userType) {
         Author a = userProvider.apply(seeder);
         UpsertAuthorRequest request = new UpsertAuthorRequest(
@@ -85,11 +85,12 @@ class AuthorControllerTest extends ControllerTest {
         );
     }
 
-    @Test
-    void deleteWithNews() {
-        Long authorId = seeder.moderator().getId();
+    @ParameterizedTest(name="{1}")
+    @MethodSource("adminAndModerator")
+    void deleteWithNews(Function<DataSeeder, Author> userProvider, String userType) {
+        Long authorId = seeder.news().get(0).getAuthor().getId();
 
-        Author a = seeder.admin();
+        Author a = userProvider.apply(seeder);
         ResponseEntity<Void> response = delete(Constants.AUTHORS_ID_URL, a, authorId);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
@@ -102,10 +103,24 @@ class AuthorControllerTest extends ControllerTest {
     }
 
     @Test
-    void deleteWithAuthors() {
-        Long authorId = seeder.admin().getId();
+    void deleteSelf() {
+        Long authorId = seeder.plainUser().getId();
 
-        Author m = seeder.moderator();
+        Author a = seeder.plainUser();
+        ResponseEntity<Void> response = delete(Constants.AUTHORS_ID_URL, a, authorId);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+        ResponseEntity<ErrorInfo> findResponse = rest.withBasicAuth(a.getUsername(), a.getPassword())
+                .getForEntity(Constants.AUTHORS_ID_URL, ErrorInfo.class, authorId);
+        assertThat(findResponse.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @ParameterizedTest(name="{1}")
+    @MethodSource("adminAndModerator")
+    void deleteWithComments(Function<DataSeeder, Author> userProvider, String userType) {
+        Long authorId = seeder.comments().get(0).getAuthor().getId();
+
+        Author m = userProvider.apply(seeder);
         ResponseEntity<Void> response = delete(Constants.AUTHORS_ID_URL, m, authorId);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 

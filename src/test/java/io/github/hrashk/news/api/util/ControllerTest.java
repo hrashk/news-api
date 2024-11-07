@@ -53,4 +53,10 @@ public abstract class ControllerTest {
                 Arguments.of((Function<DataSeeder, Author>) DataSeeder::moderator, "moderator"),
                 Arguments.of((Function<DataSeeder, Author>) DataSeeder::plainUser, "user"));
     }
+
+    static Stream<Arguments> adminAndModerator() {
+        return Stream.of(
+                Arguments.of((Function<DataSeeder, Author>) DataSeeder::admin, "admin"),
+                Arguments.of((Function<DataSeeder, Author>) DataSeeder::moderator, "moderator"));
+    }
 }

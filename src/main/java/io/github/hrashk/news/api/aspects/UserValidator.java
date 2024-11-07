@@ -45,9 +45,9 @@ public class UserValidator {
         checkUser(id -> service.findById(id).getAuthor().getId(), true);
     }
 
-    @Before("@annotation(SameAuthorLenient) && target(service)")
-    public void checkAuthor(JoinPoint jp, AuthorService service) {
-        checkUser(id -> id, false);
+    @Before("target(service) && execution(* *.findById(Long)) && args(id)")
+    public void checkAuthor(JoinPoint jp, AuthorService service, Long id) {
+        checkAdminOrSameAuthor(id);
     }
 
     private void checkUser(Function<Long, Long> authorIdLookup, boolean strict) {
@@ -63,6 +63,13 @@ public class UserValidator {
         Author author = getAuthorFromPrincipal();
 
         if ((strict || author.hasOnlyUserRole()) && !author.getId().equals(authorId))
+            throw new InvalidUserException();
+    }
+
+    private void checkAdminOrSameAuthor(Long authorId) {
+        Author author = getAuthorFromPrincipal();
+
+        if (author.hasOnlyUserRole() && !author.getId().equals(authorId))
             throw new InvalidUserException();
     }
 
