@@ -1,6 +1,6 @@
 package io.github.hrashk.news.api.authors;
 
-import io.github.hrashk.news.api.aspects.SameAuthor;
+import io.github.hrashk.news.api.aspects.SameAuthorLenient;
 import io.github.hrashk.news.api.common.BaseService;
 import io.github.hrashk.news.api.exceptions.EntityNotFoundException;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +19,7 @@ public class AuthorService extends BaseService<Author, AuthorRepository> {
     }
 
     @Override
-    @SameAuthor
+    @SameAuthorLenient
     public Author findById(Long id) throws EntityNotFoundException {
         return super.findById(id);
     }

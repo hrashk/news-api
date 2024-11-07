@@ -25,17 +25,17 @@ import java.util.function.Function;
 public class UserValidator {
     private final HttpServletRequest request;
 
-    @Before("@annotation(SameAuthor) && target(service)")
+    @Before("@annotation(io.github.hrashk.news.api.aspects.SameAuthorLenient) && target(service)")
     public void checkNews(JoinPoint jp, NewsService service) {
         checkUser(id -> service.findById(id).getAuthor().getId());
     }
 
-    @Before("@annotation(SameAuthor) && target(service)")
+    @Before("@annotation(io.github.hrashk.news.api.aspects.SameAuthorLenient) && target(service)")
     public void checkComment(JoinPoint jp, CommentService service) {
         checkUser(id -> service.findById(id).getAuthor().getId());
     }
 
-    @Before("@annotation(SameAuthor) && target(service)")
+    @Before("@annotation(io.github.hrashk.news.api.aspects.SameAuthorLenient) && target(service)")
     public void checkAuthor(JoinPoint jp, AuthorService service) {
         checkUser(id -> id);
     }
