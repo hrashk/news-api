@@ -54,7 +54,7 @@ class CategoryServiceTest extends ServiceTest {
         var category = seeder.categories().get(1);
         category.setName("asdf");
 
-        service.updateOrAdd(category.getId(), category);
+        service.update(category.getId(), category);
         seeder.flush();
 
         assertThat(service.findById(category.getId())).hasFieldOrPropertyWithValue("name", "asdf");

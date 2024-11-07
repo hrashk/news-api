@@ -50,7 +50,7 @@ public class AuthorController {
 
     @PutMapping("/{id}")
     public ResponseEntity<AuthorResponse> updateAuthor(@PathVariable Long id, @RequestBody @Valid UpsertAuthorRequest authorRequest) {
-        Long newId = service.updateOrAdd(id, mapper.map(authorRequest));
+        Long newId = service.update(id, mapper.map(authorRequest));
 
         AuthorResponse response = mapper.map(service.findById(newId));
 

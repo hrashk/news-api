@@ -51,7 +51,7 @@ public class NewsController {
             description = "the operation is forbidden unless coincides with the authorId of the news")
     @PutMapping("/{id}")
     public ResponseEntity<NewsResponse> updateNews(@PathVariable Long id, @RequestBody @Valid UpsertNewsRequest request) {
-        Long newId = service.updateOrAdd(id, mapper.map(request));
+        Long newId = service.update(id, mapper.map(request));
 
         NewsResponse response = mapper.map(service.findById(newId));
 

@@ -50,7 +50,7 @@ public class CategoryController {
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MODERATOR')")
     public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id, @RequestBody @Valid UpsertCategoryRequest request) {
-        Long newId = service.updateOrAdd(id, mapper.map(request));
+        Long newId = service.update(id, mapper.map(request));
 
         CategoryResponse response = mapper.map(service.findById(newId));
 

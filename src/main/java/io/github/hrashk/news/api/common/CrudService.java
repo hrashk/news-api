@@ -5,7 +5,7 @@ import io.github.hrashk.news.api.exceptions.EntityNotFoundException;
 public interface CrudService<E, ID> {
     E findById(ID id) throws EntityNotFoundException;
 
-    ID updateOrAdd(ID id, E entity);
+    ID update(ID id, E entity);
 
     ID add(E entity);
 

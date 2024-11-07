@@ -25,22 +25,32 @@ import java.util.function.Function;
 public class UserValidator {
     private final HttpServletRequest request;
 
-    @Before("@annotation(io.github.hrashk.news.api.aspects.SameAuthorLenient) && target(service)")
+    @Before("@annotation(SameAuthorLenient) && target(service)")
     public void checkNews(JoinPoint jp, NewsService service) {
-        checkUser(id -> service.findById(id).getAuthor().getId());
+        checkUser(id -> service.findById(id).getAuthor().getId(), false);
     }
 
-    @Before("@annotation(io.github.hrashk.news.api.aspects.SameAuthorLenient) && target(service)")
+    @Before("@annotation(SameAuthorLenient) && target(service)")
     public void checkComment(JoinPoint jp, CommentService service) {
-        checkUser(id -> service.findById(id).getAuthor().getId());
+        checkUser(id -> service.findById(id).getAuthor().getId(), false);
     }
 
-    @Before("@annotation(io.github.hrashk.news.api.aspects.SameAuthorLenient) && target(service)")
+    @Before("@annotation(SameAuthorStrict) && target(service)")
+    public void checkNewsStrict(JoinPoint jp, NewsService service) {
+        checkUser(id -> service.findById(id).getAuthor().getId(), true);
+    }
+
+    @Before("@annotation(SameAuthorStrict) && target(service)")
+    public void checkCommentStrict(JoinPoint jp, CommentService service) {
+        checkUser(id -> service.findById(id).getAuthor().getId(), true);
+    }
+
+    @Before("@annotation(SameAuthorLenient) && target(service)")
     public void checkAuthor(JoinPoint jp, AuthorService service) {
-        checkUser(id -> id);
+        checkUser(id -> id, false);
     }
 
-    private void checkUser(Function<Long, Long> authorIdLookup) {
+    private void checkUser(Function<Long, Long> authorIdLookup, boolean strict) {
         Long authorId;
 
         try {
@@ -52,7 +62,7 @@ public class UserValidator {
 
         Author author = getAuthorFromPrincipal();
 
-        if (author.hasOnlyUserRole() && !author.getId().equals(authorId))
+        if ((strict || author.hasOnlyUserRole()) && !author.getId().equals(authorId))
             throw new InvalidUserException();
     }
 

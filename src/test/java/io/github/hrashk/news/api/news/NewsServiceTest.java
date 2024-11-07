@@ -48,7 +48,7 @@ class NewsServiceTest extends ServiceTest {
         var n = seeder.news().get(1);
         n.setHeadline("asdf");
 
-        service.updateOrAdd(n.getId(), n);
+        service.update(n.getId(), n);
         seeder.flush();
 
         assertThat(service.findById(n.getId())).hasFieldOrPropertyWithValue("headline", "asdf");

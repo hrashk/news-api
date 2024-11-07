@@ -16,10 +16,12 @@ import net.datafaker.Faker;
 import org.springframework.boot.test.context.TestComponent;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.LongFunction;
+import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
 @TestComponent
@@ -44,16 +46,20 @@ public final class DataSeeder {
     public void seed(int count) {
         authors = sampleAuthors(count);
         authors.get(0).addRole(RoleType.ROLE_ADMIN);
-
         authors.get(1).addRole(RoleType.ROLE_MODERATOR);
-        authors.get(2).addRole(RoleType.ROLE_USER);
+        addUserRole(authors);
 
-        authors.get(3).addRole(RoleType.ROLE_USER);
-
-        authors = authors.stream().map(this::saveAndReturnDecoded).toList();
+        authors = authors.stream().map(this::saveAndReturnDecoded).collect(Collectors.toCollection(ArrayList::new));
         categories = categoryRepo.saveAll(sampleCategories(count));
         news = newsRepo.saveAll(sampleNews(count));
         comments = commentRepository.saveAll(sampleComments(count));
+
+        Author withoutRoles = saveAndReturnDecoded(aRandomAuthor(42));
+        authors.add(withoutRoles);
+    }
+
+    private void addUserRole(List<Author> authors) {
+        authors.subList(1, authors.size()).forEach(a -> a.addRole(RoleType.ROLE_USER));
     }
 
     public void flush() {
@@ -76,7 +82,7 @@ public final class DataSeeder {
     }
 
     public Author withoutRoles() {
-        return authors.get(4);
+        return authors.get(authors.size() - 1);
     }
 
     private Author saveAndReturnDecoded(Author a) {

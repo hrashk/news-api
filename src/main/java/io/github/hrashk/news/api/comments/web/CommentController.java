@@ -42,7 +42,7 @@ public class CommentController {
             description = "the operation is forbidden unless coincides with the authorId of the comment")
     @PutMapping("/{id}")
     public ResponseEntity<CommentResponse> updateComment(@PathVariable Long id, @RequestBody @Valid UpsertCommentRequest request) {
-        Long newId = service.updateOrAdd(id, mapper.map(request));
+        Long newId = service.update(id, mapper.map(request));
 
         CommentResponse response = mapper.map(service.findById(newId));
 
