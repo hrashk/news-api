@@ -35,26 +35,44 @@ class AuthorizationAuthorTest extends ControllerTest {
         );
     }
 
-    private DynamicAuthorTest findById(Author authn, HttpStatus status, Long query) {
-        return new DynamicAuthorTest(Constants.AUTHORS_ID_URL, authn, status, query);
+    @TestFactory
+    public List<DynamicTest> findAll() {
+        Author authorNotInSystem = Author.builder().username("fake").password("author").build();
+
+        return List.of(
+                dynamicTest("as admin", findAll(seeder.admin(), HttpStatus.OK)),
+                dynamicTest("as moderator", findAll(seeder.moderator(), HttpStatus.FORBIDDEN)),
+                dynamicTest("as user", findAll(seeder.plainUser(), HttpStatus.FORBIDDEN)),
+                dynamicTest("no roles", findAll(seeder.withoutRoles(), HttpStatus.FORBIDDEN)),
+                dynamicTest("anonymous", findAll(null, HttpStatus.UNAUTHORIZED)),
+                dynamicTest("wrong creds", findAll(authorNotInSystem, HttpStatus.UNAUTHORIZED))
+        );
+    }
+
+    private DynamicAuthorTest findById(Author authn, HttpStatus status, Long id) {
+        return new DynamicAuthorTest(Constants.AUTHORS_ID_URL, authn, status, id);
+    }
+
+    private DynamicAuthorTest findAll(Author authn, HttpStatus status) {
+        return new DynamicAuthorTest(Constants.AUTHORS_URL, authn, status);
     }
 
     class DynamicAuthorTest implements Executable {
         final Author authn;
-        protected Long query;
+        protected Object[] urlVariables;
         protected HttpStatus status;
         protected String url;
 
-        DynamicAuthorTest(String url, Author authn, HttpStatus status, Long authorId) {
-            this.authn = authn;
-            this.query = authorId;
-            this.status = status;
+        DynamicAuthorTest(String url, Author authn, HttpStatus status, Object... urlVariables) {
             this.url = url;
+            this.authn = authn;
+            this.status = status;
+            this.urlVariables = urlVariables;
         }
 
         @Override
         public void execute() {
-            ResponseEntity<?> response = request().getForEntity(url, Map.class, query);
+            ResponseEntity<?> response = request().getForEntity(url, Map.class, urlVariables);
 
             assertThat(response.getStatusCode()).isEqualTo(status);
         }
