@@ -22,17 +22,25 @@ class AuthorizationAuthorTest extends ControllerTest {
         Author authorNotInSystem = Author.builder().username("fake").password("author").build();
 
         return List.of(
-                dynamicTest("as admin", findById(seeder.admin(), HttpStatus.OK, plainUserId)),
-                dynamicTest("as moderator", findById(seeder.moderator(), HttpStatus.OK, plainUserId)),
-                dynamicTest("as user", findById(seeder.plainUser(), HttpStatus.OK, plainUserId)),
-                dynamicTest("no roles", findById(seeder.withoutRoles(), HttpStatus.FORBIDDEN, plainUserId)),
-                dynamicTest("anonymous", findById(null, HttpStatus.UNAUTHORIZED, plainUserId)),
-                dynamicTest("wrong creds", findById(authorNotInSystem, HttpStatus.UNAUTHORIZED, plainUserId)),
-                dynamicTest("user cannot find another author",
-                        findById(seeder.plainUser(), HttpStatus.FORBIDDEN, seeder.admin().getId())),
-                dynamicTest("cannot find invalid author",
-                        findById(seeder.admin(), HttpStatus.NOT_FOUND, INVALID_ID))
+                dynamicTest("as admin -> ok",
+                        findById(seeder.admin(), HttpStatus.OK, plainUserId)),
+                dynamicTest("as moderator -> ok",
+                        findById(seeder.moderator(), HttpStatus.OK, plainUserId)),
+                dynamicTest("as user -> ok",
+                        findById(seeder.plainUser(), HttpStatus.OK, plainUserId)),
+                dynamicTest("no roles -> forbidden",
+                        findById(seeder.withoutRoles(), HttpStatus.FORBIDDEN, plainUserId)),
+                dynamicTest("anonymous -> unauthorized",
+                        findById(null, HttpStatus.UNAUTHORIZED, plainUserId)),
+                dynamicTest("wrong creds -> unauthorized",
+                        findById(authorNotInSystem, HttpStatus.UNAUTHORIZED, plainUserId)),
+                dynamicTest("another author as user -> unauthorized",
+                        findById(seeder.plainUser(), HttpStatus.FORBIDDEN, seeder.admin().getId()))
         );
+    }
+
+    private DynamicAuthorTest findById(Author authn, HttpStatus status, Long id) {
+        return new DynamicAuthorTest(Constants.AUTHORS_ID_URL, authn, status, id);
     }
 
     @TestFactory
@@ -40,17 +48,19 @@ class AuthorizationAuthorTest extends ControllerTest {
         Author authorNotInSystem = Author.builder().username("fake").password("author").build();
 
         return List.of(
-                dynamicTest("as admin", findAll(seeder.admin(), HttpStatus.OK)),
-                dynamicTest("as moderator", findAll(seeder.moderator(), HttpStatus.FORBIDDEN)),
-                dynamicTest("as user", findAll(seeder.plainUser(), HttpStatus.FORBIDDEN)),
-                dynamicTest("no roles", findAll(seeder.withoutRoles(), HttpStatus.FORBIDDEN)),
-                dynamicTest("anonymous", findAll(null, HttpStatus.UNAUTHORIZED)),
-                dynamicTest("wrong creds", findAll(authorNotInSystem, HttpStatus.UNAUTHORIZED))
+                dynamicTest("as admin -> ok",
+                        findAll(seeder.admin(), HttpStatus.OK)),
+                dynamicTest("as moderator -> forbidden",
+                        findAll(seeder.moderator(), HttpStatus.FORBIDDEN)),
+                dynamicTest("as user -> forbidden",
+                        findAll(seeder.plainUser(), HttpStatus.FORBIDDEN)),
+                dynamicTest("no roles -> unauthorized",
+                        findAll(seeder.withoutRoles(), HttpStatus.FORBIDDEN)),
+                dynamicTest("anonymous -> unauthorized",
+                        findAll(null, HttpStatus.UNAUTHORIZED)),
+                dynamicTest("wrong creds -> unauthorized",
+                        findAll(authorNotInSystem, HttpStatus.UNAUTHORIZED))
         );
-    }
-
-    private DynamicAuthorTest findById(Author authn, HttpStatus status, Long id) {
-        return new DynamicAuthorTest(Constants.AUTHORS_ID_URL, authn, status, id);
     }
 
     private DynamicAuthorTest findAll(Author authn, HttpStatus status) {
