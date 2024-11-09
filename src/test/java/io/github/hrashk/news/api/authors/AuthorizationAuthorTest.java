@@ -6,8 +6,7 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.function.Executable;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 
 import java.util.List;
 import java.util.Map;
@@ -34,13 +33,13 @@ class AuthorizationAuthorTest extends ControllerTest {
                         findById(null, HttpStatus.UNAUTHORIZED, plainUserId)),
                 dynamicTest("wrong creds -> unauthorized",
                         findById(authorNotInSystem, HttpStatus.UNAUTHORIZED, plainUserId)),
-                dynamicTest("another author as user -> unauthorized",
+                dynamicTest("another author as user -> forbidden",
                         findById(seeder.plainUser(), HttpStatus.FORBIDDEN, seeder.admin().getId()))
         );
     }
 
-    private DynamicAuthorTest findById(Author authn, HttpStatus status, Long id) {
-        return new DynamicAuthorTest(Constants.AUTHORS_ID_URL, authn, status, id);
+    private HttpExecutable findById(Author authn, HttpStatus status, Long id) {
+        return new HttpExecutable(HttpMethod.GET, Constants.AUTHORS_ID_URL, authn, null, status, id);
     }
 
     @TestFactory
@@ -54,7 +53,7 @@ class AuthorizationAuthorTest extends ControllerTest {
                         findAll(seeder.moderator(), HttpStatus.FORBIDDEN)),
                 dynamicTest("as user -> forbidden",
                         findAll(seeder.plainUser(), HttpStatus.FORBIDDEN)),
-                dynamicTest("no roles -> unauthorized",
+                dynamicTest("no roles -> forbidden",
                         findAll(seeder.withoutRoles(), HttpStatus.FORBIDDEN)),
                 dynamicTest("anonymous -> unauthorized",
                         findAll(null, HttpStatus.UNAUTHORIZED)),
@@ -63,28 +62,39 @@ class AuthorizationAuthorTest extends ControllerTest {
         );
     }
 
-    private DynamicAuthorTest findAll(Author authn, HttpStatus status) {
-        return new DynamicAuthorTest(Constants.AUTHORS_URL, authn, status);
+    private HttpExecutable findAll(Author authn, HttpStatus status) {
+        return new HttpExecutable(HttpMethod.GET, Constants.AUTHORS_URL, authn, null, status);
     }
 
-    class DynamicAuthorTest implements Executable {
+    class HttpExecutable implements Executable {
+        final HttpMethod method;
+        final String url;
         final Author authn;
-        protected Object[] urlVariables;
-        protected HttpStatus status;
-        protected String url;
+        final Object body;
+        final HttpStatus expectedStatus;
+        final Object[] urlVariables;
 
-        DynamicAuthorTest(String url, Author authn, HttpStatus status, Object... urlVariables) {
+        HttpExecutable(HttpMethod method, String url, Author authn, Object body, HttpStatus expectedStatus, Object... urlVariables) {
             this.url = url;
             this.authn = authn;
-            this.status = status;
+            this.expectedStatus = expectedStatus;
             this.urlVariables = urlVariables;
+            this.body = body;
+            this.method = method;
         }
 
         @Override
         public void execute() {
-            ResponseEntity<?> response = request().getForEntity(url, Map.class, urlVariables);
+            ResponseEntity<?> response = request().exchange(url, method, entity(), Map.class, urlVariables);
 
-            assertThat(response.getStatusCode()).isEqualTo(status);
+            assertThat(response.getStatusCode()).isEqualTo(expectedStatus);
+        }
+
+        private HttpEntity<?> entity() {
+            var headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            return body == null ? HttpEntity.EMPTY : new HttpEntity<>(body, headers);
         }
 
         private TestRestTemplate request() {
