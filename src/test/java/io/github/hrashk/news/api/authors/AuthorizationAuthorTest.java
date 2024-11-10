@@ -1,6 +1,7 @@
 package io.github.hrashk.news.api.authors;
 
 import io.github.hrashk.news.api.Constants;
+import io.github.hrashk.news.api.authors.web.UpsertAuthorRequest;
 import io.github.hrashk.news.api.util.ControllerTest;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
@@ -64,6 +65,32 @@ class AuthorizationAuthorTest extends ControllerTest {
 
     private HttpExecutable findAll(Author authn, HttpStatus status) {
         return new HttpExecutable(HttpMethod.GET, Constants.AUTHORS_URL, authn, null, status);
+    }
+
+    @TestFactory
+    public List<DynamicTest> add() {
+        Author authorNotInSystem = Author.builder().username("fake").password("author").build();
+        UpsertAuthorRequest request = new UpsertAuthorRequest(
+                "lorem", "ipsum", "random", "password");
+
+        return List.of(
+                dynamicTest("as admin -> created",
+                        add(seeder.admin(), HttpStatus.CREATED, request)),
+                dynamicTest("as moderator -> created",
+                        add(seeder.moderator(), HttpStatus.CREATED, request)),
+                dynamicTest("as user -> forbidden",
+                        add(seeder.plainUser(), HttpStatus.FORBIDDEN, request)),
+                dynamicTest("no roles -> forbidden",
+                        add(seeder.withoutRoles(), HttpStatus.FORBIDDEN, request)),
+                dynamicTest("anonymous -> unauthorized",
+                        add(null, HttpStatus.UNAUTHORIZED, request)),
+                dynamicTest("wrong creds -> unauthorized",
+                        add(authorNotInSystem, HttpStatus.UNAUTHORIZED, request))
+        );
+    }
+
+    private HttpExecutable add(Author authn, HttpStatus status, Object body) {
+        return new HttpExecutable(HttpMethod.POST, Constants.AUTHORS_URL, authn, body, status);
     }
 
     class HttpExecutable implements Executable {

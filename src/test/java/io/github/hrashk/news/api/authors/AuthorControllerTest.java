@@ -18,10 +18,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class AuthorControllerTest extends ControllerTest {
-    @ParameterizedTest(name="{1}")
-    @MethodSource("adminAndModerator")
-    void add(Function<DataSeeder, Author> userProvider, String userType) {
-        Author a = userProvider.apply(seeder);
+    @Test
+    void add() {
+        Author a = seeder.moderator();
         UpsertAuthorRequest request = new UpsertAuthorRequest(
                 "lorem", "ipsum", "random", "password");
 
