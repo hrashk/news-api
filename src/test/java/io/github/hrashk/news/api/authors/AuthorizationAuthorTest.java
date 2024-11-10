@@ -3,16 +3,14 @@ package io.github.hrashk.news.api.authors;
 import io.github.hrashk.news.api.Constants;
 import io.github.hrashk.news.api.authors.web.UpsertAuthorRequest;
 import io.github.hrashk.news.api.util.ControllerTest;
+import io.github.hrashk.news.api.util.HttpExecutable;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
-import org.junit.jupiter.api.function.Executable;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.*;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
-import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 class AuthorizationAuthorTest extends ControllerTest {
@@ -36,7 +34,7 @@ class AuthorizationAuthorTest extends ControllerTest {
 
     private DynamicTest findById(String message, Author authn, HttpStatus status, Long id) {
         return dynamicTest(message,
-                new HttpExecutable(HttpMethod.GET, Constants.AUTHORS_ID_URL, authn, null, status, id));
+                new HttpExecutable(HttpMethod.GET, Constants.AUTHORS_ID_URL, authn, null, status, rest, id));
     }
 
     @TestFactory
@@ -55,7 +53,7 @@ class AuthorizationAuthorTest extends ControllerTest {
 
     private DynamicTest findAll(String message, Author authn, HttpStatus status) {
         return dynamicTest(message,
-                new HttpExecutable(HttpMethod.GET, Constants.AUTHORS_URL, authn, null, status));
+                new HttpExecutable(HttpMethod.GET, Constants.AUTHORS_URL, authn, null, status, rest));
     }
 
     @TestFactory
@@ -75,42 +73,7 @@ class AuthorizationAuthorTest extends ControllerTest {
     }
 
     private DynamicTest add(String message, Author authn, HttpStatus status, UpsertAuthorRequest body) {
-        return dynamicTest(message, new HttpExecutable(HttpMethod.POST, Constants.AUTHORS_URL, authn, body, status));
-    }
-
-    class HttpExecutable implements Executable {
-        final HttpMethod method;
-        final String url;
-        final Author authn;
-        final Object body;
-        final HttpStatus expectedStatus;
-        final Object[] urlVariables;
-
-        HttpExecutable(HttpMethod method, String url, Author authn, Object body, HttpStatus expectedStatus, Object... urlVariables) {
-            this.url = url;
-            this.authn = authn;
-            this.expectedStatus = expectedStatus;
-            this.urlVariables = urlVariables;
-            this.body = body;
-            this.method = method;
-        }
-
-        @Override
-        public void execute() {
-            ResponseEntity<?> response = request().exchange(url, method, entity(), Map.class, urlVariables);
-
-            assertThat(response.getStatusCode()).isEqualTo(expectedStatus);
-        }
-
-        private HttpEntity<?> entity() {
-            var headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
-            return body == null ? HttpEntity.EMPTY : new HttpEntity<>(body, headers);
-        }
-
-        private TestRestTemplate request() {
-            return authn == null ? rest : rest.withBasicAuth(authn.getUsername(), authn.getPassword());
-        }
+        return dynamicTest(message,
+                new HttpExecutable(HttpMethod.POST, Constants.AUTHORS_URL, authn, body, status, rest));
     }
 }
