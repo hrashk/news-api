@@ -22,25 +22,21 @@ class AuthorizationAuthorTest extends ControllerTest {
         Author authorNotInSystem = Author.builder().username("fake").password("author").build();
 
         return List.of(
-                dynamicTest("as admin -> ok",
-                        findById(seeder.admin(), HttpStatus.OK, plainUserId)),
-                dynamicTest("as moderator -> ok",
-                        findById(seeder.moderator(), HttpStatus.OK, plainUserId)),
-                dynamicTest("as user -> ok",
-                        findById(seeder.plainUser(), HttpStatus.OK, plainUserId)),
-                dynamicTest("no roles -> forbidden",
-                        findById(seeder.withoutRoles(), HttpStatus.FORBIDDEN, plainUserId)),
-                dynamicTest("anonymous -> unauthorized",
-                        findById(null, HttpStatus.UNAUTHORIZED, plainUserId)),
-                dynamicTest("wrong creds -> unauthorized",
-                        findById(authorNotInSystem, HttpStatus.UNAUTHORIZED, plainUserId)),
-                dynamicTest("another author as user -> forbidden",
-                        findById(seeder.plainUser(), HttpStatus.FORBIDDEN, seeder.admin().getId()))
+                findById("as admin -> ok", seeder.admin(), HttpStatus.OK, plainUserId),
+                findById("as moderator -> ok", seeder.moderator(), HttpStatus.OK, plainUserId),
+                findById("as user -> ok", seeder.plainUser(), HttpStatus.OK, plainUserId),
+                findById("no roles -> forbidden", seeder.withoutRoles(), HttpStatus.FORBIDDEN, plainUserId),
+                findById("anonymous -> unauthorized", null, HttpStatus.UNAUTHORIZED, plainUserId),
+                findById("wrong creds -> unauthorized",
+                        authorNotInSystem, HttpStatus.UNAUTHORIZED, plainUserId),
+                findById("another author as user -> forbidden",
+                        seeder.plainUser(), HttpStatus.FORBIDDEN, seeder.admin().getId())
         );
     }
 
-    private HttpExecutable findById(Author authn, HttpStatus status, Long id) {
-        return new HttpExecutable(HttpMethod.GET, Constants.AUTHORS_ID_URL, authn, null, status, id);
+    private DynamicTest findById(String message, Author authn, HttpStatus status, Long id) {
+        return dynamicTest(message,
+                new HttpExecutable(HttpMethod.GET, Constants.AUTHORS_ID_URL, authn, null, status, id));
     }
 
     @TestFactory
@@ -48,23 +44,18 @@ class AuthorizationAuthorTest extends ControllerTest {
         Author authorNotInSystem = Author.builder().username("fake").password("author").build();
 
         return List.of(
-                dynamicTest("as admin -> ok",
-                        findAll(seeder.admin(), HttpStatus.OK)),
-                dynamicTest("as moderator -> forbidden",
-                        findAll(seeder.moderator(), HttpStatus.FORBIDDEN)),
-                dynamicTest("as user -> forbidden",
-                        findAll(seeder.plainUser(), HttpStatus.FORBIDDEN)),
-                dynamicTest("no roles -> forbidden",
-                        findAll(seeder.withoutRoles(), HttpStatus.FORBIDDEN)),
-                dynamicTest("anonymous -> unauthorized",
-                        findAll(null, HttpStatus.UNAUTHORIZED)),
-                dynamicTest("wrong creds -> unauthorized",
-                        findAll(authorNotInSystem, HttpStatus.UNAUTHORIZED))
+                findAll("as admin -> ok", seeder.admin(), HttpStatus.OK),
+                findAll("as moderator -> forbidden", seeder.moderator(), HttpStatus.FORBIDDEN),
+                findAll("as user -> forbidden", seeder.plainUser(), HttpStatus.FORBIDDEN),
+                findAll("no roles -> forbidden", seeder.withoutRoles(), HttpStatus.FORBIDDEN),
+                findAll("anonymous -> unauthorized", null, HttpStatus.UNAUTHORIZED),
+                findAll("wrong creds -> unauthorized", authorNotInSystem, HttpStatus.UNAUTHORIZED)
         );
     }
 
-    private HttpExecutable findAll(Author authn, HttpStatus status) {
-        return new HttpExecutable(HttpMethod.GET, Constants.AUTHORS_URL, authn, null, status);
+    private DynamicTest findAll(String message, Author authn, HttpStatus status) {
+        return dynamicTest(message,
+                new HttpExecutable(HttpMethod.GET, Constants.AUTHORS_URL, authn, null, status));
     }
 
     @TestFactory
@@ -74,23 +65,17 @@ class AuthorizationAuthorTest extends ControllerTest {
                 "lorem", "ipsum", "random", "password");
 
         return List.of(
-                dynamicTest("as admin -> created",
-                        add(seeder.admin(), HttpStatus.CREATED, request)),
-                dynamicTest("as moderator -> created",
-                        add(seeder.moderator(), HttpStatus.CREATED, request)),
-                dynamicTest("as user -> forbidden",
-                        add(seeder.plainUser(), HttpStatus.FORBIDDEN, request)),
-                dynamicTest("no roles -> forbidden",
-                        add(seeder.withoutRoles(), HttpStatus.FORBIDDEN, request)),
-                dynamicTest("anonymous -> unauthorized",
-                        add(null, HttpStatus.UNAUTHORIZED, request)),
-                dynamicTest("wrong creds -> unauthorized",
-                        add(authorNotInSystem, HttpStatus.UNAUTHORIZED, request))
+                add("as admin -> created", seeder.admin(), HttpStatus.CREATED, request),
+                add("as moderator -> created", seeder.moderator(), HttpStatus.CREATED, request),
+                add("as user -> forbidden", seeder.plainUser(), HttpStatus.FORBIDDEN, request),
+                add("no roles -> forbidden", seeder.withoutRoles(), HttpStatus.FORBIDDEN, request),
+                add("anonymous -> unauthorized", null, HttpStatus.UNAUTHORIZED, request),
+                add("wrong creds -> unauthorized", authorNotInSystem, HttpStatus.UNAUTHORIZED, request)
         );
     }
 
-    private HttpExecutable add(Author authn, HttpStatus status, Object body) {
-        return new HttpExecutable(HttpMethod.POST, Constants.AUTHORS_URL, authn, body, status);
+    private DynamicTest add(String message, Author authn, HttpStatus status, UpsertAuthorRequest body) {
+        return dynamicTest(message, new HttpExecutable(HttpMethod.POST, Constants.AUTHORS_URL, authn, body, status));
     }
 
     class HttpExecutable implements Executable {
