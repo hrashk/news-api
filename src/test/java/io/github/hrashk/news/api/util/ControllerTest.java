@@ -9,12 +9,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = {"logging.level.org.apache.hc.client5.http=DEBUG"})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ContextConfiguration(initializers = PostgreSQLInitializer.class)
 @Import(DataSeeder.class)
@@ -28,6 +30,7 @@ public abstract class ControllerTest {
     @BeforeEach
     void injectSampleData() {
         seeder.seed(10);
+        rest.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
     }
 
     public <T> ResponseEntity<T> put(String url, Object request, Author a, Class<T> responseType, Object... urlVariables) {
