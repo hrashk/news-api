@@ -46,7 +46,12 @@ public class UserValidator {
     }
 
     @Before("target(service) && execution(* *.findById(Long)) && args(id)")
-    public void checkAuthor(JoinPoint jp, AuthorService service, Long id) {
+    public void checkAuthorFindById(JoinPoint jp, AuthorService service, Long id) {
+        checkAdminOrSameAuthor(id);
+    }
+
+    @Before("target(service) && execution(* *.update(Long, ..)) && args(id, ..)")
+    public void checkAuthorUpdate(JoinPoint jp, AuthorService service, Long id) {
         checkAdminOrSameAuthor(id);
     }
 
