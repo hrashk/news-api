@@ -76,4 +76,31 @@ class AuthorizationAuthorTest extends ControllerTest {
         return dynamicTest(message,
                 new HttpExecutable(HttpMethod.POST, Constants.AUTHORS_URL, authn, body, status, rest));
     }
+
+    @TestFactory
+    public List<DynamicTest> update() {
+        Author authorNotInSystem = Author.builder().username("fake").password("author").build();
+
+        Author user = seeder.plainUser();
+        Long plainUserId = user.getId();
+        var request = new UpsertAuthorRequest(
+                "random", "last name", user.getUsername(), user.getPassword());
+
+        return List.of(
+                update("as admin -> ok", seeder.admin(), HttpStatus.OK, request, plainUserId),
+                update("as moderator -> ok", seeder.moderator(), HttpStatus.OK, request, plainUserId),
+                update("as user -> ok", user, HttpStatus.OK, request, plainUserId),
+                update("no roles -> forbidden", seeder.withoutRoles(), HttpStatus.FORBIDDEN, request, plainUserId),
+                update("anonymous -> unauthorized", null, HttpStatus.UNAUTHORIZED, request, plainUserId),
+                update("wrong creds -> unauthorized",
+                        authorNotInSystem, HttpStatus.UNAUTHORIZED, request, plainUserId),
+                update("another author as user -> forbidden",
+                        user, HttpStatus.FORBIDDEN, request, seeder.admin().getId())
+        );
+    }
+
+    private DynamicTest update(String message, Author authn, HttpStatus status, UpsertAuthorRequest body, Long id) {
+        return dynamicTest(message,
+                new HttpExecutable(HttpMethod.PUT, Constants.AUTHORS_ID_URL, authn, body, status, rest, id));
+    }
 }
