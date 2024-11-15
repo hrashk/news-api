@@ -33,8 +33,14 @@ class AuthorizationAuthorTest extends ControllerTest {
     }
 
     private DynamicTest findById(String message, Author authn, HttpStatus status, Long id) {
-        return dynamicTest(message,
-                new HttpExecutable(HttpMethod.GET, Constants.AUTHORS_ID_URL, authn, null, status, rest, id));
+        return dynamicTest(message, HttpExecutable.builder()
+                .method(HttpMethod.GET)
+                .url(Constants.AUTHORS_ID_URL)
+                .authn(authn)
+                .expectedStatus(status)
+                .rest(rest)
+                .urlVariable(id)
+                .build());
     }
 
     @TestFactory
@@ -52,8 +58,13 @@ class AuthorizationAuthorTest extends ControllerTest {
     }
 
     private DynamicTest findAll(String message, Author authn, HttpStatus status) {
-        return dynamicTest(message,
-                new HttpExecutable(HttpMethod.GET, Constants.AUTHORS_URL, authn, null, status, rest));
+        return dynamicTest(message, HttpExecutable.builder()
+                .method(HttpMethod.GET)
+                .url(Constants.AUTHORS_URL)
+                .authn(authn)
+                .expectedStatus(status)
+                .rest(rest)
+                .build());
     }
 
     @TestFactory
@@ -73,8 +84,14 @@ class AuthorizationAuthorTest extends ControllerTest {
     }
 
     private DynamicTest add(String message, Author authn, HttpStatus status, UpsertAuthorRequest body) {
-        return dynamicTest(message,
-                new HttpExecutable(HttpMethod.POST, Constants.AUTHORS_URL, authn, body, status, rest));
+        return dynamicTest(message, HttpExecutable.builder()
+                .method(HttpMethod.POST)
+                .url(Constants.AUTHORS_URL)
+                .authn(authn)
+                .body(body)
+                .expectedStatus(status)
+                .rest(rest)
+                .build());
     }
 
     @TestFactory
@@ -100,7 +117,14 @@ class AuthorizationAuthorTest extends ControllerTest {
     }
 
     private DynamicTest update(String message, Author authn, HttpStatus status, UpsertAuthorRequest body, Long id) {
-        return dynamicTest(message,
-                new HttpExecutable(HttpMethod.PUT, Constants.AUTHORS_ID_URL, authn, body, status, rest, id));
+        return dynamicTest(message, HttpExecutable.builder()
+                .method(HttpMethod.PUT)
+                .url(Constants.AUTHORS_ID_URL)
+                .authn(authn)
+                .body(body)
+                .expectedStatus(status)
+                .rest(rest)
+                .urlVariable(id)
+                .build());
     }
 }
