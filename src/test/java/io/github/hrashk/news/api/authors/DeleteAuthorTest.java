@@ -1,8 +1,6 @@
 package io.github.hrashk.news.api.authors;
 
 import io.github.hrashk.news.api.Constants;
-import io.github.hrashk.news.api.authors.web.AuthorResponse;
-import io.github.hrashk.news.api.authors.web.UpsertAuthorRequest;
 import io.github.hrashk.news.api.exceptions.ErrorInfo;
 import io.github.hrashk.news.api.util.ControllerTest;
 import io.github.hrashk.news.api.util.DataSeeder;
@@ -17,41 +15,7 @@ import java.util.function.Function;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-class AuthorControllerTest extends ControllerTest {
-    @ParameterizedTest(name="{1}")
-    @MethodSource("users")
-    void update(Function<DataSeeder, Author> userProvider, String userType) {
-        Author a = seeder.plainUser();
-        var request = new UpsertAuthorRequest(
-                a.getFirstName(), "lorem", "random", "password");
-
-        ResponseEntity<AuthorResponse> response =
-                put(Constants.AUTHORS_ID_URL, request, userProvider.apply(seeder), AuthorResponse.class, a.getId());
-
-        assertAll(
-                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
-                () -> assertThat(response.getBody().lastName()).isEqualTo("lorem"),
-                () -> assertThat(response.getBody().username()).isEqualTo("random"),
-                () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties()
-        );
-    }
-
-    @Test
-    void updateMissing() {
-        Long authorId = INVALID_ID;
-        UpsertAuthorRequest request = new UpsertAuthorRequest(
-                "lorem", "ipsum", "random", "password");
-
-        ResponseEntity<AuthorResponse> response = put(Constants.AUTHORS_ID_URL, request, seeder.moderator(), AuthorResponse.class, authorId);
-
-        assertAll(
-                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED),
-                () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties(),
-                () -> assertThat(response.getBody().firstName()).isEqualTo("lorem"),
-                () -> assertThat(response.getBody().lastName()).isEqualTo("ipsum")
-        );
-    }
-
+class DeleteAuthorTest extends ControllerTest {
     @ParameterizedTest(name="{1}")
     @MethodSource("adminAndModerator")
     void deleteWithNews(Function<DataSeeder, Author> userProvider, String userType) {
