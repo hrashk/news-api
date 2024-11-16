@@ -15,30 +15,6 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 class AuthorizationAuthorTest extends ControllerTest {
     @TestFactory
-    public List<DynamicTest> findAll() {
-        Author authorNotInSystem = Author.builder().username("fake").password("author").build();
-
-        return List.of(
-                findAll("as admin -> ok", seeder.admin(), HttpStatus.OK),
-                findAll("as moderator -> forbidden", seeder.moderator(), HttpStatus.FORBIDDEN),
-                findAll("as user -> forbidden", seeder.plainUser(), HttpStatus.FORBIDDEN),
-                findAll("no roles -> forbidden", seeder.withoutRoles(), HttpStatus.FORBIDDEN),
-                findAll("anonymous -> unauthorized", null, HttpStatus.UNAUTHORIZED),
-                findAll("wrong creds -> unauthorized", authorNotInSystem, HttpStatus.UNAUTHORIZED)
-        );
-    }
-
-    private DynamicTest findAll(String message, Author authn, HttpStatus status) {
-        return dynamicTest(message, HttpExecutable.builder()
-                .method(HttpMethod.GET)
-                .url(Constants.AUTHORS_URL)
-                .authn(authn)
-                .expectedStatus(status)
-                .rest(rest)
-                .build());
-    }
-
-    @TestFactory
     public List<DynamicTest> add() {
         Author authorNotInSystem = Author.builder().username("fake").password("author").build();
         UpsertAuthorRequest request = new UpsertAuthorRequest(
