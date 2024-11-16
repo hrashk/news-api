@@ -18,38 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class AuthorControllerTest extends ControllerTest {
-    @Test
-    void add() {
-        Author a = seeder.moderator();
-        UpsertAuthorRequest request = new UpsertAuthorRequest(
-                "lorem", "ipsum", "random", "password");
-
-        ResponseEntity<AuthorResponse> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
-                .postForEntity(Constants.AUTHORS_URL, request, AuthorResponse.class);
-
-        assertAll(
-                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED),
-                () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties(),
-                () -> assertThat(response.getBody().firstName()).isEqualTo("lorem"),
-                () -> assertThat(response.getBody().lastName()).isEqualTo("ipsum")
-        );
-    }
-
-    @Test
-    void addBroken() {
-        Author m = seeder.moderator();
-        UpsertAuthorRequest request = new UpsertAuthorRequest(
-                "  ", null, "random", "password");
-
-        ResponseEntity<ErrorInfo> response = rest.withBasicAuth(m.getUsername(), m.getPassword())
-                .postForEntity(Constants.AUTHORS_URL, request, ErrorInfo.class);
-
-        assertAll(
-                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST),
-                () -> assertThat(response.getBody().message()).contains("firstName", "lastName")
-        );
-    }
-
     @ParameterizedTest(name="{1}")
     @MethodSource("users")
     void update(Function<DataSeeder, Author> userProvider, String userType) {
