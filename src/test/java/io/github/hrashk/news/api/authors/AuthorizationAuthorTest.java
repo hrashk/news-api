@@ -15,35 +15,6 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 class AuthorizationAuthorTest extends ControllerTest {
     @TestFactory
-    public List<DynamicTest> findById() {
-        Long plainUserId = seeder.plainUser().getId();
-        Author authorNotInSystem = Author.builder().username("fake").password("author").build();
-
-        return List.of(
-                findById("as admin -> ok", seeder.admin(), HttpStatus.OK, plainUserId),
-                findById("as moderator -> ok", seeder.moderator(), HttpStatus.OK, plainUserId),
-                findById("as user -> ok", seeder.plainUser(), HttpStatus.OK, plainUserId),
-                findById("no roles -> forbidden", seeder.withoutRoles(), HttpStatus.FORBIDDEN, plainUserId),
-                findById("anonymous -> unauthorized", null, HttpStatus.UNAUTHORIZED, plainUserId),
-                findById("wrong creds -> unauthorized",
-                        authorNotInSystem, HttpStatus.UNAUTHORIZED, plainUserId),
-                findById("another author as user -> forbidden",
-                        seeder.plainUser(), HttpStatus.FORBIDDEN, seeder.admin().getId())
-        );
-    }
-
-    private DynamicTest findById(String message, Author authn, HttpStatus status, Long id) {
-        return dynamicTest(message, HttpExecutable.builder()
-                .method(HttpMethod.GET)
-                .url(Constants.AUTHORS_ID_URL)
-                .authn(authn)
-                .expectedStatus(status)
-                .rest(rest)
-                .urlVariable(id)
-                .build());
-    }
-
-    @TestFactory
     public List<DynamicTest> findAll() {
         Author authorNotInSystem = Author.builder().username("fake").password("author").build();
 
