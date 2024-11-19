@@ -23,6 +23,13 @@ public class AuthorService extends BaseService<Author, AuthorRepository> {
         return super.add(author);
     }
 
+    @Override
+    public Long update(Long id, Author author) {
+        encodePassword(author);
+
+        return super.update(id, author);
+    }
+
     public void encodePassword(Author author) {
         author.setPassword(passwordEncoder.encode(author.getPassword()));
     }
