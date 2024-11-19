@@ -17,8 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class HttpExecutable implements Executable {
     final HttpMethod method;
     final String url;
-    final String username;
-    final String password;
+    final Credentials credentials;
     final Object body;
     final HttpStatus expectedStatus;
     final TestRestTemplate rest;
@@ -41,6 +40,6 @@ public class HttpExecutable implements Executable {
     }
 
     private TestRestTemplate template() {
-        return username == null ? rest : rest.withBasicAuth(username, password);
+        return credentials == null ? rest : rest.withBasicAuth(credentials.username(), credentials.password());
     }
 }

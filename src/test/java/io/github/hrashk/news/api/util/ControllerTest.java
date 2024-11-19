@@ -1,6 +1,5 @@
 package io.github.hrashk.news.api.util;
 
-import io.github.hrashk.news.api.authors.Author;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,39 +26,41 @@ public abstract class ControllerTest {
     @Autowired
     protected DataSeeder seeder;
 
+    protected final Credentials authorNotInSystem = new Credentials("fake", "author");
+
     @BeforeEach
     void injectSampleData() {
         seeder.seed(10);
         rest.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
     }
 
-    public <T> ResponseEntity<T> put(String url, Object request, Author a, Class<T> responseType, Object... urlVariables) {
+    public <T> ResponseEntity<T> put(String url, Object request, Credentials a, Class<T> responseType, Object... urlVariables) {
         var headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        return rest.withBasicAuth(a.getUsername(), a.getPassword())
+        return rest.withBasicAuth(a.username(), a.password())
                 .exchange(url, HttpMethod.PUT, new HttpEntity<>(request, headers), responseType, urlVariables);
     }
 
-    public <T> ResponseEntity<T> delete(String url, Author a, Class<T> responseType, Object... urlVariables) {
-        return rest.withBasicAuth(a.getUsername(), a.getPassword())
+    public <T> ResponseEntity<T> delete(String url, Credentials a, Class<T> responseType, Object... urlVariables) {
+        return rest.withBasicAuth(a.username(), a.password())
                 .exchange(url, HttpMethod.DELETE, HttpEntity.EMPTY, responseType, urlVariables);
     }
 
-    public ResponseEntity<Void> delete(String url, Author a, Object... urlVariables) {
+    public ResponseEntity<Void> delete(String url, Credentials a, Object... urlVariables) {
         return delete(url, a, Void.class, urlVariables);
     }
 
     static Stream<Arguments> users() {
         return Stream.of(
-                Arguments.of((Function<DataSeeder, Author>) DataSeeder::admin, "admin"),
-                Arguments.of((Function<DataSeeder, Author>) DataSeeder::moderator, "moderator"),
-                Arguments.of((Function<DataSeeder, Author>) DataSeeder::plainUser, "user"));
+                Arguments.of((Function<DataSeeder, Credentials>) DataSeeder::admin, "admin"),
+                Arguments.of((Function<DataSeeder, Credentials>) DataSeeder::moderator, "moderator"),
+                Arguments.of((Function<DataSeeder, Credentials>) DataSeeder::plainUser, "user"));
     }
 
     static Stream<Arguments> adminAndModerator() {
         return Stream.of(
-                Arguments.of((Function<DataSeeder, Author>) DataSeeder::admin, "admin"),
-                Arguments.of((Function<DataSeeder, Author>) DataSeeder::moderator, "moderator"));
+                Arguments.of((Function<DataSeeder, Credentials>) DataSeeder::admin, "admin"),
+                Arguments.of((Function<DataSeeder, Credentials>) DataSeeder::moderator, "moderator"));
     }
 }

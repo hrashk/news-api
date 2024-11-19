@@ -4,6 +4,7 @@ import io.github.hrashk.news.api.Constants;
 import io.github.hrashk.news.api.authors.web.AuthorResponse;
 import io.github.hrashk.news.api.exceptions.ErrorInfo;
 import io.github.hrashk.news.api.util.ControllerTest;
+import io.github.hrashk.news.api.util.Credentials;
 import io.github.hrashk.news.api.util.HttpExecutable;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
@@ -21,10 +22,10 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 class FindByIdTest extends ControllerTest {
     @Test
     void findById() {
-        Author a = seeder.moderator();
-        Long authorId = seeder.plainUser().getId();
+        Credentials a = seeder.moderator();
+        Long authorId = seeder.plainUserId();
 
-        ResponseEntity<AuthorResponse> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
+        ResponseEntity<AuthorResponse> response = rest.withBasicAuth(a.username(), a.password())
                 .getForEntity(Constants.AUTHORS_ID_URL, AuthorResponse.class, authorId);
 
         assertAll(
@@ -36,10 +37,10 @@ class FindByIdTest extends ControllerTest {
 
     @Test
     void findMissing() {
-        Author admin = seeder.admin();
+        Credentials admin = seeder.admin();
         Long authorId = INVALID_ID;
 
-        ResponseEntity<ErrorInfo> response = rest.withBasicAuth(admin.getUsername(), admin.getPassword())
+        ResponseEntity<ErrorInfo> response = rest.withBasicAuth(admin.username(), admin.password())
                 .getForEntity(Constants.AUTHORS_ID_URL, ErrorInfo.class, authorId);
 
         assertAll(
@@ -50,8 +51,7 @@ class FindByIdTest extends ControllerTest {
 
     @TestFactory
     public List<DynamicTest> authorization() {
-        Long plainUserId = seeder.plainUser().getId();
-        Author authorNotInSystem = Author.builder().username("fake").password("author").build();
+        Long plainUserId = seeder.plainUserId();
 
         return List.of(
                 findById("as admin -> ok", seeder.admin(), HttpStatus.OK, plainUserId),
@@ -62,16 +62,15 @@ class FindByIdTest extends ControllerTest {
                 findById("wrong creds -> unauthorized",
                         authorNotInSystem, HttpStatus.UNAUTHORIZED, plainUserId),
                 findById("another author as user -> forbidden",
-                        seeder.plainUser(), HttpStatus.FORBIDDEN, seeder.admin().getId())
+                        seeder.plainUser(), HttpStatus.FORBIDDEN, seeder.adminId())
         );
     }
 
-    private DynamicTest findById(String message, Author authn, HttpStatus status, Long id) {
+    private DynamicTest findById(String message, Credentials creds, HttpStatus status, Long id) {
         return dynamicTest(message, HttpExecutable.builder()
                 .method(HttpMethod.GET)
                 .url(Constants.AUTHORS_ID_URL)
-                .username(authn == null ? null : authn.getUsername())
-                .password(authn == null ? null : authn.getPassword())
+                .credentials(creds)
                 .expectedStatus(status)
                 .rest(rest)
                 .urlVariable(id)

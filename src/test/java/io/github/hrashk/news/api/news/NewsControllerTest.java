@@ -7,6 +7,7 @@ import io.github.hrashk.news.api.news.web.NewsListResponse;
 import io.github.hrashk.news.api.news.web.NewsResponse;
 import io.github.hrashk.news.api.news.web.UpsertNewsRequest;
 import io.github.hrashk.news.api.util.ControllerTest;
+import io.github.hrashk.news.api.util.Credentials;
 import io.github.hrashk.news.api.util.DataSeeder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -219,7 +220,7 @@ class NewsControllerTest extends ControllerTest {
         UpsertNewsRequest request = new UpsertNewsRequest(authorId, categoryId, "asdf", news.getContent());
 
         Long newsId = news.getId();
-        ResponseEntity<NewsResponse> response = put(NEWS_ID_URL, request, author, NewsResponse.class, newsId);
+        ResponseEntity<NewsResponse> response = put(NEWS_ID_URL, request, new Credentials(author), NewsResponse.class, newsId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),

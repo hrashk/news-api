@@ -3,6 +3,7 @@ package io.github.hrashk.news.api.authors;
 import io.github.hrashk.news.api.Constants;
 import io.github.hrashk.news.api.exceptions.ErrorInfo;
 import io.github.hrashk.news.api.util.ControllerTest;
+import io.github.hrashk.news.api.util.Credentials;
 import io.github.hrashk.news.api.util.DataSeeder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,14 +19,14 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 class DeleteAuthorTest extends ControllerTest {
     @ParameterizedTest(name="{1}")
     @MethodSource("adminAndModerator")
-    void deleteWithNews(Function<DataSeeder, Author> userProvider, String userType) {
+    void deleteWithNews(Function<DataSeeder, Credentials> userProvider, String userType) {
         Long authorId = seeder.news().get(0).getAuthor().getId();
 
-        Author a = userProvider.apply(seeder);
+        Credentials a = userProvider.apply(seeder);
         ResponseEntity<Void> response = delete(Constants.AUTHORS_ID_URL, a, authorId);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        ResponseEntity<ErrorInfo> findResponse = rest.withBasicAuth(a.getUsername(), a.getPassword())
+        ResponseEntity<ErrorInfo> findResponse = rest.withBasicAuth(a.username(), a.password())
                 .getForEntity(Constants.AUTHORS_ID_URL, ErrorInfo.class, authorId);
         assertAll(
                 () -> assertThat(findResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
@@ -35,27 +36,27 @@ class DeleteAuthorTest extends ControllerTest {
 
     @Test
     void deleteSelf() {
-        Long authorId = seeder.plainUser().getId();
+        Long authorId = seeder.plainUserId();
 
-        Author a = seeder.plainUser();
+        Credentials a = seeder.plainUser();
         ResponseEntity<Void> response = delete(Constants.AUTHORS_ID_URL, a, authorId);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        ResponseEntity<ErrorInfo> findResponse = rest.withBasicAuth(a.getUsername(), a.getPassword())
+        ResponseEntity<ErrorInfo> findResponse = rest.withBasicAuth(a.username(), a.password())
                 .getForEntity(Constants.AUTHORS_ID_URL, ErrorInfo.class, authorId);
         assertThat(findResponse.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @ParameterizedTest(name="{1}")
     @MethodSource("adminAndModerator")
-    void deleteWithComments(Function<DataSeeder, Author> userProvider, String userType) {
+    void deleteWithComments(Function<DataSeeder, Credentials> userProvider, String userType) {
         Long authorId = seeder.comments().get(0).getAuthor().getId();
 
-        Author m = userProvider.apply(seeder);
+        Credentials m = userProvider.apply(seeder);
         ResponseEntity<Void> response = delete(Constants.AUTHORS_ID_URL, m, authorId);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        ResponseEntity<ErrorInfo> findResponse = rest.withBasicAuth(m.getUsername(), m.getPassword())
+        ResponseEntity<ErrorInfo> findResponse = rest.withBasicAuth(m.username(), m.password())
                 .getForEntity(Constants.AUTHORS_ID_URL, ErrorInfo.class, authorId);
         assertAll(
                 () -> assertThat(findResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),

@@ -39,6 +39,7 @@ public final class DataSeeder {
     private final Faker faker = new Faker(random);
 
     private List<Author> authors;
+    private List<Credentials> creds = new ArrayList<>();
     private List<Category> categories;
     private List<News> news;
     private List<Comment> comments;
@@ -49,12 +50,18 @@ public final class DataSeeder {
         authors.get(1).addRole(RoleType.ROLE_MODERATOR);
         addUserRole(authors);
 
-        authors = authors.stream().map(this::saveAndReturnDecoded).collect(Collectors.toCollection(ArrayList::new));
+        authors.stream().map(Credentials::new).forEach(creds::add);
+        authors.forEach(this::encodePassword);
+
+        authors = authorsRepo.saveAll(authors);
         categories = categoryRepo.saveAll(sampleCategories(count));
         news = newsRepo.saveAll(sampleNews(count));
         comments = commentRepository.saveAll(sampleComments(count));
 
-        Author withoutRoles = saveAndReturnDecoded(aRandomAuthor(42));
+        Author withoutRoles = aRandomAuthor(42);
+        creds.add(new Credentials(withoutRoles.getUsername(), withoutRoles.getPassword()));
+        encodePassword(withoutRoles);
+        withoutRoles = authorsRepo.save(withoutRoles);
         authors.add(withoutRoles);
     }
 
@@ -69,28 +76,32 @@ public final class DataSeeder {
         commentRepository.flush();
     }
 
-    public Author admin() {
-        return authors.get(0);
+    public Credentials admin() {
+        return creds.get(0);
     }
 
-    public Author moderator() {
-        return authors.get(1);
+    public Long adminId() {
+        return authors.get(0).getId();
     }
 
-    public Author plainUser() {
-        return authors.get(3);
+    public Credentials moderator() {
+        return creds.get(1);
     }
 
-    public Author withoutRoles() {
-        return authors.get(authors.size() - 1);
+    public Credentials plainUser() {
+        return creds.get(3);
     }
 
-    private Author saveAndReturnDecoded(Author a) {
-        String decoded = a.getPassword();
+    public Long plainUserId() {
+        return authors.get(3).getId();
+    }
 
+    public Credentials withoutRoles() {
+        return creds.get(creds.size() - 1);
+    }
+
+    private Author encodePassword(Author a) {
         a.setPassword(encoder.encode(a.getPassword()));
-        a = authorsRepo.save(a);
-        a.setPassword(decoded);
 
         return a;
     }
@@ -114,7 +125,7 @@ public final class DataSeeder {
     private <T> List<T> generateSample(int count, LongFunction<T> entityGenerator) {
         return LongStream.range(1, count + 1)
                 .mapToObj(entityGenerator)
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public Author aRandomAuthor(long id) {

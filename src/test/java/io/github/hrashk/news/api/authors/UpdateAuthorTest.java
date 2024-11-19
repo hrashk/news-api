@@ -4,6 +4,7 @@ import io.github.hrashk.news.api.Constants;
 import io.github.hrashk.news.api.authors.web.AuthorResponse;
 import io.github.hrashk.news.api.authors.web.UpsertAuthorRequest;
 import io.github.hrashk.news.api.util.ControllerTest;
+import io.github.hrashk.news.api.util.Credentials;
 import io.github.hrashk.news.api.util.HttpExecutable;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
@@ -21,12 +22,12 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 class UpdateAuthorTest extends ControllerTest {
     @Test
     void update() {
-        Author a = seeder.plainUser();
+        Credentials a = seeder.plainUser();
         var request = new UpsertAuthorRequest(
-                a.getFirstName(), "lorem", "random", "password");
+                "ipsum", "lorem", "random", "password");
 
         ResponseEntity<AuthorResponse> response =
-                put(Constants.AUTHORS_ID_URL, request, seeder.admin(), AuthorResponse.class, a.getId());
+                put(Constants.AUTHORS_ID_URL, request, seeder.admin(), AuthorResponse.class, seeder.plainUserId());
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
@@ -54,12 +55,10 @@ class UpdateAuthorTest extends ControllerTest {
 
     @TestFactory
     public List<DynamicTest> authorization() {
-        Author authorNotInSystem = Author.builder().username("fake").password("author").build();
-
-        Author user = seeder.plainUser();
-        Long plainUserId = user.getId();
+        Credentials user = seeder.plainUser();
+        Long plainUserId = seeder.plainUserId();
         var request = new UpsertAuthorRequest(
-                "random", "last name", user.getUsername(), user.getPassword());
+                "random", "last name", user.username(), user.password());
 
         return List.of(
                 update("as admin -> ok", seeder.admin(), HttpStatus.OK, request, plainUserId),
@@ -70,16 +69,15 @@ class UpdateAuthorTest extends ControllerTest {
                 update("wrong creds -> unauthorized",
                         authorNotInSystem, HttpStatus.UNAUTHORIZED, request, plainUserId),
                 update("another author as user -> forbidden",
-                        user, HttpStatus.FORBIDDEN, request, seeder.admin().getId())
+                        user, HttpStatus.FORBIDDEN, request, seeder.adminId())
         );
     }
 
-    private DynamicTest update(String message, Author authn, HttpStatus status, UpsertAuthorRequest body, Long id) {
+    private DynamicTest update(String message, Credentials creds, HttpStatus status, UpsertAuthorRequest body, Long id) {
         return dynamicTest(message, HttpExecutable.builder()
                 .method(HttpMethod.PUT)
                 .url(Constants.AUTHORS_ID_URL)
-                .username(authn == null ? null : authn.getUsername())
-                .password(authn == null ? null : authn.getPassword())
+                .credentials(creds)
                 .body(body)
                 .expectedStatus(status)
                 .rest(rest)

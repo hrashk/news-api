@@ -5,6 +5,7 @@ import io.github.hrashk.news.api.authors.web.AuthorResponse;
 import io.github.hrashk.news.api.authors.web.UpsertAuthorRequest;
 import io.github.hrashk.news.api.exceptions.ErrorInfo;
 import io.github.hrashk.news.api.util.ControllerTest;
+import io.github.hrashk.news.api.util.Credentials;
 import io.github.hrashk.news.api.util.HttpExecutable;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
@@ -22,11 +23,11 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 class CreateAuthorTest extends ControllerTest {
     @Test
     void create() {
-        Author a = seeder.moderator();
+        Credentials c = seeder.moderator();
         UpsertAuthorRequest request = new UpsertAuthorRequest(
                 "lorem", "ipsum", "random", "password");
 
-        ResponseEntity<AuthorResponse> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
+        ResponseEntity<AuthorResponse> response = rest.withBasicAuth(c.username(), c.password())
                 .postForEntity(Constants.AUTHORS_URL, request, AuthorResponse.class);
 
         assertAll(
@@ -39,11 +40,11 @@ class CreateAuthorTest extends ControllerTest {
 
     @Test
     void createBroken() {
-        Author m = seeder.moderator();
+        Credentials c = seeder.moderator();
         UpsertAuthorRequest request = new UpsertAuthorRequest(
                 "  ", null, "random", "password");
 
-        ResponseEntity<ErrorInfo> response = rest.withBasicAuth(m.getUsername(), m.getPassword())
+        ResponseEntity<ErrorInfo> response = rest.withBasicAuth(c.username(), c.password())
                 .postForEntity(Constants.AUTHORS_URL, request, ErrorInfo.class);
 
         assertAll(
@@ -54,7 +55,6 @@ class CreateAuthorTest extends ControllerTest {
 
     @TestFactory
     public List<DynamicTest> authorization() {
-        Author authorNotInSystem = Author.builder().username("fake").password("author").build();
         UpsertAuthorRequest request = new UpsertAuthorRequest(
                 "lorem", "ipsum", "random", "password");
 
@@ -68,12 +68,11 @@ class CreateAuthorTest extends ControllerTest {
         );
     }
 
-    private DynamicTest create(String message, Author authn, HttpStatus status, UpsertAuthorRequest body) {
+    private DynamicTest create(String message, Credentials creds, HttpStatus status, UpsertAuthorRequest body) {
         return dynamicTest(message, HttpExecutable.builder()
                 .method(HttpMethod.POST)
                 .url(Constants.AUTHORS_URL)
-                .username(authn == null ? null : authn.getUsername())
-                .password(authn == null ? null : authn.getPassword())
+                .credentials(creds)
                 .body(body)
                 .expectedStatus(status)
                 .rest(rest)

@@ -3,6 +3,7 @@ package io.github.hrashk.news.api.authors;
 import io.github.hrashk.news.api.Constants;
 import io.github.hrashk.news.api.authors.web.AuthorListResponse;
 import io.github.hrashk.news.api.util.ControllerTest;
+import io.github.hrashk.news.api.util.Credentials;
 import io.github.hrashk.news.api.util.HttpExecutable;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
@@ -20,9 +21,9 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 class FindAllTest extends ControllerTest {
     @Test
     void firstPage() {
-        Author admin = seeder.admin();
+        Credentials admin = seeder.admin();
 
-        ResponseEntity<AuthorListResponse> response = rest.withBasicAuth(admin.getUsername(), admin.getPassword())
+        ResponseEntity<AuthorListResponse> response = rest.withBasicAuth(admin.username(), admin.password())
                 .getForEntity(Constants.AUTHORS_URL, AuthorListResponse.class);
 
         assertAll(
@@ -38,9 +39,9 @@ class FindAllTest extends ControllerTest {
 
     @Test
     void secondPage() {
-        Author admin = seeder.admin();
+        Credentials admin = seeder.admin();
 
-        ResponseEntity<AuthorListResponse> response = rest.withBasicAuth(admin.getUsername(), admin.getPassword())
+        ResponseEntity<AuthorListResponse> response = rest.withBasicAuth(admin.username(), admin.password())
                 .getForEntity(Constants.AUTHORS_URL + "?page=1&size=3", AuthorListResponse.class);
 
         assertAll(
@@ -56,8 +57,6 @@ class FindAllTest extends ControllerTest {
 
     @TestFactory
     public List<DynamicTest> authorization() {
-        Author authorNotInSystem = Author.builder().username("fake").password("author").build();
-
         return List.of(
                 findAll("as admin -> ok", seeder.admin(), HttpStatus.OK),
                 findAll("as moderator -> forbidden", seeder.moderator(), HttpStatus.FORBIDDEN),
@@ -68,12 +67,11 @@ class FindAllTest extends ControllerTest {
         );
     }
 
-    private DynamicTest findAll(String message, Author authn, HttpStatus status) {
+    private DynamicTest findAll(String message, Credentials creds, HttpStatus status) {
         return dynamicTest(message, HttpExecutable.builder()
                 .method(HttpMethod.GET)
                 .url(Constants.AUTHORS_URL)
-                .username(authn == null ? null : authn.getUsername())
-                .password(authn == null ? null : authn.getPassword())
+                .credentials(creds)
                 .expectedStatus(status)
                 .rest(rest)
                 .build());

@@ -1,12 +1,12 @@
 package io.github.hrashk.news.api.categories;
 
 import io.github.hrashk.news.api.Constants;
-import io.github.hrashk.news.api.authors.Author;
 import io.github.hrashk.news.api.categories.web.CategoryListResponse;
 import io.github.hrashk.news.api.categories.web.CategoryResponse;
 import io.github.hrashk.news.api.categories.web.UpsertCategoryRequest;
 import io.github.hrashk.news.api.exceptions.ErrorInfo;
 import io.github.hrashk.news.api.util.ControllerTest;
+import io.github.hrashk.news.api.util.Credentials;
 import io.github.hrashk.news.api.util.DataSeeder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,16 +25,16 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 class CategoryControllerTest extends ControllerTest {
     static Stream<Arguments> upsertUsers() {
         return Stream.of(
-                Arguments.of((Function<DataSeeder, Author>) DataSeeder::admin, "admin"),
-                Arguments.of((Function<DataSeeder, Author>) DataSeeder::moderator, "moderator"));
+                Arguments.of((Function<DataSeeder, Credentials>) DataSeeder::admin, "admin"),
+                Arguments.of((Function<DataSeeder, Credentials>) DataSeeder::moderator, "moderator"));
     }
 
     @ParameterizedTest(name = "{1}")
     @MethodSource("users")
-    void firstPage(Function<DataSeeder, Author> userProvider, String userType) {
-        Author a = userProvider.apply(seeder);
+    void firstPage(Function<DataSeeder, Credentials> userProvider, String userType) {
+        Credentials a = userProvider.apply(seeder);
 
-        ResponseEntity<CategoryListResponse> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
+        ResponseEntity<CategoryListResponse> response = rest.withBasicAuth(a.username(), a.password())
                 .getForEntity(Constants.CATEGORIES_URL, CategoryListResponse.class);
 
         assertAll(
@@ -46,9 +46,9 @@ class CategoryControllerTest extends ControllerTest {
 
     @Test
     void secondPage() {
-        Author a = seeder.moderator();
+        Credentials a = seeder.moderator();
 
-        ResponseEntity<CategoryListResponse> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
+        ResponseEntity<CategoryListResponse> response = rest.withBasicAuth(a.username(), a.password())
                 .getForEntity(Constants.CATEGORIES_URL + "?page=1&size=3", CategoryListResponse.class);
 
         assertAll(
@@ -60,12 +60,12 @@ class CategoryControllerTest extends ControllerTest {
 
     @ParameterizedTest(name = "{1}")
     @MethodSource("users")
-    void findById(Function<DataSeeder, Author> userProvider, String userType) {
-        Author a = userProvider.apply(seeder);
+    void findById(Function<DataSeeder, Credentials> userProvider, String userType) {
+        Credentials a = userProvider.apply(seeder);
 
         Long categoryId = seeder.categories().get(0).getId();
 
-        ResponseEntity<CategoryResponse> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
+        ResponseEntity<CategoryResponse> response = rest.withBasicAuth(a.username(), a.password())
                 .getForEntity(Constants.CATEGORIES_ID_URL, CategoryResponse.class, categoryId);
 
         assertAll(
@@ -77,11 +77,11 @@ class CategoryControllerTest extends ControllerTest {
 
     @Test
     void findMissing() {
-        Author a = seeder.plainUser();
+        Credentials a = seeder.plainUser();
 
         Long categoryId = INVALID_ID;
 
-        ResponseEntity<ErrorInfo> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
+        ResponseEntity<ErrorInfo> response = rest.withBasicAuth(a.username(), a.password())
                 .getForEntity(Constants.CATEGORIES_ID_URL, ErrorInfo.class, categoryId);
 
         assertAll(
@@ -92,12 +92,12 @@ class CategoryControllerTest extends ControllerTest {
 
     @ParameterizedTest(name = "{1}")
     @MethodSource("upsertUsers")
-    void addThenDelete(Function<DataSeeder, Author> userProvider, String userType) {
-        Author a = userProvider.apply(seeder);
+    void addThenDelete(Function<DataSeeder, Credentials> userProvider, String userType) {
+        Credentials a = userProvider.apply(seeder);
 
         var request = new UpsertCategoryRequest("lorem");
 
-        ResponseEntity<CategoryResponse> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
+        ResponseEntity<CategoryResponse> response = rest.withBasicAuth(a.username(), a.password())
                 .postForEntity(Constants.CATEGORIES_URL, request, CategoryResponse.class);
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED),
@@ -109,7 +109,7 @@ class CategoryControllerTest extends ControllerTest {
         ResponseEntity<Void> deleteResponse = delete(Constants.CATEGORIES_ID_URL, a, id);
         assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        ResponseEntity<ErrorInfo> findResponse = rest.withBasicAuth(a.getUsername(), a.getPassword())
+        ResponseEntity<ErrorInfo> findResponse = rest.withBasicAuth(a.username(), a.password())
                 .getForEntity(Constants.CATEGORIES_ID_URL, ErrorInfo.class, id);
         assertAll(
                 () -> assertThat(findResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
@@ -119,11 +119,11 @@ class CategoryControllerTest extends ControllerTest {
 
     @Test
     void addBroken() {
-        Author a = seeder.moderator();
+        Credentials a = seeder.moderator();
 
         var request = new UpsertCategoryRequest("  ");
 
-        ResponseEntity<ErrorInfo> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
+        ResponseEntity<ErrorInfo> response = rest.withBasicAuth(a.username(), a.password())
                 .postForEntity(Constants.CATEGORIES_URL, request, ErrorInfo.class);
 
         assertAll(
@@ -134,11 +134,11 @@ class CategoryControllerTest extends ControllerTest {
 
     @Test
     void plainUserCannotAdd() {
-        Author a = seeder.plainUser();
+        Credentials a = seeder.plainUser();
 
         var request = new UpsertCategoryRequest("lorem");
 
-        ResponseEntity<?> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
+        ResponseEntity<?> response = rest.withBasicAuth(a.username(), a.password())
                 .postForEntity(Constants.CATEGORIES_URL, request, Map.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
@@ -146,8 +146,8 @@ class CategoryControllerTest extends ControllerTest {
 
     @ParameterizedTest(name = "{1}")
     @MethodSource("upsertUsers")
-    void update(Function<DataSeeder, Author> userProvider, String userType) {
-        Author a = userProvider.apply(seeder);
+    void update(Function<DataSeeder, Credentials> userProvider, String userType) {
+        Credentials a = userProvider.apply(seeder);
 
         Long categoryId = seeder.categories().get(0).getId();
         var request = new UpsertCategoryRequest("lorem");
@@ -164,7 +164,7 @@ class CategoryControllerTest extends ControllerTest {
 
     @Test
     void plainUserCannotUpdate() {
-        Author a = seeder.plainUser();
+        Credentials a = seeder.plainUser();
 
         Long categoryId = seeder.categories().get(0).getId();
         var request = new UpsertCategoryRequest("lorem");
@@ -192,8 +192,8 @@ class CategoryControllerTest extends ControllerTest {
 
     @ParameterizedTest(name = "{1}")
     @MethodSource("upsertUsers")
-    void deleteWithNews(Function<DataSeeder, Author> userProvider, String userType) {
-        Author a = userProvider.apply(seeder);
+    void deleteWithNews(Function<DataSeeder, Credentials> userProvider, String userType) {
+        Credentials a = userProvider.apply(seeder);
 
         Long categoryId = seeder.news().get(0).getCategory().getId();
 
@@ -208,7 +208,7 @@ class CategoryControllerTest extends ControllerTest {
 
     @Test
     void plainUserCannotDelete() {
-        Author a = seeder.plainUser();
+        Credentials a = seeder.plainUser();
 
         Long categoryId = seeder.news().get(0).getCategory().getId();
 
