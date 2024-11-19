@@ -1,6 +1,5 @@
 package io.github.hrashk.news.api.util;
 
-import io.github.hrashk.news.api.authors.Author;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.Singular;
@@ -18,7 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class HttpExecutable implements Executable {
     final HttpMethod method;
     final String url;
-    final Author authn;
+    final String username;
+    final String password;
     final Object body;
     final HttpStatus expectedStatus;
     final TestRestTemplate rest;
@@ -41,6 +41,6 @@ public class HttpExecutable implements Executable {
     }
 
     private TestRestTemplate template() {
-        return authn == null ? rest : rest.withBasicAuth(authn.getUsername(), authn.getPassword());
+        return username == null ? rest : rest.withBasicAuth(username, password);
     }
 }

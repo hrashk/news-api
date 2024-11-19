@@ -72,7 +72,8 @@ class FindAllTest extends ControllerTest {
         return dynamicTest(message, HttpExecutable.builder()
                 .method(HttpMethod.GET)
                 .url(Constants.AUTHORS_URL)
-                .authn(authn)
+                .username(authn == null ? null : authn.getUsername())
+                .password(authn == null ? null : authn.getPassword())
                 .expectedStatus(status)
                 .rest(rest)
                 .build());
