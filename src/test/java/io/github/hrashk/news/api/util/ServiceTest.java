@@ -1,5 +1,6 @@
 package io.github.hrashk.news.api.util;
 
+import io.github.hrashk.news.api.authors.AuthorService;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -10,7 +11,7 @@ import org.springframework.test.context.ContextConfiguration;
 @DataJpaTest(properties = {"logging.level.org.hibernate.orm.jdbc.bind=trace"})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ContextConfiguration(initializers = PostgreSQLInitializer.class)
-@Import({DataSeeder.class, ServiceTestBeans.class})
+@Import({DataSeeder.class, ServiceTestBeans.class, AuthorService.class})
 public abstract class ServiceTest {
     @Autowired
     protected DataSeeder seeder;

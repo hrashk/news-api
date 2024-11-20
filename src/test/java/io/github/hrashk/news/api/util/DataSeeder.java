@@ -2,6 +2,7 @@ package io.github.hrashk.news.api.util;
 
 import io.github.hrashk.news.api.authors.Author;
 import io.github.hrashk.news.api.authors.AuthorRepository;
+import io.github.hrashk.news.api.authors.AuthorService;
 import io.github.hrashk.news.api.categories.Category;
 import io.github.hrashk.news.api.categories.CategoryRepository;
 import io.github.hrashk.news.api.comments.Comment;
@@ -14,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import net.datafaker.Faker;
 import org.springframework.boot.test.context.TestComponent;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ import java.util.stream.LongStream;
 @Accessors(fluent = true)
 public final class DataSeeder {
     private final AuthorRepository authorsRepo;
-    private final PasswordEncoder encoder;
+    private final AuthorService authorService;
     private final NewsRepository newsRepo;
     private final CategoryRepository categoryRepo;
     private final CommentRepository commentRepository;
@@ -51,7 +51,7 @@ public final class DataSeeder {
         addUserRole(authors);
 
         authors.stream().map(Credentials::new).forEach(creds::add);
-        authors.forEach(this::encodePassword);
+        authors.forEach(authorService::encodePassword);
 
         authors = authorsRepo.saveAll(authors);
         categories = categoryRepo.saveAll(sampleCategories(count));
@@ -60,7 +60,8 @@ public final class DataSeeder {
 
         Author withoutRoles = aRandomAuthor(42);
         creds.add(new Credentials(withoutRoles.getUsername(), withoutRoles.getPassword()));
-        encodePassword(withoutRoles);
+        authorService.encodePassword(withoutRoles);
+
         withoutRoles = authorsRepo.save(withoutRoles);
         authors.add(withoutRoles);
     }
@@ -98,12 +99,6 @@ public final class DataSeeder {
 
     public Credentials withoutRoles() {
         return creds.get(creds.size() - 1);
-    }
-
-    private Author encodePassword(Author a) {
-        a.setPassword(encoder.encode(a.getPassword()));
-
-        return a;
     }
 
     public List<Author> sampleAuthors(int count) {

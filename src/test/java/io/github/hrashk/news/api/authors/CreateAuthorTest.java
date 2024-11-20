@@ -24,8 +24,7 @@ class CreateAuthorTest extends ControllerTest {
     @Test
     void create() {
         Credentials c = seeder.moderator();
-        UpsertAuthorRequest request = new UpsertAuthorRequest(
-                "lorem", "ipsum", "random", "password");
+        UpsertAuthorRequest request = randomRequest();
 
         ResponseEntity<AuthorResponse> response = rest.withBasicAuth(c.username(), c.password())
                 .postForEntity(Constants.AUTHORS_URL, request, AuthorResponse.class);
@@ -33,16 +32,23 @@ class CreateAuthorTest extends ControllerTest {
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED),
                 () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties(),
-                () -> assertThat(response.getBody().firstName()).isEqualTo("lorem"),
-                () -> assertThat(response.getBody().lastName()).isEqualTo("ipsum")
+                () -> assertThat(response.getBody().firstName()).isEqualTo(request.firstName()),
+                () -> assertThat(response.getBody().lastName()).isEqualTo(request.lastName())
         );
+    }
+
+    private UpsertAuthorRequest randomRequest() {
+        return new UpsertAuthorRequest(
+                seeder.faker().name().firstName(),
+                seeder.faker().name().lastName(),
+                seeder.faker().internet().username(),
+                seeder.faker().internet().password());
     }
 
     @Test
     void creatingWithSameUsernameFails() {
         Credentials c = seeder.moderator();
-        UpsertAuthorRequest request = new UpsertAuthorRequest(
-                "lorem", "ipsum", "random.user", "password");
+        UpsertAuthorRequest request = randomRequest();
 
         ResponseEntity<AuthorResponse> response = rest.withBasicAuth(c.username(), c.password())
                 .postForEntity(Constants.AUTHORS_URL, request, AuthorResponse.class);
@@ -57,7 +63,7 @@ class CreateAuthorTest extends ControllerTest {
     void createBroken() {
         Credentials c = seeder.moderator();
         UpsertAuthorRequest request = new UpsertAuthorRequest(
-                "  ", null, "random", "password");
+                "  ", null, seeder.faker().internet().username(), "password");
 
         ResponseEntity<ErrorInfo> response = rest.withBasicAuth(c.username(), c.password())
                 .postForEntity(Constants.AUTHORS_URL, request, ErrorInfo.class);
@@ -70,16 +76,14 @@ class CreateAuthorTest extends ControllerTest {
 
     @TestFactory
     public List<DynamicTest> authorization() {
-        UpsertAuthorRequest request = new UpsertAuthorRequest(
-                "lorem", "ipsum", "random", "password");
 
         return List.of(
-                create("as admin -> created", seeder.admin(), HttpStatus.CREATED, request),
-                create("as moderator -> created", seeder.moderator(), HttpStatus.CREATED, request),
-                create("as user -> forbidden", seeder.plainUser(), HttpStatus.FORBIDDEN, request),
-                create("no roles -> forbidden", seeder.withoutRoles(), HttpStatus.FORBIDDEN, request),
-                create("anonymous -> unauthorized", null, HttpStatus.UNAUTHORIZED, request),
-                create("wrong creds -> unauthorized", authorNotInSystem, HttpStatus.UNAUTHORIZED, request)
+                create("as admin -> created", seeder.admin(), HttpStatus.CREATED, randomRequest()),
+                create("as moderator -> created", seeder.moderator(), HttpStatus.CREATED, randomRequest()),
+                create("as user -> forbidden", seeder.plainUser(), HttpStatus.FORBIDDEN, randomRequest()),
+                create("no roles -> forbidden", seeder.withoutRoles(), HttpStatus.FORBIDDEN, randomRequest()),
+                create("anonymous -> unauthorized", null, HttpStatus.UNAUTHORIZED, randomRequest()),
+                create("wrong creds -> unauthorized", authorNotInSystem, HttpStatus.UNAUTHORIZED, randomRequest())
         );
     }
 
