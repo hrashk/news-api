@@ -22,17 +22,15 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 class UpdateAuthorTest extends ControllerTest {
     @Test
     void update() {
-        Credentials a = seeder.plainUser();
-        var request = new UpsertAuthorRequest(
-                "ipsum", "lorem", "random", "password");
+        var request = seeder.randomAuthorRequest();
 
         ResponseEntity<AuthorResponse> response =
                 put(Constants.AUTHORS_ID_URL, request, seeder.admin(), AuthorResponse.class, seeder.plainUserId());
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
-                () -> assertThat(response.getBody().lastName()).isEqualTo("lorem"),
-                () -> assertThat(response.getBody().username()).isEqualTo("random"),
+                () -> assertThat(response.getBody().lastName()).isEqualTo(request.lastName()),
+                () -> assertThat(response.getBody().username()).isEqualTo(request.username()),
                 () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties()
         );
     }
@@ -40,16 +38,15 @@ class UpdateAuthorTest extends ControllerTest {
     @Test
     void updateMissing() {
         Long authorId = INVALID_ID;
-        UpsertAuthorRequest request = new UpsertAuthorRequest(
-                "lorem", "ipsum", "random", "password");
+        UpsertAuthorRequest request = seeder.randomAuthorRequest();
 
         ResponseEntity<AuthorResponse> response = put(Constants.AUTHORS_ID_URL, request, seeder.moderator(), AuthorResponse.class, authorId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED),
                 () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties(),
-                () -> assertThat(response.getBody().firstName()).isEqualTo("lorem"),
-                () -> assertThat(response.getBody().lastName()).isEqualTo("ipsum")
+                () -> assertThat(response.getBody().firstName()).isEqualTo(request.firstName()),
+                () -> assertThat(response.getBody().lastName()).isEqualTo(request.lastName())
         );
     }
 

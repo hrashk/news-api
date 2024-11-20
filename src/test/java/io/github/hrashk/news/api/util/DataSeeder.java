@@ -3,6 +3,7 @@ package io.github.hrashk.news.api.util;
 import io.github.hrashk.news.api.authors.Author;
 import io.github.hrashk.news.api.authors.AuthorRepository;
 import io.github.hrashk.news.api.authors.AuthorService;
+import io.github.hrashk.news.api.authors.web.UpsertAuthorRequest;
 import io.github.hrashk.news.api.categories.Category;
 import io.github.hrashk.news.api.categories.CategoryRepository;
 import io.github.hrashk.news.api.comments.Comment;
@@ -130,6 +131,14 @@ public final class DataSeeder {
                 .username(faker.internet().username())
                 .password(faker.internet().password())
                 .build();
+    }
+
+    public UpsertAuthorRequest randomAuthorRequest() {
+        return new UpsertAuthorRequest(
+                faker().name().firstName(),
+                faker().name().lastName(),
+                faker().internet().username(),
+                faker().internet().password());
     }
 
     public Category aRandomCategory(long id) {
