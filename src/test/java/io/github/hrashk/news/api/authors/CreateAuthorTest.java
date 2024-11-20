@@ -39,6 +39,21 @@ class CreateAuthorTest extends ControllerTest {
     }
 
     @Test
+    void creatingWithSameUsernameFails() {
+        Credentials c = seeder.moderator();
+        UpsertAuthorRequest request = new UpsertAuthorRequest(
+                "lorem", "ipsum", "random.user", "password");
+
+        ResponseEntity<AuthorResponse> response = rest.withBasicAuth(c.username(), c.password())
+                .postForEntity(Constants.AUTHORS_URL, request, AuthorResponse.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+        ResponseEntity<AuthorResponse> response2 = rest.withBasicAuth(c.username(), c.password())
+                .postForEntity(Constants.AUTHORS_URL, request, AuthorResponse.class);
+        assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
     void createBroken() {
         Credentials c = seeder.moderator();
         UpsertAuthorRequest request = new UpsertAuthorRequest(

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.sql.SQLException;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
@@ -21,7 +22,7 @@ public class NewsApiAdvice {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(ValidationException.class)
+    @ExceptionHandler({ValidationException.class, SQLException.class})
     @ResponseBody
     ErrorInfo handleValidationIssues(HttpServletRequest req, Exception ex) {
         return new ErrorInfo(ex.getMessage());
