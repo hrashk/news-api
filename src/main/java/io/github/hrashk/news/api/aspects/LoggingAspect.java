@@ -29,20 +29,26 @@ public class LoggingAspect {
     public void logAfterThrowing(JoinPoint jp, Throwable e) {
         Logger logger = LoggerFactory.getLogger(jp.getTarget().getClass());
 
-        logger.debug("Exception " + jp.getSignature().toShortString(), e);
+        logger.debug("Exception in " + describeMethod(jp), e);
     }
 
     @Around("applicationPackagePointcut() && springServicePointcut()")
     public Object invoke(ProceedingJoinPoint pjp) throws Throwable {
         Logger logger = LoggerFactory.getLogger(pjp.getTarget().getClass());
-        final String args = Arrays.toString(pjp.getArgs());
+        final String method = describeMethod(pjp);
 
-        logger.debug("Enter: {} with argument[s] = {}", pjp.getSignature().toShortString(), args);
+        logger.debug("Enter: {}", method);
 
         final Object result = pjp.proceed();
 
-        logger.debug("Exit: {} with result = {}", pjp.getSignature().toShortString(), result);
+        logger.debug("Exit: {} => {}", method, result);
 
         return result;
+    }
+
+    private String describeMethod(JoinPoint jp) {
+        String args = Arrays.toString(jp.getArgs());
+
+        return jp.getSignature().toShortString().replace("..", args);
     }
 }
