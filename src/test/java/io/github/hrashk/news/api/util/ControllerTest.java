@@ -14,8 +14,14 @@ import org.springframework.test.context.ContextConfiguration;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = {"logging.level.org.apache.hc.client5.http=DEBUG"})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
+        "logging.level.org.apache.hc.client5.http=DEBUG",
+        "logging.level.io.github.hrashk.news.api.authors=DEBUG",
+        "logging.level.org.hibernate.orm.jdbc.bind=trace",
+        "logging.level.org.hibernate.SQL=DEBUG",
+        "logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE",
+        "spring.jpa.properties.hibernate.format_sql=true"
+})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ContextConfiguration(initializers = PostgreSQLInitializer.class)
 @Import(DataSeeder.class)
@@ -56,11 +62,5 @@ public abstract class ControllerTest {
                 Arguments.of((Function<DataSeeder, Credentials>) DataSeeder::admin, "admin"),
                 Arguments.of((Function<DataSeeder, Credentials>) DataSeeder::moderator, "moderator"),
                 Arguments.of((Function<DataSeeder, Credentials>) DataSeeder::plainUser, "user"));
-    }
-
-    static Stream<Arguments> adminAndModerator() {
-        return Stream.of(
-                Arguments.of((Function<DataSeeder, Credentials>) DataSeeder::admin, "admin"),
-                Arguments.of((Function<DataSeeder, Credentials>) DataSeeder::moderator, "moderator"));
     }
 }

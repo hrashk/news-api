@@ -19,6 +19,7 @@ import org.springframework.boot.test.context.TestComponent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.LongFunction;
@@ -40,35 +41,28 @@ public final class DataSeeder {
     private final Faker faker = new Faker(random);
 
     private List<Author> authors;
-    private List<Credentials> creds = new ArrayList<>();
+    private List<Credentials> creds;
     private List<Category> categories;
     private List<News> news;
     private List<Comment> comments;
 
     public void seed(int count) {
         authors = sampleAuthors(count);
-        authors.get(0).addRole(RoleType.ROLE_ADMIN);
-        authors.get(1).addRole(RoleType.ROLE_MODERATOR);
+        authors.get(1).addRole(RoleType.ROLE_ADMIN);
+        authors.get(2).addRole(RoleType.ROLE_MODERATOR);
         addUserRole(authors);
 
-        authors.stream().map(Credentials::new).forEach(creds::add);
+        creds = authors.stream().map(Credentials::new).collect(Collectors.toCollection(ArrayList::new));
         authors.forEach(authorService::encodePassword);
 
         authors = authorsRepo.saveAll(authors);
         categories = categoryRepo.saveAll(sampleCategories(count));
         news = newsRepo.saveAll(sampleNews(count));
         comments = commentRepository.saveAll(sampleComments(count));
-
-        Author withoutRoles = aRandomAuthor(42);
-        creds.add(new Credentials(withoutRoles.getUsername(), withoutRoles.getPassword()));
-        authorService.encodePassword(withoutRoles);
-
-        withoutRoles = authorsRepo.save(withoutRoles);
-        authors.add(withoutRoles);
     }
 
     private void addUserRole(List<Author> authors) {
-        authors.subList(1, authors.size()).forEach(a -> a.addRole(RoleType.ROLE_USER));
+        authors.subList(2, authors.size()).forEach(a -> a.addRole(RoleType.ROLE_USER));
     }
 
     public void flush() {
@@ -79,15 +73,19 @@ public final class DataSeeder {
     }
 
     public Credentials admin() {
-        return creds.get(0);
+        return creds.get(1);
     }
 
     public Long adminId() {
-        return authors.get(0).getId();
+        return authors.get(1).getId();
     }
 
     public Credentials moderator() {
-        return creds.get(1);
+        return creds.get(2);
+    }
+
+    public Long moderatorId() {
+        return authors.get(2).getId();
     }
 
     public Credentials plainUser() {
@@ -99,7 +97,7 @@ public final class DataSeeder {
     }
 
     public Credentials withoutRoles() {
-        return creds.get(creds.size() - 1);
+        return creds.get(0);
     }
 
     public List<Author> sampleAuthors(int count) {
@@ -175,5 +173,17 @@ public final class DataSeeder {
 
     private <T> T randomItem(List<T> items) {
         return items.get(random.nextInt(items.size()));
+    }
+
+    public News aNewsNotByAuthor(Long authorId) {
+        return news.stream()
+                .filter(n -> !Objects.equals(n.getAuthor().getId(), authorId))
+                .findAny().get();
+    }
+
+    public Comment aCommentNotByAuthor(Long authorId) {
+        return comments.stream()
+                .filter(c -> !Objects.equals(c.getAuthor().getId(), authorId))
+                .findAny().get();
     }
 }

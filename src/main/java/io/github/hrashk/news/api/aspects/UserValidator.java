@@ -55,6 +55,11 @@ public class UserValidator {
         checkAdminOrSameAuthor(id);
     }
 
+    @Before("target(service) && execution(* *.deleteById(Long)) && args(id)")
+    public void checkAuthorDelete(JoinPoint jp, AuthorService service, Long id) {
+        checkAdminOrSameAuthor(id);
+    }
+
     private void checkUser(Function<Long, Long> authorIdLookup, boolean strict) {
         Long authorId;
 
