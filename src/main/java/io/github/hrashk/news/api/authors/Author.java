@@ -41,7 +41,6 @@ public class Author implements BaseEntity {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "author", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
-    @ToString.Exclude
     private Collection<Role> roles = new ArrayList<>();
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.REMOVE)
