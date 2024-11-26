@@ -101,6 +101,10 @@ public final class DataSeeder {
         return creds.get(0);
     }
 
+    public Long categoryId(int index) {
+        return categories.get(index).getId();
+    }
+
     public List<Author> sampleAuthors(int count) {
         return generateSample(count, this::aRandomAuthor);
     }
@@ -154,7 +158,7 @@ public final class DataSeeder {
         Author author = randomItem(authors);
 
         News newsItem = new News().toBuilder()
-                .category(randomItem(categories))
+                .category(randomItem(categories, 3))
                 .headline(faker.lorem().sentence())
                 .content(faker.lorem().paragraph(10))
                 .build();
@@ -178,6 +182,13 @@ public final class DataSeeder {
 
     private <T> T randomItem(List<T> items) {
         return items.get(random.nextInt(items.size()));
+    }
+
+    /**
+     * skip some items at the beginning
+     */
+    private <T> T randomItem(List<T> items, int from) {
+        return items.get(from + random.nextInt(items.size() - from));
     }
 
     public News aNewsNotByAuthor(Long authorId) {
