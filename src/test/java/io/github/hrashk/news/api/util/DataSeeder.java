@@ -236,6 +236,12 @@ public final class DataSeeder {
                 .findAny().get();
     }
 
+    public Credentials newsAuthorCreds(News news) {
+        String username = news.getAuthor().getUsername();
+
+        return new Credentials(username, unencodedPassword(username));
+    }
+
     public String unencodedPassword(String username) {
         return creds.stream()
                 .filter(c -> Objects.equals(c.username(), username))
