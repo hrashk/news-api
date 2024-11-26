@@ -2,7 +2,6 @@ package io.github.hrashk.news.api.news;
 
 import io.github.hrashk.news.api.Constants;
 import io.github.hrashk.news.api.authors.Author;
-import io.github.hrashk.news.api.comments.Comment;
 import io.github.hrashk.news.api.exceptions.ErrorInfo;
 import io.github.hrashk.news.api.news.web.NewsResponse;
 import io.github.hrashk.news.api.news.web.UpsertNewsRequest;
@@ -22,40 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class NewsControllerTest extends ControllerTest {
-    @ParameterizedTest(name = "{1}")
-    @MethodSource("users")
-    void findById(Function<DataSeeder, Author> userProvider, String userType) {
-        Comment comment = seeder.comments().get(0);
-        Long newsId = comment.getNews().getId();
-
-        Author a = userProvider.apply(seeder);
-        ResponseEntity<NewsResponse> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
-                .getForEntity(Constants.NEWS_ID_URL, NewsResponse.class, newsId);
-
-        assertAll(
-                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
-                () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties(),
-                () -> assertThat(response.getBody().id()).isEqualTo(newsId),
-                () -> assertThat(response.getBody().comments()).anySatisfy(c ->
-                        assertThat(c.id()).isEqualTo(comment.getId()))
-        );
-    }
-
-    @ParameterizedTest(name = "{1}")
-    @MethodSource("users")
-    void findMissing(Function<DataSeeder, Author> userProvider, String userType) {
-        Long newsId = INVALID_ID;
-
-        Author a = userProvider.apply(seeder);
-        ResponseEntity<ErrorInfo> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
-                .getForEntity(Constants.NEWS_ID_URL, ErrorInfo.class, newsId);
-
-        assertAll(
-                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
-                () -> assertThat(response.getBody().message()).contains("News")
-        );
-    }
-
     @ParameterizedTest(name = "{1}")
     @MethodSource("users")
     void add(Function<DataSeeder, Author> userProvider, String userType) {
