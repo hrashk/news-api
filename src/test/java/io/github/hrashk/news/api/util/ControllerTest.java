@@ -37,6 +37,10 @@ public abstract class ControllerTest {
     @BeforeEach
     void injectSampleData() {
         seeder.seed(10);
+    }
+
+    @BeforeEach
+    void enableHttpLogging() {
         rest.getRestTemplate().setRequestFactory(new HttpComponentsClientHttpRequestFactory());
     }
 
