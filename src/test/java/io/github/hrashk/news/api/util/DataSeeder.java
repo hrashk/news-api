@@ -180,7 +180,7 @@ public final class DataSeeder {
     }
 
     public News aRandomNews(long ignored) {
-        Author author = randomItem(authors);
+        Author author = randomItem(authors, 1);
 
         News newsItem = new News().toBuilder()
                 .category(randomItem(categories, 3))
@@ -201,7 +201,7 @@ public final class DataSeeder {
     }
 
     public Comment aRandomComment(long ignored) {
-        Author author = randomItem(authors);
+        Author author = randomItem(authors, 1);
         News newsItem = randomItem(news);
 
         Comment comment = Comment.builder()
@@ -233,6 +233,13 @@ public final class DataSeeder {
     public Comment aCommentNotByAuthor(Long authorId) {
         return comments.stream()
                 .filter(c -> !Objects.equals(c.getAuthor().getId(), authorId))
+                .findAny().get();
+    }
+
+    public String unencodedPassword(String username) {
+        return creds.stream()
+                .filter(c -> Objects.equals(c.username(), username))
+                .map(Credentials::password)
                 .findAny().get();
     }
 }
