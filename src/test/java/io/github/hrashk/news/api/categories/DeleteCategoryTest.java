@@ -20,6 +20,22 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 class DeleteCategoryTest extends ControllerTest {
     @Test
+    void deleteWithoutNews() {
+        Credentials a = seeder.admin();
+
+        Long id = seeder.categoryId(0);
+        ResponseEntity<Void> deleteResponse = delete(Constants.CATEGORIES_ID_URL, a, id);
+        assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+        ResponseEntity<ErrorInfo> findResponse = rest.withBasicAuth(a.username(), a.password())
+                .getForEntity(Constants.CATEGORIES_ID_URL, ErrorInfo.class, id);
+        assertAll(
+                () -> assertThat(findResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
+                () -> assertThat(findResponse.getBody().message()).contains("Category")
+        );
+    }
+
+    @Test
     void deleteWithNews() {
         Credentials a = seeder.admin();
 

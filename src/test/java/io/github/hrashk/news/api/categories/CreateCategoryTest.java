@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 class CreateCategoryTest extends ControllerTest {
     @Test
-    void createThenDelete() {
+    void create() {
         Credentials a = seeder.admin();
 
         var request = new UpsertCategoryRequest("lorem");
@@ -33,17 +33,6 @@ class CreateCategoryTest extends ControllerTest {
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED),
                 () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties(),
                 () -> assertThat(response.getBody().name()).isEqualTo("lorem")
-        );
-
-        Long id = response.getBody().id();
-        ResponseEntity<Void> deleteResponse = delete(Constants.CATEGORIES_ID_URL, a, id);
-        assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-
-        ResponseEntity<ErrorInfo> findResponse = rest.withBasicAuth(a.username(), a.password())
-                .getForEntity(Constants.CATEGORIES_ID_URL, ErrorInfo.class, id);
-        assertAll(
-                () -> assertThat(findResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
-                () -> assertThat(findResponse.getBody().message()).contains("Category")
         );
     }
 
