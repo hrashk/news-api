@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
-class FindByIdTest extends ControllerTest {
+class FindAuthorByIdTest extends ControllerTest {
     @Test
     void findById() {
         Credentials a = seeder.moderator();
