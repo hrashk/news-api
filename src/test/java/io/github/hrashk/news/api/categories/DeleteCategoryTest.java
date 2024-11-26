@@ -57,7 +57,7 @@ class DeleteCategoryTest extends ControllerTest {
                 delById("as user -> forbidden", seeder.plainUser(), HttpStatus.FORBIDDEN, id),
                 delById("no roles -> forbidden", seeder.withoutRoles(), HttpStatus.FORBIDDEN, id),
                 delById("anonymous -> unauthorized", null, HttpStatus.UNAUTHORIZED, id),
-                delById("wrong creds -> unauthorized", authorNotInSystem, HttpStatus.UNAUTHORIZED, id)
+                delById("wrong creds -> unauthorized", seeder.fakeUser(), HttpStatus.UNAUTHORIZED, id)
         );
     }
 

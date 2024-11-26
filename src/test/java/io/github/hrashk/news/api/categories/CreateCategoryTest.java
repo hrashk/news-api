@@ -70,7 +70,7 @@ class CreateCategoryTest extends ControllerTest {
                 create("as user -> forbidden", seeder.plainUser(), HttpStatus.FORBIDDEN, seeder.randomCategoryRequest()),
                 create("no roles -> forbidden", seeder.withoutRoles(), HttpStatus.FORBIDDEN, seeder.randomCategoryRequest()),
                 create("anonymous -> unauthorized", null, HttpStatus.UNAUTHORIZED, seeder.randomCategoryRequest()),
-                create("wrong creds -> unauthorized", authorNotInSystem, HttpStatus.UNAUTHORIZED, seeder.randomCategoryRequest())
+                create("wrong creds -> unauthorized", seeder.fakeUser(), HttpStatus.UNAUTHORIZED, seeder.randomCategoryRequest())
         );
     }
 

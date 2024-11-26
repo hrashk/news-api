@@ -63,7 +63,7 @@ class UpdateCategoryTest extends ControllerTest {
                 update("as user -> forbidden", seeder.plainUser(), HttpStatus.FORBIDDEN, request, id),
                 update("no roles -> forbidden", seeder.withoutRoles(), HttpStatus.FORBIDDEN, request, id),
                 update("anonymous -> unauthorized", null, HttpStatus.UNAUTHORIZED, request, id),
-                update("wrong creds -> unauthorized", authorNotInSystem, HttpStatus.UNAUTHORIZED, request, id)
+                update("wrong creds -> unauthorized", seeder.fakeUser(), HttpStatus.UNAUTHORIZED, request, id)
         );
     }
 

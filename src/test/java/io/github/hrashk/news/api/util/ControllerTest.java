@@ -32,8 +32,6 @@ public abstract class ControllerTest {
     @Autowired
     protected DataSeeder seeder;
 
-    protected final Credentials authorNotInSystem = new Credentials("fake", "author");
-
     @BeforeEach
     void injectSampleData() {
         seeder.seed(10);

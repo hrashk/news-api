@@ -75,7 +75,7 @@ class CreateAuthorTest extends ControllerTest {
                 create("as user -> forbidden", seeder.plainUser(), HttpStatus.FORBIDDEN, seeder.randomAuthorRequest()),
                 create("no roles -> forbidden", seeder.withoutRoles(), HttpStatus.FORBIDDEN, seeder.randomAuthorRequest()),
                 create("anonymous -> unauthorized", null, HttpStatus.UNAUTHORIZED, seeder.randomAuthorRequest()),
-                create("wrong creds -> unauthorized", authorNotInSystem, HttpStatus.UNAUTHORIZED, seeder.randomAuthorRequest())
+                create("wrong creds -> unauthorized", seeder.fakeUser(), HttpStatus.UNAUTHORIZED, seeder.randomAuthorRequest())
         );
     }
 

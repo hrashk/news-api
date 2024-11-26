@@ -63,7 +63,7 @@ class FindAllAuthorsTest extends ControllerTest {
                 findAll("as user -> forbidden", seeder.plainUser(), HttpStatus.FORBIDDEN),
                 findAll("no roles -> forbidden", seeder.withoutRoles(), HttpStatus.FORBIDDEN),
                 findAll("anonymous -> unauthorized", null, HttpStatus.UNAUTHORIZED),
-                findAll("wrong creds -> unauthorized", authorNotInSystem, HttpStatus.UNAUTHORIZED)
+                findAll("wrong creds -> unauthorized", seeder.fakeUser(), HttpStatus.UNAUTHORIZED)
         );
     }
 

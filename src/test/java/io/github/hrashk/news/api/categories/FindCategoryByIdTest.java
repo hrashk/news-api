@@ -61,7 +61,7 @@ class FindCategoryByIdTest extends ControllerTest {
                 findById("as user -> ok", seeder.plainUser(), HttpStatus.OK, categoryId),
                 findById("no roles -> forbidden", seeder.withoutRoles(), HttpStatus.FORBIDDEN, categoryId),
                 findById("anonymous -> unauthorized", null, HttpStatus.UNAUTHORIZED, categoryId),
-                findById("wrong creds -> unauthorized", authorNotInSystem, HttpStatus.UNAUTHORIZED, categoryId)
+                findById("wrong creds -> unauthorized", seeder.fakeUser(), HttpStatus.UNAUTHORIZED, categoryId)
         );
     }
 

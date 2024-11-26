@@ -87,7 +87,7 @@ class DeleteAuthorTest extends ControllerTest {
                 delById("no roles -> forbidden", seeder.withoutRoles(), HttpStatus.FORBIDDEN, aUserId),
                 delById("anonymous -> unauthorized", null, HttpStatus.UNAUTHORIZED, aUserId),
                 delById("wrong creds -> unauthorized",
-                        authorNotInSystem, HttpStatus.UNAUTHORIZED, aUserId),
+                        seeder.fakeUser(), HttpStatus.UNAUTHORIZED, aUserId),
                 delById("another author as user -> forbidden",
                         seeder.creds().get(6), HttpStatus.FORBIDDEN, seeder.adminId())
         );

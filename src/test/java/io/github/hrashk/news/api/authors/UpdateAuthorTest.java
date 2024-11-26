@@ -64,7 +64,7 @@ class UpdateAuthorTest extends ControllerTest {
                 update("no roles -> forbidden", seeder.withoutRoles(), HttpStatus.FORBIDDEN, request, plainUserId),
                 update("anonymous -> unauthorized", null, HttpStatus.UNAUTHORIZED, request, plainUserId),
                 update("wrong creds -> unauthorized",
-                        authorNotInSystem, HttpStatus.UNAUTHORIZED, request, plainUserId),
+                        seeder.fakeUser(), HttpStatus.UNAUTHORIZED, request, plainUserId),
                 update("another author as user -> forbidden",
                         user, HttpStatus.FORBIDDEN, request, seeder.adminId())
         );

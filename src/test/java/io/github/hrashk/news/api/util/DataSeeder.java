@@ -101,6 +101,10 @@ public final class DataSeeder {
         return creds.get(0);
     }
 
+    public Credentials fakeUser() {
+        return new Credentials("fake", "author");
+    }
+
     public Long categoryId(int index) {
         return categories.get(index).getId();
     }

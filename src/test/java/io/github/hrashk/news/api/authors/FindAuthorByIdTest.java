@@ -60,7 +60,7 @@ class FindAuthorByIdTest extends ControllerTest {
                 findById("no roles -> forbidden", seeder.withoutRoles(), HttpStatus.FORBIDDEN, plainUserId),
                 findById("anonymous -> unauthorized", null, HttpStatus.UNAUTHORIZED, plainUserId),
                 findById("wrong creds -> unauthorized",
-                        authorNotInSystem, HttpStatus.UNAUTHORIZED, plainUserId),
+                        seeder.fakeUser(), HttpStatus.UNAUTHORIZED, plainUserId),
                 findById("another author as user -> forbidden",
                         seeder.plainUser(), HttpStatus.FORBIDDEN, seeder.adminId())
         );
