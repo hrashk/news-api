@@ -30,60 +30,6 @@ class CategoryControllerTest extends ControllerTest {
 
     @ParameterizedTest(name = "{1}")
     @MethodSource("upsertUsers")
-    void addThenDelete(Function<DataSeeder, Credentials> userProvider, String userType) {
-        Credentials a = userProvider.apply(seeder);
-
-        var request = new UpsertCategoryRequest("lorem");
-
-        ResponseEntity<CategoryResponse> response = rest.withBasicAuth(a.username(), a.password())
-                .postForEntity(Constants.CATEGORIES_URL, request, CategoryResponse.class);
-        assertAll(
-                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED),
-                () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties(),
-                () -> assertThat(response.getBody().name()).isEqualTo("lorem")
-        );
-
-        Long id = response.getBody().id();
-        ResponseEntity<Void> deleteResponse = delete(Constants.CATEGORIES_ID_URL, a, id);
-        assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-
-        ResponseEntity<ErrorInfo> findResponse = rest.withBasicAuth(a.username(), a.password())
-                .getForEntity(Constants.CATEGORIES_ID_URL, ErrorInfo.class, id);
-        assertAll(
-                () -> assertThat(findResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
-                () -> assertThat(findResponse.getBody().message()).contains("Category")
-        );
-    }
-
-    @Test
-    void addBroken() {
-        Credentials a = seeder.moderator();
-
-        var request = new UpsertCategoryRequest("  ");
-
-        ResponseEntity<ErrorInfo> response = rest.withBasicAuth(a.username(), a.password())
-                .postForEntity(Constants.CATEGORIES_URL, request, ErrorInfo.class);
-
-        assertAll(
-                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST),
-                () -> assertThat(response.getBody().message()).contains("name")
-        );
-    }
-
-    @Test
-    void plainUserCannotAdd() {
-        Credentials a = seeder.plainUser();
-
-        var request = new UpsertCategoryRequest("lorem");
-
-        ResponseEntity<?> response = rest.withBasicAuth(a.username(), a.password())
-                .postForEntity(Constants.CATEGORIES_URL, request, Map.class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
-    }
-
-    @ParameterizedTest(name = "{1}")
-    @MethodSource("upsertUsers")
     void update(Function<DataSeeder, Credentials> userProvider, String userType) {
         Credentials a = userProvider.apply(seeder);
 

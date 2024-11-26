@@ -6,6 +6,7 @@ import io.github.hrashk.news.api.authors.AuthorService;
 import io.github.hrashk.news.api.authors.web.UpsertAuthorRequest;
 import io.github.hrashk.news.api.categories.Category;
 import io.github.hrashk.news.api.categories.CategoryRepository;
+import io.github.hrashk.news.api.categories.web.UpsertCategoryRequest;
 import io.github.hrashk.news.api.comments.Comment;
 import io.github.hrashk.news.api.comments.CommentRepository;
 import io.github.hrashk.news.api.news.News;
@@ -143,6 +144,10 @@ public final class DataSeeder {
         return Category.builder()
                 .name(faker.book().genre())
                 .build();
+    }
+
+    public UpsertCategoryRequest randomCategoryRequest() {
+        return new UpsertCategoryRequest(faker.book().genre());
     }
 
     public News aRandomNews(long ignored) {
