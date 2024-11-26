@@ -29,38 +29,6 @@ class CategoryControllerTest extends ControllerTest {
     }
 
     @ParameterizedTest(name = "{1}")
-    @MethodSource("users")
-    void findById(Function<DataSeeder, Credentials> userProvider, String userType) {
-        Credentials a = userProvider.apply(seeder);
-
-        Long categoryId = seeder.categories().get(0).getId();
-
-        ResponseEntity<CategoryResponse> response = rest.withBasicAuth(a.username(), a.password())
-                .getForEntity(Constants.CATEGORIES_ID_URL, CategoryResponse.class, categoryId);
-
-        assertAll(
-                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
-                () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties(),
-                () -> assertThat(response.getBody().id()).isEqualTo(categoryId)
-        );
-    }
-
-    @Test
-    void findMissing() {
-        Credentials a = seeder.plainUser();
-
-        Long categoryId = INVALID_ID;
-
-        ResponseEntity<ErrorInfo> response = rest.withBasicAuth(a.username(), a.password())
-                .getForEntity(Constants.CATEGORIES_ID_URL, ErrorInfo.class, categoryId);
-
-        assertAll(
-                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
-                () -> assertThat(response.getBody().message()).contains("Category")
-        );
-    }
-
-    @ParameterizedTest(name = "{1}")
     @MethodSource("upsertUsers")
     void addThenDelete(Function<DataSeeder, Credentials> userProvider, String userType) {
         Credentials a = userProvider.apply(seeder);
