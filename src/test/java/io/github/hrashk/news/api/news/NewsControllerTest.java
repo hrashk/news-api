@@ -1,5 +1,6 @@
 package io.github.hrashk.news.api.news;
 
+import io.github.hrashk.news.api.Constants;
 import io.github.hrashk.news.api.authors.Author;
 import io.github.hrashk.news.api.comments.Comment;
 import io.github.hrashk.news.api.exceptions.ErrorInfo;
@@ -22,15 +23,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class NewsControllerTest extends ControllerTest {
-    private static final String NEWS_URL = "/api/v1/news";
-    private static final String NEWS_ID_URL = NEWS_URL + "/{id}";
-
     @ParameterizedTest(name = "{1}")
     @MethodSource("users")
     void firstPage(Function<DataSeeder, Author> userProvider, String userType) {
         Author a = userProvider.apply(seeder);
         ResponseEntity<NewsListResponse> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
-                .getForEntity(NEWS_URL, NewsListResponse.class);
+                .getForEntity(Constants.NEWS_URL, NewsListResponse.class);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
@@ -44,7 +42,7 @@ class NewsControllerTest extends ControllerTest {
     void secondPage(Function<DataSeeder, Author> userProvider, String userType) {
         Author a = userProvider.apply(seeder);
         ResponseEntity<NewsListResponse> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
-                .getForEntity(NEWS_URL + "?page=1&size=3", NewsListResponse.class);
+                .getForEntity(Constants.NEWS_URL + "?page=1&size=3", NewsListResponse.class);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
@@ -62,7 +60,7 @@ class NewsControllerTest extends ControllerTest {
 
         Author a = userProvider.apply(seeder);
         ResponseEntity<NewsListResponse> entity = rest.withBasicAuth(a.getUsername(), a.getPassword())
-                .getForEntity(NEWS_URL + "?authorId={aid}&categoryId={cid}",
+                .getForEntity(Constants.NEWS_URL + "?authorId={aid}&categoryId={cid}",
                 NewsListResponse.class, authorId, categoryId);
 
         assertAll(
@@ -82,7 +80,7 @@ class NewsControllerTest extends ControllerTest {
 
         Author a = userProvider.apply(seeder);
         ResponseEntity<NewsListResponse> entity = rest.withBasicAuth(a.getUsername(), a.getPassword())
-                .getForEntity(NEWS_URL + "?authorId={aid}", NewsListResponse.class, authorId);
+                .getForEntity(Constants.NEWS_URL + "?authorId={aid}", NewsListResponse.class, authorId);
 
         assertAll(
                 () -> assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK),
@@ -99,7 +97,7 @@ class NewsControllerTest extends ControllerTest {
 
         Author a = userProvider.apply(seeder);
         ResponseEntity<NewsListResponse> entity = rest.withBasicAuth(a.getUsername(), a.getPassword())
-                .getForEntity(NEWS_URL + "?categoryId={cid}", NewsListResponse.class, categoryId);
+                .getForEntity(Constants.NEWS_URL + "?categoryId={cid}", NewsListResponse.class, categoryId);
 
         assertAll(
                 () -> assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.OK),
@@ -117,7 +115,7 @@ class NewsControllerTest extends ControllerTest {
 
         Author a = userProvider.apply(seeder);
         ResponseEntity<NewsResponse> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
-                .getForEntity(NEWS_ID_URL, NewsResponse.class, newsId);
+                .getForEntity(Constants.NEWS_ID_URL, NewsResponse.class, newsId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
@@ -135,7 +133,7 @@ class NewsControllerTest extends ControllerTest {
 
         Author a = userProvider.apply(seeder);
         ResponseEntity<ErrorInfo> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
-                .getForEntity(NEWS_ID_URL, ErrorInfo.class, newsId);
+                .getForEntity(Constants.NEWS_ID_URL, ErrorInfo.class, newsId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
@@ -152,7 +150,7 @@ class NewsControllerTest extends ControllerTest {
         UpsertNewsRequest request = new UpsertNewsRequest(authorId, categoryId, "h", "c");
 
         ResponseEntity<NewsResponse> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
-                .postForEntity(NEWS_URL, request, NewsResponse.class);
+                .postForEntity(Constants.NEWS_URL, request, NewsResponse.class);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED),
@@ -171,7 +169,7 @@ class NewsControllerTest extends ControllerTest {
 
         Author a = userProvider.apply(seeder);
         ResponseEntity<ErrorInfo> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
-                .postForEntity(NEWS_URL, request, ErrorInfo.class);
+                .postForEntity(Constants.NEWS_URL, request, ErrorInfo.class);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
@@ -188,7 +186,7 @@ class NewsControllerTest extends ControllerTest {
 
         Author a = userProvider.apply(seeder);
         ResponseEntity<ErrorInfo> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
-                .postForEntity(NEWS_URL, request, ErrorInfo.class);
+                .postForEntity(Constants.NEWS_URL, request, ErrorInfo.class);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
@@ -203,7 +201,7 @@ class NewsControllerTest extends ControllerTest {
 
         Author a = userProvider.apply(seeder);
         ResponseEntity<ErrorInfo> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
-                .postForEntity(NEWS_URL, request, ErrorInfo.class);
+                .postForEntity(Constants.NEWS_URL, request, ErrorInfo.class);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST),
@@ -220,7 +218,7 @@ class NewsControllerTest extends ControllerTest {
         UpsertNewsRequest request = new UpsertNewsRequest(authorId, categoryId, "asdf", news.getContent());
 
         Long newsId = news.getId();
-        ResponseEntity<NewsResponse> response = put(NEWS_ID_URL, request, new Credentials(author), NewsResponse.class, newsId);
+        ResponseEntity<NewsResponse> response = put(Constants.NEWS_ID_URL, request, new Credentials(author), NewsResponse.class, newsId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
@@ -236,7 +234,7 @@ class NewsControllerTest extends ControllerTest {
         UpsertNewsRequest request = new UpsertNewsRequest(authorId, categoryId, "h", "c");
 
         Long newsId = INVALID_ID;
-        ResponseEntity<NewsResponse> response = put(NEWS_ID_URL, request, seeder.moderator(), NewsResponse.class, newsId);
+        ResponseEntity<NewsResponse> response = put(Constants.NEWS_ID_URL, request, seeder.moderator(), NewsResponse.class, newsId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED),
@@ -245,7 +243,7 @@ class NewsControllerTest extends ControllerTest {
     }
 
     @ParameterizedTest
-    @CsvSource({NEWS_ID_URL})
+    @CsvSource({Constants.NEWS_ID_URL})
     void updateWithInvalidUser(String url) {
         var news = seeder.news().get(0);
         Long authorId = news.getAuthor().getId();
@@ -266,10 +264,10 @@ class NewsControllerTest extends ControllerTest {
         var news = seeder.comments().get(0).getNews();
         Long newsId = news.getId();
 
-        ResponseEntity<Void> response = delete(NEWS_ID_URL, seeder.admin(), newsId);
+        ResponseEntity<Void> response = delete(Constants.NEWS_ID_URL, seeder.admin(), newsId);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        ResponseEntity<ErrorInfo> findResponse = rest.getForEntity(NEWS_ID_URL, ErrorInfo.class, newsId);
+        ResponseEntity<ErrorInfo> findResponse = rest.getForEntity(Constants.NEWS_ID_URL, ErrorInfo.class, newsId);
         assertAll(
                 () -> assertThat(findResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
                 () -> assertThat(findResponse.getBody().message()).contains("News")
@@ -280,7 +278,7 @@ class NewsControllerTest extends ControllerTest {
     void deleteMissing() {
         Long newsId = INVALID_ID;
 
-        ResponseEntity<ErrorInfo> response = delete(NEWS_ID_URL, seeder.moderator(), ErrorInfo.class, newsId);
+        ResponseEntity<ErrorInfo> response = delete(Constants.NEWS_ID_URL, seeder.moderator(), ErrorInfo.class, newsId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
@@ -289,7 +287,7 @@ class NewsControllerTest extends ControllerTest {
     }
 
     @ParameterizedTest
-    @CsvSource({NEWS_ID_URL})
+    @CsvSource({Constants.NEWS_ID_URL})
     void deleteWithInvalidUser(String url) {
         Long newsId = seeder.news().get(0).getId();
         Long userId = INVALID_ID;

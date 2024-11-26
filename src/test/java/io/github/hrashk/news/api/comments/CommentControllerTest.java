@@ -1,5 +1,6 @@
 package io.github.hrashk.news.api.comments;
 
+import io.github.hrashk.news.api.Constants;
 import io.github.hrashk.news.api.comments.web.CommentResponse;
 import io.github.hrashk.news.api.comments.web.UpsertCommentRequest;
 import io.github.hrashk.news.api.exceptions.ErrorInfo;
@@ -14,15 +15,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class CommentControllerTest extends ControllerTest {
-    private static final String COMMENTS_URL = "/api/v1/comments";
-    private static final String COMMENTS_ID_URL = COMMENTS_URL + "/{id}";
-    private static final String COMMENTS_WITH_USER_URL = COMMENTS_ID_URL + "?userId={userId}";
-
     @Test
     void findById() {
         Long commentId = seeder.comments().get(0).getId();
 
-        ResponseEntity<CommentResponse> response = rest.getForEntity(COMMENTS_ID_URL, CommentResponse.class, commentId);
+        ResponseEntity<CommentResponse> response = rest.getForEntity(Constants.COMMENTS_ID_URL, CommentResponse.class, commentId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
@@ -34,7 +31,7 @@ class CommentControllerTest extends ControllerTest {
     void findMissing() {
         Long commentId = INVALID_ID;
 
-        ResponseEntity<ErrorInfo> response = rest.getForEntity(COMMENTS_ID_URL, ErrorInfo.class, commentId);
+        ResponseEntity<ErrorInfo> response = rest.getForEntity(Constants.COMMENTS_ID_URL, ErrorInfo.class, commentId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
@@ -48,7 +45,7 @@ class CommentControllerTest extends ControllerTest {
         Long authorId = seeder.authorId(0);
         UpsertCommentRequest request = new UpsertCommentRequest(newsId, authorId, "lorem");
 
-        ResponseEntity<CommentResponse> response = rest.postForEntity(COMMENTS_URL, request, CommentResponse.class);
+        ResponseEntity<CommentResponse> response = rest.postForEntity(Constants.COMMENTS_URL, request, CommentResponse.class);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED),
@@ -63,7 +60,7 @@ class CommentControllerTest extends ControllerTest {
         Long authorId = INVALID_ID;
         UpsertCommentRequest request = new UpsertCommentRequest(newsId, authorId, "lorem");
 
-        ResponseEntity<ErrorInfo> response = rest.postForEntity(COMMENTS_URL, request, ErrorInfo.class);
+        ResponseEntity<ErrorInfo> response = rest.postForEntity(Constants.COMMENTS_URL, request, ErrorInfo.class);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
@@ -77,7 +74,7 @@ class CommentControllerTest extends ControllerTest {
         Long authorId = seeder.authorId(0);
         UpsertCommentRequest request = new UpsertCommentRequest(newsId, authorId, "lorem");
 
-        ResponseEntity<ErrorInfo> response = rest.postForEntity(COMMENTS_URL, request, ErrorInfo.class);
+        ResponseEntity<ErrorInfo> response = rest.postForEntity(Constants.COMMENTS_URL, request, ErrorInfo.class);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
@@ -89,7 +86,7 @@ class CommentControllerTest extends ControllerTest {
     void addBroken() {
         UpsertCommentRequest request = new UpsertCommentRequest(null, null, "  ");
 
-        ResponseEntity<ErrorInfo> response = rest.postForEntity(COMMENTS_URL, request, ErrorInfo.class);
+        ResponseEntity<ErrorInfo> response = rest.postForEntity(Constants.COMMENTS_URL, request, ErrorInfo.class);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST),
@@ -106,7 +103,7 @@ class CommentControllerTest extends ControllerTest {
 
         Long commentId = comment.getId();
         Long userId = authorId;
-        ResponseEntity<CommentResponse> response = put(COMMENTS_WITH_USER_URL,
+        ResponseEntity<CommentResponse> response = put(Constants.COMMENTS_WITH_USER_URL,
                 request, seeder.moderator(), CommentResponse.class, commentId, userId);
 
         assertAll(
@@ -124,7 +121,7 @@ class CommentControllerTest extends ControllerTest {
 
         Long commentId = INVALID_ID;
         Long userId = authorId;
-        ResponseEntity<CommentResponse> response = put(COMMENTS_WITH_USER_URL,
+        ResponseEntity<CommentResponse> response = put(Constants.COMMENTS_WITH_USER_URL,
                 request, seeder.admin(), CommentResponse.class, commentId, userId);
 
         assertAll(
@@ -134,7 +131,7 @@ class CommentControllerTest extends ControllerTest {
     }
 
     @ParameterizedTest
-    @CsvSource({COMMENTS_ID_URL, COMMENTS_WITH_USER_URL})
+    @CsvSource({Constants.COMMENTS_ID_URL, Constants.COMMENTS_WITH_USER_URL})
     void updateWithInvalidUser(String url) {
         Comment comment = seeder.comments().get(0);
         Long newsId = comment.getNews().getId();
@@ -157,10 +154,10 @@ class CommentControllerTest extends ControllerTest {
         Long commentId = comment.getId();
         Long userId = comment.getAuthor().getId();
 
-        ResponseEntity<Void> response = delete(COMMENTS_WITH_USER_URL, seeder.admin(), commentId, userId);
+        ResponseEntity<Void> response = delete(Constants.COMMENTS_WITH_USER_URL, seeder.admin(), commentId, userId);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        ResponseEntity<ErrorInfo> findResponse = rest.getForEntity(COMMENTS_ID_URL, ErrorInfo.class, commentId);
+        ResponseEntity<ErrorInfo> findResponse = rest.getForEntity(Constants.COMMENTS_ID_URL, ErrorInfo.class, commentId);
         assertAll(
                 () -> assertThat(findResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
                 () -> assertThat(findResponse.getBody().message()).contains("Comment")
@@ -172,7 +169,7 @@ class CommentControllerTest extends ControllerTest {
         Long commentId = INVALID_ID;
         Long userId = seeder.authorId(0);
 
-        ResponseEntity<ErrorInfo> response = delete(COMMENTS_WITH_USER_URL, seeder.moderator(), ErrorInfo.class, commentId, userId);
+        ResponseEntity<ErrorInfo> response = delete(Constants.COMMENTS_WITH_USER_URL, seeder.moderator(), ErrorInfo.class, commentId, userId);
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
@@ -181,7 +178,7 @@ class CommentControllerTest extends ControllerTest {
     }
 
     @ParameterizedTest
-    @CsvSource({COMMENTS_ID_URL, COMMENTS_WITH_USER_URL})
+    @CsvSource({Constants.COMMENTS_ID_URL, Constants.COMMENTS_WITH_USER_URL})
     void deleteWithInvalidUser(String url) {
         Long commentId = seeder.comments().get(0).getId();
         Long userId = INVALID_ID;
