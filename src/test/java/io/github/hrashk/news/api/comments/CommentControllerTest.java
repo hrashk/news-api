@@ -45,7 +45,7 @@ class CommentControllerTest extends ControllerTest {
     @Test
     void add() {
         Long newsId = seeder.news().get(0).getId();
-        Long authorId = seeder.authors().get(0).getId();
+        Long authorId = seeder.authorId(0);
         UpsertCommentRequest request = new UpsertCommentRequest(newsId, authorId, "lorem");
 
         ResponseEntity<CommentResponse> response = rest.postForEntity(COMMENTS_URL, request, CommentResponse.class);
@@ -74,7 +74,7 @@ class CommentControllerTest extends ControllerTest {
     @Test
     void addWithInvalidNews() {
         Long newsId = INVALID_ID;
-        Long authorId = seeder.authors().get(0).getId();
+        Long authorId = seeder.authorId(0);
         UpsertCommentRequest request = new UpsertCommentRequest(newsId, authorId, "lorem");
 
         ResponseEntity<ErrorInfo> response = rest.postForEntity(COMMENTS_URL, request, ErrorInfo.class);
@@ -119,7 +119,7 @@ class CommentControllerTest extends ControllerTest {
     @Test
     void updateMissing() {
         Long newsId = seeder.news().get(0).getId();
-        Long authorId = seeder.authors().get(0).getId();
+        Long authorId = seeder.authorId(0);
         UpsertCommentRequest request = new UpsertCommentRequest(newsId, authorId, "lorem");
 
         Long commentId = INVALID_ID;
@@ -170,7 +170,7 @@ class CommentControllerTest extends ControllerTest {
     @Test
     void deleteMissing() {
         Long commentId = INVALID_ID;
-        Long userId = seeder.authors().get(0).getId();
+        Long userId = seeder.authorId(0);
 
         ResponseEntity<ErrorInfo> response = delete(COMMENTS_WITH_USER_URL, seeder.moderator(), ErrorInfo.class, commentId, userId);
 

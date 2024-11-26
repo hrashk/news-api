@@ -182,7 +182,7 @@ class NewsControllerTest extends ControllerTest {
     @ParameterizedTest(name = "{1}")
     @MethodSource("users")
     void addiWithInvalidCategoryId(Function<DataSeeder, Author> userProvider, String userType) {
-        Long authorId = seeder.authors().get(3).getId();
+        Long authorId = seeder.authorId(3);
         Long categoryId = INVALID_ID;
         UpsertNewsRequest request = new UpsertNewsRequest(authorId, categoryId, "h", "c");
 
@@ -231,7 +231,7 @@ class NewsControllerTest extends ControllerTest {
 
     @Test
     void updateMissing() {
-        Long authorId = seeder.authors().get(3).getId();
+        Long authorId = seeder.authorId(3);
         Long categoryId = seeder.categoryId(4);
         UpsertNewsRequest request = new UpsertNewsRequest(authorId, categoryId, "h", "c");
 
