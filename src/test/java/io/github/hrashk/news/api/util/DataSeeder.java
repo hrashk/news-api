@@ -105,6 +105,10 @@ public final class DataSeeder {
         return authors.get(3).getId();
     }
 
+    public Long authorId(int index) {
+        return authors.get(index).getId();
+    }
+
     public Credentials withoutRoles() {
         return creds.get(0);
     }

@@ -78,16 +78,15 @@ class DeleteAuthorTest extends ControllerTest {
 
     @TestFactory
     public List<DynamicTest> authorization() {
-        Long aUserId = seeder.authors().get(6).getId();
+        Long id = seeder.authorId(6);
 
         return List.of(
-                delById("as admin -> ok", seeder.admin(), HttpStatus.NO_CONTENT, seeder.authors().get(4).getId()),
-                delById("as moderator -> ok", seeder.moderator(), HttpStatus.NO_CONTENT, seeder.authors().get(5).getId()),
+                delById("as admin -> ok", seeder.admin(), HttpStatus.NO_CONTENT, seeder.authorId(4)),
+                delById("as moderator -> ok", seeder.moderator(), HttpStatus.NO_CONTENT, seeder.authorId(5)),
                 delById("as user -> ok", seeder.plainUser(), HttpStatus.NO_CONTENT, seeder.plainUserId()),
-                delById("no roles -> forbidden", seeder.withoutRoles(), HttpStatus.FORBIDDEN, aUserId),
-                delById("anonymous -> unauthorized", null, HttpStatus.UNAUTHORIZED, aUserId),
-                delById("wrong creds -> unauthorized",
-                        seeder.fakeUser(), HttpStatus.UNAUTHORIZED, aUserId),
+                delById("no roles -> forbidden", seeder.withoutRoles(), HttpStatus.FORBIDDEN, id),
+                delById("anonymous -> unauthorized", null, HttpStatus.UNAUTHORIZED, id),
+                delById("wrong creds -> unauthorized", seeder.fakeUser(), HttpStatus.UNAUTHORIZED, id),
                 delById("another author as user -> forbidden",
                         seeder.creds().get(6), HttpStatus.FORBIDDEN, seeder.adminId())
         );
