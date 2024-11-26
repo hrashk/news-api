@@ -148,7 +148,7 @@ class NewsControllerTest extends ControllerTest {
     void add(Function<DataSeeder, Author> userProvider, String userType) {
         Author a = userProvider.apply(seeder);
         Long authorId = a.getId();
-        Long categoryId = seeder.categories().get(4).getId();
+        Long categoryId = seeder.categoryId(4);
         UpsertNewsRequest request = new UpsertNewsRequest(authorId, categoryId, "h", "c");
 
         ResponseEntity<NewsResponse> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
@@ -166,7 +166,7 @@ class NewsControllerTest extends ControllerTest {
     @MethodSource("users")
     void addWithInvalidAuthorId(Function<DataSeeder, Author> userProvider, String userType) {
         Long authorId = INVALID_ID;
-        Long categoryId = seeder.categories().get(4).getId();
+        Long categoryId = seeder.categoryId(4);
         UpsertNewsRequest request = new UpsertNewsRequest(authorId, categoryId, "h", "c");
 
         Author a = userProvider.apply(seeder);
@@ -232,7 +232,7 @@ class NewsControllerTest extends ControllerTest {
     @Test
     void updateMissing() {
         Long authorId = seeder.authors().get(3).getId();
-        Long categoryId = seeder.categories().get(4).getId();
+        Long categoryId = seeder.categoryId(4);
         UpsertNewsRequest request = new UpsertNewsRequest(authorId, categoryId, "h", "c");
 
         Long newsId = INVALID_ID;

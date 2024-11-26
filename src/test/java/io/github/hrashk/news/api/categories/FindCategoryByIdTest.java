@@ -24,7 +24,7 @@ class FindCategoryByIdTest extends ControllerTest {
     void findById() {
         Credentials a = seeder.moderator();
 
-        Long categoryId = seeder.categories().get(0).getId();
+        Long categoryId = seeder.categoryId(0);
 
         ResponseEntity<CategoryResponse> response = rest.withBasicAuth(a.username(), a.password())
                 .getForEntity(Constants.CATEGORIES_ID_URL, CategoryResponse.class, categoryId);
@@ -53,7 +53,7 @@ class FindCategoryByIdTest extends ControllerTest {
 
     @TestFactory
     public List<DynamicTest> authorization() {
-        Long categoryId = seeder.categories().get(0).getId();
+        Long categoryId = seeder.categoryId(0);
 
         return List.of(
                 findById("as admin -> ok", seeder.admin(), HttpStatus.OK, categoryId),

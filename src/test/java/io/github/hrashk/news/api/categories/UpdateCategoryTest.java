@@ -24,7 +24,7 @@ class UpdateCategoryTest extends ControllerTest {
     void update() {
         Credentials a = seeder.admin();
 
-        Long categoryId = seeder.categories().get(0).getId();
+        Long categoryId = seeder.categoryId(0);
         var request = new UpsertCategoryRequest("lorem");
 
         ResponseEntity<CategoryResponse> response =
@@ -54,7 +54,7 @@ class UpdateCategoryTest extends ControllerTest {
 
     @TestFactory
     public List<DynamicTest> authorization() {
-        Long id = seeder.categories().get(0).getId();
+        Long id = seeder.categoryId(0);
         var request = new UpsertCategoryRequest("lorem");
 
         return List.of(
