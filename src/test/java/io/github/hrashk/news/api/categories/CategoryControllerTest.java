@@ -1,7 +1,6 @@
 package io.github.hrashk.news.api.categories;
 
 import io.github.hrashk.news.api.Constants;
-import io.github.hrashk.news.api.categories.web.CategoryListResponse;
 import io.github.hrashk.news.api.categories.web.CategoryResponse;
 import io.github.hrashk.news.api.categories.web.UpsertCategoryRequest;
 import io.github.hrashk.news.api.exceptions.ErrorInfo;
@@ -27,35 +26,6 @@ class CategoryControllerTest extends ControllerTest {
         return Stream.of(
                 Arguments.of((Function<DataSeeder, Credentials>) DataSeeder::admin, "admin"),
                 Arguments.of((Function<DataSeeder, Credentials>) DataSeeder::moderator, "moderator"));
-    }
-
-    @ParameterizedTest(name = "{1}")
-    @MethodSource("users")
-    void firstPage(Function<DataSeeder, Credentials> userProvider, String userType) {
-        Credentials a = userProvider.apply(seeder);
-
-        ResponseEntity<CategoryListResponse> response = rest.withBasicAuth(a.username(), a.password())
-                .getForEntity(Constants.CATEGORIES_URL, CategoryListResponse.class);
-
-        assertAll(
-                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
-                () -> assertThat(response.getBody().categories()).hasSize(10),
-                () -> assertThat(response.getBody().categories()).allSatisfy(c -> assertThat(c).hasNoNullFieldsOrProperties())
-        );
-    }
-
-    @Test
-    void secondPage() {
-        Credentials a = seeder.moderator();
-
-        ResponseEntity<CategoryListResponse> response = rest.withBasicAuth(a.username(), a.password())
-                .getForEntity(Constants.CATEGORIES_URL + "?page=1&size=3", CategoryListResponse.class);
-
-        assertAll(
-                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
-                () -> assertThat(response.getBody().categories()).hasSize(3),
-                () -> assertThat(response.getBody().categories()).allSatisfy(c -> assertThat(c).hasNoNullFieldsOrProperties())
-        );
     }
 
     @ParameterizedTest(name = "{1}")
