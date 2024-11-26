@@ -41,9 +41,17 @@ public final class DataSeeder {
     private final Random random = ThreadLocalRandom.current();
     private final Faker faker = new Faker(random);
 
+    /**
+     * 0 - has no roles; 1 - admin; 2 - moderator+user; the rest are just users
+     */
     private List<Author> authors;
     private List<Credentials> creds;
+
+    /**
+     * 0, 1, 2 - have no news
+     */
     private List<Category> categories;
+
     private List<News> news;
     private List<Comment> comments;
 
