@@ -11,6 +11,7 @@ import io.github.hrashk.news.api.comments.Comment;
 import io.github.hrashk.news.api.comments.CommentRepository;
 import io.github.hrashk.news.api.news.News;
 import io.github.hrashk.news.api.news.NewsRepository;
+import io.github.hrashk.news.api.news.web.UpsertNewsRequest;
 import io.github.hrashk.news.api.security.RoleType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -113,6 +114,10 @@ public final class DataSeeder {
         return creds.get(0);
     }
 
+    public Long withoutRolesId() {
+        return authors.get(0).getId();
+    }
+
     public Credentials fakeUser() {
         return new Credentials("fake", "author");
     }
@@ -185,6 +190,14 @@ public final class DataSeeder {
         author.addNews(newsItem);
 
         return newsItem;
+    }
+
+    public UpsertNewsRequest randomNewsRequest(Long authorId) {
+        return new UpsertNewsRequest(
+                authorId,
+                randomItem(categories, 3).getId(),
+                faker.lorem().sentence(),
+                faker.lorem().paragraph(10));
     }
 
     public Comment aRandomComment(long ignored) {

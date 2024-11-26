@@ -6,12 +6,19 @@ import io.github.hrashk.news.api.news.web.NewsResponse;
 import io.github.hrashk.news.api.news.web.UpsertNewsRequest;
 import io.github.hrashk.news.api.util.ControllerTest;
 import io.github.hrashk.news.api.util.Credentials;
+import io.github.hrashk.news.api.util.HttpExecutable;
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 class CreateNewsTest extends ControllerTest {
     @Test
@@ -76,5 +83,28 @@ class CreateNewsTest extends ControllerTest {
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST),
                 () -> assertThat(response.getBody().message()).contains("authorId", "categoryId", "headline", "content")
         );
+    }
+
+    @TestFactory
+    public List<DynamicTest> authorization() {
+        return List.of(
+                create("as admin -> created", seeder.admin(), HttpStatus.CREATED, seeder.randomNewsRequest(seeder.adminId())),
+                create("as moderator -> created", seeder.moderator(), HttpStatus.CREATED, seeder.randomNewsRequest(seeder.moderatorId())),
+                create("as user -> created", seeder.plainUser(), HttpStatus.CREATED, seeder.randomNewsRequest(seeder.plainUserId())),
+                create("no roles -> forbidden", seeder.withoutRoles(), HttpStatus.FORBIDDEN, seeder.randomNewsRequest(seeder.withoutRolesId())),
+                create("anonymous -> unauthorized", null, HttpStatus.UNAUTHORIZED, seeder.randomNewsRequest(INVALID_ID)),
+                create("wrong creds -> unauthorized", seeder.fakeUser(), HttpStatus.UNAUTHORIZED, seeder.randomNewsRequest(INVALID_ID))
+        );
+    }
+
+    private DynamicTest create(String message, Credentials creds, HttpStatus status, UpsertNewsRequest body) {
+        return dynamicTest(message, HttpExecutable.builder()
+                .method(HttpMethod.POST)
+                .url(Constants.NEWS_URL)
+                .credentials(creds)
+                .body(body)
+                .expectedStatus(status)
+                .rest(rest)
+                .build());
     }
 }
