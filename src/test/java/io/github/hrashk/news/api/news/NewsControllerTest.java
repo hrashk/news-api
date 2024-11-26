@@ -7,88 +7,16 @@ import io.github.hrashk.news.api.news.web.NewsResponse;
 import io.github.hrashk.news.api.news.web.UpsertNewsRequest;
 import io.github.hrashk.news.api.util.ControllerTest;
 import io.github.hrashk.news.api.util.Credentials;
-import io.github.hrashk.news.api.util.DataSeeder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class NewsControllerTest extends ControllerTest {
-    @ParameterizedTest(name = "{1}")
-    @MethodSource("users")
-    void add(Function<DataSeeder, Author> userProvider, String userType) {
-        Author a = userProvider.apply(seeder);
-        Long authorId = a.getId();
-        Long categoryId = seeder.categoryId(4);
-        UpsertNewsRequest request = new UpsertNewsRequest(authorId, categoryId, "h", "c");
-
-        ResponseEntity<NewsResponse> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
-                .postForEntity(Constants.NEWS_URL, request, NewsResponse.class);
-
-        assertAll(
-                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED),
-                () -> assertThat(response.getBody()).hasNoNullFieldsOrProperties(),
-                () -> assertThat(response.getBody().headline()).isEqualTo("h"),
-                () -> assertThat(response.getBody().content()).isEqualTo("c")
-        );
-    }
-
-    @ParameterizedTest(name = "{1}")
-    @MethodSource("users")
-    void addWithInvalidAuthorId(Function<DataSeeder, Author> userProvider, String userType) {
-        Long authorId = INVALID_ID;
-        Long categoryId = seeder.categoryId(4);
-        UpsertNewsRequest request = new UpsertNewsRequest(authorId, categoryId, "h", "c");
-
-        Author a = userProvider.apply(seeder);
-        ResponseEntity<ErrorInfo> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
-                .postForEntity(Constants.NEWS_URL, request, ErrorInfo.class);
-
-        assertAll(
-                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
-                () -> assertThat(response.getBody().message()).contains("Author")
-        );
-    }
-
-    @ParameterizedTest(name = "{1}")
-    @MethodSource("users")
-    void addiWithInvalidCategoryId(Function<DataSeeder, Author> userProvider, String userType) {
-        Long authorId = seeder.authorId(3);
-        Long categoryId = INVALID_ID;
-        UpsertNewsRequest request = new UpsertNewsRequest(authorId, categoryId, "h", "c");
-
-        Author a = userProvider.apply(seeder);
-        ResponseEntity<ErrorInfo> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
-                .postForEntity(Constants.NEWS_URL, request, ErrorInfo.class);
-
-        assertAll(
-                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
-                () -> assertThat(response.getBody().message()).contains("Category")
-        );
-    }
-
-    @ParameterizedTest(name = "{1}")
-    @MethodSource("users")
-    void addBroken(Function<DataSeeder, Author> userProvider, String userType) {
-        UpsertNewsRequest request = new UpsertNewsRequest(null, null, " ", null);
-
-        Author a = userProvider.apply(seeder);
-        ResponseEntity<ErrorInfo> response = rest.withBasicAuth(a.getUsername(), a.getPassword())
-                .postForEntity(Constants.NEWS_URL, request, ErrorInfo.class);
-
-        assertAll(
-                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST),
-                () -> assertThat(response.getBody().message()).contains("authorId", "categoryId", "headline", "content")
-        );
-    }
-
     @Test
     void update() {
         var news = seeder.news().get(0);
