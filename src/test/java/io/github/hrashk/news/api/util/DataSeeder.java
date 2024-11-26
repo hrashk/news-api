@@ -121,6 +121,10 @@ public final class DataSeeder {
         return categories.get(index).getId();
     }
 
+    public Long newsId(int index) {
+        return news.get(index).getId();
+    }
+
     public List<Author> sampleAuthors(int count) {
         return generateSample(count, this::aRandomAuthor);
     }
