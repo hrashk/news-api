@@ -1,6 +1,7 @@
 package io.github.hrashk.news.api.authors;
 
 import io.github.hrashk.news.api.exceptions.EntityNotFoundException;
+import io.github.hrashk.news.api.news.News;
 import io.github.hrashk.news.api.security.RoleType;
 import io.github.hrashk.news.api.util.ServiceTest;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,7 @@ class AuthorServiceTest extends ServiceTest {
         a.addRole(RoleType.ROLE_USER);
         a.addRole(RoleType.ROLE_ADMIN);
 
-        assertThat(a.toString()).as("Author as string").contains("roles");
+        assertThat(a.toString()).as("Author as string").contains("ROLE_ADMIN");
     }
 
     @Test
@@ -92,5 +93,18 @@ class AuthorServiceTest extends ServiceTest {
 
         assertThatThrownBy(() -> service.findById(id))
                 .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    @Test
+    void changeNewsAuthor() {
+        News n = seeder.news().get(6);
+        Author a1 = n.getAuthor();
+        Author a2 = seeder.authors().get(0);
+
+        a2.addNews(n);
+
+        assertThat(n.getAuthor()).as("News author").isEqualTo(a2);
+        assertThat(a2.getNews()).as("New author has news").contains(n);
+        assertThat(a1.getNews()).as("Old author does not have the news").doesNotContain(n);
     }
 }

@@ -66,6 +66,9 @@ public class Author implements BaseEntity {
     }
 
     public void addNews(News newsItem) {
+        if (newsItem.getAuthor() != null) {
+            newsItem.getAuthor().news.remove(newsItem);
+        }
         newsItem.setAuthor(this);
         news.add(newsItem);
     }
