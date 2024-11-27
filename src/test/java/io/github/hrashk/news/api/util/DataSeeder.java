@@ -67,8 +67,18 @@ public final class DataSeeder {
 
         authors = authorsRepo.saveAll(authors);
         categories = categoryRepo.saveAll(sampleCategories(count));
-        news = newsRepo.saveAll(sampleNews(count));
-        comments = commentRepository.saveAll(sampleComments(count));
+
+        news = sampleNews(count);
+        authors.get(1).addNews(news.get(0)); // admin
+        authors.get(2).addNews(news.get(1)); // moderator
+        authors.get(3).addNews(news.get(2)); // user
+        news = newsRepo.saveAll(news);
+
+        comments = sampleComments(count);
+        authors.get(1).addComment(comments.get(0)); // admin
+        authors.get(2).addComment(comments.get(1)); // moderator
+        authors.get(3).addComment(comments.get(2)); // user
+        comments = commentRepository.saveAll(comments);
     }
 
     private void addUserRole(List<Author> authors) {
@@ -138,11 +148,11 @@ public final class DataSeeder {
         return generateSample(count, this::aRandomCategory);
     }
 
-    public Iterable<News> sampleNews(int count) {
+    public List<News> sampleNews(int count) {
         return generateSample(count, this::aRandomNews);
     }
 
-    private Iterable<Comment> sampleComments(int count) {
+    private List<Comment> sampleComments(int count) {
         return generateSample(count, this::aRandomComment);
     }
 
@@ -180,7 +190,7 @@ public final class DataSeeder {
     }
 
     public News aRandomNews(long ignored) {
-        Author author = randomItem(authors, 1);
+        Author author = randomItem(authors, 4);
 
         News newsItem = new News().toBuilder()
                 .category(randomItem(categories, 3))
@@ -201,7 +211,7 @@ public final class DataSeeder {
     }
 
     public Comment aRandomComment(long ignored) {
-        Author author = randomItem(authors, 1);
+        Author author = randomItem(authors, 4);
         News newsItem = randomItem(news);
 
         Comment comment = Comment.builder()

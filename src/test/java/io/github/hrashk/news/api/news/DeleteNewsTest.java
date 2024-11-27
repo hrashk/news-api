@@ -63,24 +63,17 @@ class DeleteNewsTest extends ControllerTest {
 
     @TestFactory
     public List<DynamicTest> authorization() {
-        News news = seeder.news().get(0);
-        Credentials creds = seeder.newsAuthorCreds(news);
+        Long adminNewsId = seeder.news().get(0).getId();
 
         return List.of(
-                delById("no roles -> forbidden", seeder.withoutRoles(), HttpStatus.FORBIDDEN, news.getId()),
-                delById("anonymous -> unauthorized", null, HttpStatus.UNAUTHORIZED, news.getId()),
-                delById("wrong creds -> unauthorized", seeder.fakeUser(), HttpStatus.UNAUTHORIZED, news.getId()),
-                deleteOther("as user -> forbidden", seeder.plainUser(), HttpStatus.FORBIDDEN, seeder.plainUserId()),
-                delById("own news -> ok", creds, HttpStatus.NO_CONTENT, news.getId()),
-                deleteOther("as admin -> ok", seeder.admin(), HttpStatus.NO_CONTENT, seeder.adminId()),
-                deleteOther("as moderator -> ok", seeder.moderator(), HttpStatus.NO_CONTENT, seeder.moderatorId())
+                delById("no roles -> forbidden", seeder.withoutRoles(), HttpStatus.FORBIDDEN, adminNewsId),
+                delById("anonymous -> unauthorized", null, HttpStatus.UNAUTHORIZED, adminNewsId),
+                delById("wrong creds -> unauthorized", seeder.fakeUser(), HttpStatus.UNAUTHORIZED, adminNewsId),
+                delById("another news as user -> forbidden", seeder.plainUser(), HttpStatus.FORBIDDEN, adminNewsId),
+                delById("own news -> ok", seeder.plainUser(), HttpStatus.NO_CONTENT, seeder.news().get(2).getId()),
+                delById("another news as admin -> ok", seeder.admin(), HttpStatus.NO_CONTENT, seeder.news().get(5).getId()),
+                delById("another news as moderator -> ok", seeder.moderator(), HttpStatus.NO_CONTENT, seeder.news().get(6).getId())
         );
-    }
-
-    private DynamicTest deleteOther(String message, Credentials creds, HttpStatus status, Long authorId) {
-        var news = seeder.aNewsNotByAuthor(authorId);
-
-        return delById("another news " + message, creds, status, news.getId());
     }
 
     private DynamicTest delById(String message, Credentials creds, HttpStatus status, Long id) {
