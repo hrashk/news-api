@@ -61,13 +61,16 @@ public class Author implements BaseEntity {
     private LocalDateTime updatedAt;
 
     public void addComment(Comment comment) {
+        if (comment.getAuthor() != null) {
+            comment.getAuthor().getComments().remove(comment);
+        }
         comment.setAuthor(this);
         comments.add(comment);
     }
 
     public void addNews(News newsItem) {
         if (newsItem.getAuthor() != null) {
-            newsItem.getAuthor().news.remove(newsItem);
+            newsItem.getAuthor().getNews().remove(newsItem);
         }
         newsItem.setAuthor(this);
         news.add(newsItem);
