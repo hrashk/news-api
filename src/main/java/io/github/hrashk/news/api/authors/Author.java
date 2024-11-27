@@ -41,13 +41,16 @@ public class Author implements BaseEntity {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "author", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Collection<Role> roles = new ArrayList<>();
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.REMOVE)
+    @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Collection<News> news = new ArrayList<>();
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.REMOVE)
+    @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Collection<Comment> comments = new ArrayList<>();
 
@@ -73,6 +76,7 @@ public class Author implements BaseEntity {
         roles.add(role);
     }
 
+    @ToString.Include(name = "roles")
     public EnumSet<RoleType> roleSet() {
         return roles.stream().map(Role::getAuthority)
                 .collect(Collectors.toCollection(() -> EnumSet.noneOf(RoleType.class)));

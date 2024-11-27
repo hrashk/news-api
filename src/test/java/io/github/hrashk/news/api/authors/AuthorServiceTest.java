@@ -1,6 +1,7 @@
 package io.github.hrashk.news.api.authors;
 
 import io.github.hrashk.news.api.exceptions.EntityNotFoundException;
+import io.github.hrashk.news.api.security.RoleType;
 import io.github.hrashk.news.api.util.ServiceTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,15 @@ class AuthorServiceTest extends ServiceTest {
         seeder.flush();
 
         assertThat(id).as("Author id").isNotNull();
+    }
+
+    @Test
+    void toStringShowsRoles() {
+        Author a = seeder.aRandomAuthor(-1L);
+        a.addRole(RoleType.ROLE_USER);
+        a.addRole(RoleType.ROLE_ADMIN);
+
+        assertThat(a.toString()).as("Author as string").contains("roles");
     }
 
     @Test
